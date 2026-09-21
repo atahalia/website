@@ -1,62 +1,62 @@
-# Website Resmi SMKN 1 Kras
+# 🏫 Website Resmi SMK Negeri 1 Kras
 
-Website sekolah berbasis Node.js + Express + MySQL, dilengkapi panel admin, portal guru, dan integrasi database CBT.
+Website sekolah modern berbasis **Node.js + Express + MySQL**, dilengkapi panel admin lengkap, portal guru, dan fitur real-time jadwal KBM.
 
----
-
-## Teknologi
-
-- **Backend**: Node.js, Express.js
-- **Database**: MySQL
-- **Template**: EJS
-- **Frontend**: Bootstrap 5, SB Admin 2
-- **Upload**: Multer + Sharp (kompresi otomatis)
-- **Auth**: Express Session + bcrypt
-- **Process Manager**: PM2
+[![Node.js](https://img.shields.io/badge/Node.js-%3E%3D16.0.0-green)](https://nodejs.org)
+[![License](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
 
 ---
 
-## Fitur Utama
+## ✨ Fitur Utama
 
-### Frontend Publik
-- Beranda dengan slider, berita, galeri, jurusan
-- Profil sekolah, visi misi, sejarah, sambutan kepsek
+### 🌐 Frontend Publik
+- Beranda dengan slider, berita terkini, galeri, dan jurusan
+- Profil sekolah (visi misi, sejarah, sambutan kepala sekolah)
 - Halaman berita dengan pagination
-- Galeri foto
 - Data guru & staff
+- Halaman program keahlian (jurusan) dinamis
 - Media sosial (YouTube, TikTok, Instagram, Facebook)
-- Form kontak
-- Halaman dinamis per program keahlian
+- **Jam KBM real-time** — menampilkan jam pelajaran yang sedang berlangsung beserta countdown, mendukung mode Upacara / Tanpa Upacara
 
-### Panel Admin (`/admin`)
+### 🔧 Panel Admin (`/admin`)
 - Dashboard statistik
 - Kelola berita, galeri, slider
-- Kelola guru & staff (import/export Excel, sync CBT)
+- Kelola guru & staff (import/export Excel, sinkronisasi CBT)
 - Kelola siswa
-- Kelola jurusan
+- Kelola jurusan & program keahlian
 - Kelola menu navigasi
 - Kelola halaman dinamis
-- Profil sekolah
-- Kontrol website (maintenance mode, tampilan)
-- Manajemen user admin
+- Profil & pengaturan website
+- Maintenance mode
 
-### Portal Guru (`/guru/login`)
+### 👨‍🏫 Portal Guru (`/guru/login`)
 - Login khusus guru
 - Edit profil sendiri (foto, data diri)
 - Ganti password
 
 ---
 
-## Instalasi Lokal
+## 🛠️ Teknologi
+
+| Layer | Stack |
+|---|---|
+| Backend | Node.js, Express.js |
+| Database | MySQL (mysql2) |
+| Template | EJS |
+| Frontend | Bootstrap 5, SB Admin 2 |
+| Upload | Multer + Sharp (kompresi otomatis) |
+| Auth | Express Session + bcrypt |
+| Security | Helmet, CSRF, Rate Limit, XSS Clean |
+| Process Manager | PM2 |
+
+---
+
+## 🚀 Instalasi Lokal
 
 ### 1. Clone repository
-Kalau Anda sudah punya folder yang berisi file, maka jangan clone ke situ langsung. Lebih aman begini:
-```
-cd /website
-git init
-git remote add origin https://github.com/Hemrom/web.git
-git fetch origin
-git checkout -t origin/main
+```bash
+git clone git@github-atahalia:atahalia/website.git
+cd website
 ```
 
 ### 2. Install dependencies
@@ -64,174 +64,107 @@ git checkout -t origin/main
 npm install
 ```
 
-### 3. Setup database
-```bash
-mysql -u root -p
-```
+### 3. Setup database MySQL
 ```sql
 CREATE DATABASE sekolah_db CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-CREATE USER 'smkn1kras'@'localhost' IDENTIFIED BY 'password';
+CREATE USER 'smkn1kras'@'localhost' IDENTIFIED BY 'password_anda';
 GRANT ALL PRIVILEGES ON sekolah_db.* TO 'smkn1kras'@'localhost';
 FLUSH PRIVILEGES;
-EXIT;
-```
-```bash
-mysql -u smkn1kras -p sekolah_db < config/database.sql
 ```
 
-### 4. Konfigurasi .env
+### 4. Konfigurasi environment
 ```bash
 cp .env.example .env
 ```
-Edit file `.env` sesuai konfigurasi database lokal.
-
-### 5. Setup akun guru
-```bash
-node setup_guru_login.js
+Edit `.env` sesuai konfigurasi lokal Anda:
+```env
+DB_HOST=localhost
+DB_USER=smkn1kras
+DB_PASSWORD=password_anda
+DB_NAME=sekolah_db
+SESSION_SECRET=ganti_dengan_string_acak_panjang
+PORT=3000
 ```
 
-### 6. Jalankan
+### 5. Jalankan server
 ```bash
 npm start
+# atau development mode
+npm run dev
 ```
 
 Akses di `http://localhost:3000`
 
 ---
 
-## Akses
+## 🔑 Akses Default
 
-| Halaman | URL |
-|---------|-----|
-| Website | http://localhost:3000 |
-| Admin Panel | http://localhost:3000/admin |
-| Portal Guru | http://localhost:3000/guru/login |
+| Halaman | URL | Kredensial |
+|---|---|---|
+| Website | `/` | — |
+| Panel Admin | `/admin` | `admin` / `admin123` |
+| Portal Guru | `/guru/login` | NIP atau `guru{id}` / `smkn1kras` |
 
-**Admin default:** username `admin` / password `admin123`
-
-**Guru default:** username = NIP atau `guru{id}` / password = `smkn1kras`
+> ⚠️ **Ganti password default segera setelah instalasi!**
 
 ---
 
-## Deploy ke VPS
+## 📁 Struktur Folder
+
+```
+├── assets/           # CSS, JS, gambar statis (SB Admin 2)
+├── config/           # Konfigurasi koneksi database
+├── controllers/      # Logic bisnis (admin, frontend, guru)
+├── middleware/       # Auth, CSRF, security, upload
+├── migrations/       # File migrasi database
+├── routes/           # Definisi route Express
+├── scripts/          # Script utilitas
+├── tests/            # Unit & integration tests
+├── utils/            # Helper functions
+├── views/            # Template EJS
+│   ├── admin/        # Halaman panel admin
+│   ├── frontend/     # Halaman publik
+│   └── guru/         # Portal guru
+├── uploads/          # File yang diupload user
+├── logs/             # Log aplikasi
+├── server.js         # Entry point
+├── ecosystem.config.js # Konfigurasi PM2
+└── .env.example      # Template environment variables
+```
+
+---
+
+## 🌍 Deploy ke VPS
 
 Lihat panduan lengkap di [TUTORIAL_DEPLOY_VPS.md](TUTORIAL_DEPLOY_VPS.md)
 
+### Perintah cepat setelah pull di VPS:
+```bash
+git pull origin main
+npm install --production
+pm2 restart website-sekolah
+```
+
 ---
 
-## Struktur Folder
+## 🔄 Workflow Update Kode
 
-```
-├── assets/           # CSS, JS, gambar statis
-├── config/           # Konfigurasi database
-├── controllers/      # Logic controller
-├── middleware/       # Auth, CSRF, security, cache
-├── routes/           # Definisi route
-├── utils/            # Helper (cache, dll)
-├── views/            # Template EJS
-│   ├── admin/        # Halaman admin
-│   ├── frontend/     # Halaman publik
-│   └── guru/         # Portal guru
-├── uploads/          # File yang diupload
-└── logs/             # Log aplikasi
-```
----
-## Cara update isi GitHub dari Windows
-
-Kalau Anda coding di Windows lalu ingin perubahan naik ke GitHub, alurnya adalah:
-Pertama kali, kalau project belum jadi repo Git
-Masuk ke folder project Anda di Windows, lalu buka Git Bash atau terminal:
-```
-git init
-git remote add origin https://github.com/Hemrom/web.git
-git branch -M main
+### Dari lokal (Windows/Mac/Linux):
+```bash
 git add .
-git commit -m "Initial commit"
-git push -u origin main
-```
-## Kalau project itu memang hasil clone dari GitHub
-
-Maka setiap ada perubahan, cukup:
-```
-git add .
-git commit -m "Update coding terbaru"
+git commit -m "feat: deskripsi perubahan"
 git push origin main
 ```
-## Sebelum push, sebaiknya ambil update dulu
 
-Kalau repo di GitHub mungkin berubah dari tempat lain, lakukan dulu:
-```
+### Di VPS setelah push:
+```bash
+cd /path/to/website
 git pull origin main
+pm2 restart website-sekolah
 ```
-baru lanjut:
-```
-git add .
-git commit -m "Perubahan terbaru"
-git push origin main
-```
----
-## Alur kerja yang paling aman untuk update
-
-## Di Windows
-
-Anda coding di lokal:
-```
-git add .
-git commit -m "Perubahan fitur terbaru"
-git push origin main
-```
-## Di VPS
-
-Setelah push berhasil:
-```
-cd /website
-git pull origin main
-```
-Kalau project Node.js atau PHP/Laravel/Next.js, biasanya ada langkah tambahan setelah pull.
-
-Contoh Node.js:
-```
-npm install
-npm run build
-pm2 restart all
-```
----
-## Alur update lebih cepat
-
-## Dari Windows komputer lokal
-```
-git add .
-git commit -m "fix: sidebar brand text nowrap"
-git push
-```
-
-## Di VPS
-```
-git pull origin main
-pm2 restart 0
-```
-## Tambahan update lebih singkat
-
-## Sekali saja (setu alias):
-```
-git config --global alias.up '!git add . && git commit -m "update" && git push'
-```
-## Setiap ada perubahan kode:
-## Git Bash (lokal):
-```
-git up
-```
-## Kalau muncul rejected, jalankan dulu:
-```
-git pull origin main --rebase
-git up
-```
-## VPS
-```
-git pull origin main
-pm2 restart 0
-```
-Itu saja. Dua tempat, masing-masing satu perintah.
 
 ---
-SMK Negeri 1 Kras — Kediri, Jawa Timur
+
+## 📄 Lisensi
+
+MIT License — © SMK Negeri 1 Kras, Kediri, Jawa Timur

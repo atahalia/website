@@ -217,6 +217,289 @@ const s4Label  = (typeof siteSettings!=='undefined' && siteSettings.stat4_label)
         </div>
     </div>
 
+﻿﻿    <!-- ===== BANNER JAM PELAJARAN ===== -->
+    <div id="jam-pelajaran-banner" style="background:linear-gradient(135deg,#1e3a5f 0%,#1a56db 100%);padding:0;overflow:hidden;">
+      <div class="container py-3">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+          <!-- Kiri: ikon + jam sekarang -->
+          <div class="d-flex align-items-center gap-3">
+            <div style="background:rgba(255,255,255,.15);border-radius:12px;padding:.6rem .9rem;display:flex;align-items:center;gap:.5rem;">
+              <i class="fas fa-clock" style="color:#fbbf24;font-size:1.3rem;"></i>
+              <span id="jp-jam-sekarang" style="color:white;font-size:1.1rem;font-weight:700;font-variant-numeric:tabular-nums;min-width:60px;">--:--:--</span>
+            </div>
+            <div>
+              <div style="color:rgba(255,255,255,.7);font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;font-weight:600;">Hari ini</div>
+              <div id="jp-hari-label" style="color:white;font-size:.95rem;font-weight:700;"></div>
+            </div>
+          </div>
+          <!-- Tengah: info jam ke -->
+          <div id="jp-info-box" style="flex:1;min-width:220px;text-align:center;">
+            <div id="jp-status-text" style="color:#fbbf24;font-size:1rem;font-weight:800;letter-spacing:.02em;"></div>
+            <div id="jp-detail-text" style="color:rgba(255,255,255,.85);font-size:.82rem;margin-top:.15rem;"></div>
+          </div>
+          <!-- Kanan: toggle senin + progress + countdown -->
+          <div style="text-align:right;min-width:160px;">
+            <!-- Toggle Senin (hanya tampil hari Senin) -->
+            <div id="jp-senin-toggle" style="display:none;margin-bottom:.4rem;">
+              <button onclick="jpToggleSenin()" id="jp-btn-toggle"
+                style="background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.35);color:white;border-radius:20px;padding:.2rem .75rem;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .2s;">
+                <i class="fas fa-flag me-1"></i><span id="jp-toggle-label">Ada Upacara</span>
+              </button>
+            </div>
+            <div style="color:rgba(255,255,255,.7);font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;font-weight:600;">Sisa waktu</div>
+            <div id="jp-countdown" style="color:#4ade80;font-size:1.05rem;font-weight:800;font-variant-numeric:tabular-nums;">--:--</div>
+            <div style="background:rgba(255,255,255,.2);border-radius:99px;height:5px;margin-top:.35rem;overflow:hidden;">
+              <div id="jp-progress" style="background:linear-gradient(90deg,#4ade80,#22d3ee);height:100%;border-radius:99px;width:0%;transition:width .5s;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+    (function() {
+      // ===== DATA JADWAL =====
+      function t(h, m) { return h * 60 + m; }
+
+      var JADWAL = {
+        // SENIN - ADA UPACARA
+        '1_upacara': [
+          { label: 'Upacara',                      mulai: t(7,0),  akhir: t(7,50), istirahat: true },
+          { label: 'Jam ke-2',                     mulai: t(8,0),  akhir: t(8,40) },
+          { label: 'Jam ke-3',                     mulai: t(8,40), akhir: t(9,20) },
+          { label: 'Jam ke-4',                     mulai: t(9,20), akhir: t(10,0) },
+          { label: 'Istirahat 1',                  mulai: t(10,0), akhir: t(10,15), istirahat: true },
+          { label: 'Jam ke-5',                     mulai: t(10,15),akhir: t(10,55) },
+          { label: 'Jam ke-6',                     mulai: t(10,55),akhir: t(11,35) },
+          { label: 'Jam ke-7',                     mulai: t(11,35),akhir: t(12,15) },
+          { label: 'Istirahat 2 / Sholat Dzuhur',  mulai: t(12,15),akhir: t(13,25), istirahat: true },
+          { label: 'Jam ke-8',                     mulai: t(13,25),akhir: t(14,5) },
+          { label: 'Jam ke-9',                     mulai: t(14,5), akhir: t(14,45) },
+          { label: 'Jam ke-10',                    mulai: t(14,45),akhir: t(15,25) }
+        ],
+        // SENIN - TANPA UPACARA
+        '1_biasa': [
+          { label: 'Jam ke-2',                     mulai: t(7,0),  akhir: t(7,40) },
+          { label: 'Jam ke-3',                     mulai: t(7,40), akhir: t(8,20) },
+          { label: 'Jam ke-4',                     mulai: t(8,20), akhir: t(9,0) },
+          { label: 'Istirahat 1',                  mulai: t(9,0),  akhir: t(9,15), istirahat: true },
+          { label: 'Jam ke-5',                     mulai: t(9,15), akhir: t(9,55) },
+          { label: 'Jam ke-6',                     mulai: t(9,55), akhir: t(10,35) },
+          { label: 'Jam ke-7',                     mulai: t(10,35),akhir: t(11,15) },
+          { label: 'Istirahat 2 / Sholat Dzuhur',  mulai: t(11,15),akhir: t(11,45), istirahat: true },
+          { label: 'Jam ke-8',                     mulai: t(11,45),akhir: t(12,25) },
+          { label: 'Jam ke-9',                     mulai: t(12,25),akhir: t(13,5) },
+          { label: 'Jam ke-10',                    mulai: t(13,5), akhir: t(13,45) }
+        ],
+        // SELASA
+        2: [
+          { label: 'Jam ke-1',                     mulai: t(7,0),  akhir: t(7,40) },
+          { label: 'Jam ke-2',                     mulai: t(7,40), akhir: t(8,20) },
+          { label: 'Jam ke-3',                     mulai: t(8,20), akhir: t(9,0) },
+          { label: 'Jam ke-4',                     mulai: t(9,0),  akhir: t(9,40) },
+          { label: 'Sholat Dhuha / Tadarus',       mulai: t(9,40), akhir: t(10,10), istirahat: true },
+          { label: 'Istirahat 1',                  mulai: t(10,10),akhir: t(10,25), istirahat: true },
+          { label: 'Jam ke-5',                     mulai: t(10,25),akhir: t(11,5) },
+          { label: 'Jam ke-6',                     mulai: t(11,5), akhir: t(11,45) },
+          { label: 'Jam ke-7',                     mulai: t(11,45),akhir: t(12,25) },
+          { label: 'Istirahat 2 / Sholat Dzuhur',  mulai: t(12,25),akhir: t(13,0), istirahat: true },
+          { label: 'Jam ke-8',                     mulai: t(13,0), akhir: t(13,40) },
+          { label: 'Jam ke-9',                     mulai: t(13,40),akhir: t(14,20) },
+          { label: 'Jam ke-10',                    mulai: t(14,20),akhir: t(15,0) }
+        ],
+        // RABU
+        3: [
+          { label: 'Jam ke-1',                     mulai: t(7,0),  akhir: t(7,40) },
+          { label: 'Jam ke-2',                     mulai: t(7,40), akhir: t(8,20) },
+          { label: 'Jam ke-3',                     mulai: t(8,20), akhir: t(9,0) },
+          { label: 'Jam ke-4',                     mulai: t(9,0),  akhir: t(9,40) },
+          { label: 'Sholat Dhuha / Tadarus',       mulai: t(9,40), akhir: t(10,10), istirahat: true },
+          { label: 'Istirahat 1',                  mulai: t(10,10),akhir: t(10,25), istirahat: true },
+          { label: 'Jam ke-5',                     mulai: t(10,25),akhir: t(11,5) },
+          { label: 'Jam ke-6',                     mulai: t(11,5), akhir: t(11,45) },
+          { label: 'Jam ke-7',                     mulai: t(11,45),akhir: t(12,25) },
+          { label: 'Istirahat 2 / Sholat Dzuhur',  mulai: t(12,25),akhir: t(13,0), istirahat: true },
+          { label: 'Jam ke-8',                     mulai: t(13,0), akhir: t(13,40) },
+          { label: 'Jam ke-9',                     mulai: t(13,40),akhir: t(14,20) },
+          { label: 'Jam ke-10',                    mulai: t(14,20),akhir: t(15,0) }
+        ],
+        // KAMIS
+        4: [
+          { label: 'Jam ke-1',                     mulai: t(7,0),  akhir: t(7,40) },
+          { label: 'Jam ke-2',                     mulai: t(7,40), akhir: t(8,20) },
+          { label: 'Jam ke-3',                     mulai: t(8,20), akhir: t(9,0) },
+          { label: 'Jam ke-4',                     mulai: t(9,0),  akhir: t(9,40) },
+          { label: 'Sholat Dhuha / Tadarus',       mulai: t(9,40), akhir: t(10,10), istirahat: true },
+          { label: 'Istirahat 1',                  mulai: t(10,10),akhir: t(10,25), istirahat: true },
+          { label: 'Jam ke-5',                     mulai: t(10,25),akhir: t(11,5) },
+          { label: 'Jam ke-6',                     mulai: t(11,5), akhir: t(11,45) },
+          { label: 'Jam ke-7',                     mulai: t(11,45),akhir: t(12,25) },
+          { label: 'Istirahat 2 / Sholat Dzuhur',  mulai: t(12,25),akhir: t(13,0), istirahat: true },
+          { label: 'Jam ke-8',                     mulai: t(13,0), akhir: t(13,40) },
+          { label: 'Jam ke-9',                     mulai: t(13,40),akhir: t(14,20) },
+          { label: 'Jam ke-10',                    mulai: t(14,20),akhir: t(15,0) }
+        ],
+        // JUMAT
+        5: [
+          { label: 'Jumat Bersih / Senam',        mulai: t(7,0),  akhir: t(7,40),  istirahat: true },
+          { label: 'Jam ke-1',                    mulai: t(7,45), akhir: t(8,25) },
+          { label: 'Jam ke-2',                    mulai: t(8,25), akhir: t(9,5) },
+          { label: 'Jam ke-3',                    mulai: t(9,5),  akhir: t(9,45) },
+          { label: 'Istirahat 1',                 mulai: t(9,45), akhir: t(10,0),  istirahat: true },
+          { label: 'Jam ke-4',                    mulai: t(10,0), akhir: t(10,35) },
+          { label: 'Jam ke-5',                    mulai: t(10,35),akhir: t(11,10) },
+          { label: 'Jam ke-6',                    mulai: t(11,10),akhir: t(11,45) },
+          { label: 'Istirahat 2 / Sholat Jumat',  mulai: t(11,45),akhir: t(12,20), istirahat: true },
+          { label: 'Jam ke-7',                    mulai: t(12,20),akhir: t(12,55) },
+          { label: 'Jam ke-8',                    mulai: t(12,55),akhir: t(13,30) },
+          { label: 'Jam ke-9',                    mulai: t(13,30),akhir: t(14,5) },
+          { label: 'Jam ke-10',                   mulai: t(14,5), akhir: t(14,40) }
+        ]
+      };
+
+      var NAMA_HARI = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+
+      // ===== HELPER NOMOR MINGGU (per tahun) =====
+      function getNomorMinggu(date) {
+        var d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+        var dayNum = d.getUTCDay() || 7;
+        d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+        var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+        return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+      }
+
+      function getStorageKey() {
+        var now = new Date();
+        return 'jp_senin_upacara_' + now.getFullYear() + '_w' + getNomorMinggu(now);
+      }
+
+      // Default: ada upacara (true)
+      function isUpacara() {
+        var val = localStorage.getItem(getStorageKey());
+        return val === null ? true : val === '1';
+      }
+
+      // Toggle dan simpan
+      window.jpToggleSenin = function() {
+        var cur = isUpacara();
+        localStorage.setItem(getStorageKey(), cur ? '0' : '1');
+        updateToggleBtn();
+      };
+
+      function updateToggleBtn() {
+        var btn = document.getElementById('jp-btn-toggle');
+        var lbl = document.getElementById('jp-toggle-label');
+        if (!btn || !lbl) return;
+        if (isUpacara()) {
+          lbl.textContent = 'Ada Upacara';
+          btn.style.background = 'rgba(251,191,36,.25)';
+          btn.style.borderColor = 'rgba(251,191,36,.6)';
+          btn.style.color = '#fde68a';
+        } else {
+          lbl.textContent = 'Tanpa Upacara';
+          btn.style.background = 'rgba(74,222,128,.2)';
+          btn.style.borderColor = 'rgba(74,222,128,.5)';
+          btn.style.color = '#bbf7d0';
+        }
+      }
+
+      function pad(n) { return String(Math.max(0,Math.floor(n))).padStart(2,'0'); }
+      function menitKeStr(m) { return pad(m/60) + ':' + pad(m%60); }
+
+      function tick() {
+        var now  = new Date();
+        var hari = now.getDay();
+        var menitNow = now.getHours()*60 + now.getMinutes();
+        var totalSec = now.getHours()*3600 + now.getMinutes()*60 + now.getSeconds();
+
+        document.getElementById('jp-jam-sekarang').textContent =
+          pad(now.getHours())+':'+pad(now.getMinutes())+':'+pad(now.getSeconds());
+
+        var hariLabel = NAMA_HARI[hari];
+        var toggleEl  = document.getElementById('jp-senin-toggle');
+        var jadwal;
+
+        if (hari === 1) {
+          // Senin — tampilkan toggle
+          toggleEl.style.display = 'block';
+          updateToggleBtn();
+          jadwal = JADWAL[isUpacara() ? '1_upacara' : '1_biasa'];
+          hariLabel = isUpacara() ? 'Senin (Upacara)' : 'Senin (Tanpa Upacara)';
+        } else {
+          toggleEl.style.display = 'none';
+          jadwal = JADWAL[hari];
+        }
+
+        document.getElementById('jp-hari-label').textContent = hariLabel;
+
+        var statusEl = document.getElementById('jp-status-text');
+        var detailEl = document.getElementById('jp-detail-text');
+        var cdEl     = document.getElementById('jp-countdown');
+        var progEl   = document.getElementById('jp-progress');
+        var banner   = document.getElementById('jam-pelajaran-banner');
+
+        if (!jadwal) {
+          statusEl.textContent = '\uD83C\uDF89 Hari Libur';
+          detailEl.textContent = 'Selamat beristirahat!';
+          cdEl.textContent     = '--:--';
+          progEl.style.width   = '0%';
+          statusEl.style.color = '#4ade80';
+          banner.style.background = 'linear-gradient(135deg,#1e3a5f 0%,#1a56db 100%)';
+          return;
+        }
+
+        var slot = null, next = null;
+        for (var i = 0; i < jadwal.length; i++) {
+          if (menitNow >= jadwal[i].mulai && menitNow < jadwal[i].akhir) {
+            slot = jadwal[i];
+            if (i+1 < jadwal.length) next = jadwal[i+1];
+            break;
+          }
+          if (menitNow < jadwal[i].mulai && !next) next = jadwal[i];
+        }
+
+        if (slot) {
+          var durasi   = slot.akhir - slot.mulai;
+          var terlewat = menitNow - slot.mulai + now.getSeconds()/60;
+          var sisaSec  = slot.akhir*60 - totalSec;
+          var pct      = Math.min(100, (terlewat/durasi)*100);
+
+          statusEl.style.color  = slot.istirahat ? '#4ade80' : '#fbbf24';
+          statusEl.textContent  = (slot.istirahat ? '\u2615 ' : '\uD83D\uDCDA ') + slot.label;
+          detailEl.textContent  = menitKeStr(slot.mulai) + ' \u2013 ' + menitKeStr(slot.akhir) +
+            (next ? '  |  Berikutnya: ' + next.label + ' pukul ' + menitKeStr(next.mulai) : '');
+          cdEl.textContent      = pad(sisaSec/60) + ':' + pad(sisaSec%60);
+          progEl.style.width    = pct + '%';
+          banner.style.background = slot.istirahat
+            ? 'linear-gradient(135deg,#065f46 0%,#059669 100%)'
+            : 'linear-gradient(135deg,#1e3a5f 0%,#1a56db 100%)';
+
+        } else {
+          var first = jadwal[0], last = jadwal[jadwal.length-1];
+          banner.style.background = 'linear-gradient(135deg,#1e3a5f 0%,#1a56db 100%)';
+          if (menitNow < first.mulai) {
+            var sisaMulai = first.mulai*60 - totalSec;
+            statusEl.style.color = '#93c5fd';
+            statusEl.textContent = '\uD83C\uDF05 Belum mulai';
+            detailEl.textContent = 'KBM dimulai pukul ' + menitKeStr(first.mulai);
+            cdEl.textContent     = pad(sisaMulai/60) + ':' + pad(sisaMulai%60);
+            progEl.style.width   = '0%';
+          } else {
+            statusEl.style.color = '#a3e635';
+            statusEl.textContent = '\uD83C\uDFC1 KBM Selesai';
+            detailEl.textContent = 'Jam pelajaran berakhir pukul ' + menitKeStr(last.akhir);
+            cdEl.textContent     = '00:00';
+            progEl.style.width   = '100%';
+          }
+        }
+      }
+
+      tick();
+      setInterval(tick, 1000);
+    })();
+    </script>
+    <!-- ===== END BANNER JAM PELAJARAN ===== -->
+
+
     <!-- Stats Section -->
     <section class="stats-section">
         <div class="container">

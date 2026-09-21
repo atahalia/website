@@ -1,5 +1,5 @@
 // Service Worker - SMKN 1 Kras PWA
-const CACHE_NAME = 'smkn1kras-v2';
+const CACHE_NAME = 'smkn1kras-v3';
 const OFFLINE_URL = '/offline';
 
 // Aset yang di-cache saat install (App Shell)

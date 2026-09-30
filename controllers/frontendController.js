@@ -99,6 +99,32 @@ async function getHomeSlider() {
 
 const { getSettings } = require('./kontrolWebsiteController');
 
+async function getGuruHome() {
+  const cached = cache.get('home_guru');
+  if (cached) return cached;
+  const [rows] = await db.query(`SELECT id, nama, jabatan, mata_pelajaran, foto,
+    CASE
+      WHEN LOWER(jabatan) LIKE '%kepala sekolah%' OR LOWER(jabatan) LIKE '%kepsek%' THEN 1
+      WHEN LOWER(jabatan) LIKE '%wakil kepala%' OR LOWER(jabatan) LIKE '%waka%' THEN 2
+      WHEN LOWER(jabatan) LIKE '%kepala tata usaha%' OR LOWER(jabatan) LIKE '%ktu%' THEN 3
+      WHEN LOWER(jabatan) LIKE '%kepala program%' OR LOWER(jabatan) LIKE '%kaproli%' OR LOWER(jabatan) LIKE '%kaprogli%' OR LOWER(jabatan) LIKE '%kepala jurusan%' OR LOWER(jabatan) LIKE '%kakomli%' THEN 4
+      WHEN LOWER(jabatan) LIKE '%guru%' THEN 5
+      WHEN LOWER(jabatan) LIKE '%staf%' OR LOWER(jabatan) LIKE '%staff%' OR LOWER(jabatan) LIKE '%karyawan%' OR LOWER(jabatan) LIKE '%tata usaha%' THEN 6
+      ELSE 7
+    END AS urutan_jabatan
+    FROM guru ORDER BY urutan_jabatan ASC, nama ASC`);
+  cache.set('home_guru', rows, 600); // cache 10 menit
+  return rows;
+}
+
+async function getGaleriHome() {
+  const cached = cache.get('home_galeri');
+  if (cached) return cached;
+  const [rows] = await db.query('SELECT judul, MIN(gambar) as gambar, COUNT(*) as jumlah FROM galeri GROUP BY judul ORDER BY MAX(created_at) DESC LIMIT 5');
+  cache.set('home_galeri', rows, 300); // cache 5 menit
+  return rows;
+}
+
 // ── Frontend Controllers ──────────────────────────────────────────────────────
 
 exports.home = async (req, res) => {
@@ -108,7 +134,7 @@ exports.home = async (req, res) => {
     const [
       profil,
       [beritaTerbaru],
-      [galeri],
+      galeri,
       slider,
       [jurusan],
       menuItems,
@@ -121,11 +147,11 @@ exports.home = async (req, res) => {
       [bkkHome],
       siteSettings,
       [agendaHome],
-      [guruHome]
+      guruHome
     ] = await Promise.all([
       getProfilSekolah(),
       db.query('SELECT id, judul, slug, gambar, konten, kategori, created_at FROM berita WHERE status = "published" ORDER BY created_at DESC LIMIT 6'),
-      db.query('SELECT judul, MIN(gambar) as gambar, COUNT(*) as jumlah FROM galeri GROUP BY judul ORDER BY MAX(created_at) DESC LIMIT 5'),
+      getGaleriHome(),
       getHomeSlider(),
       db.query("SELECT id, kode, nama, deskripsi, icon, warna, warna_badge, warna_teks_badge FROM jurusan WHERE status = 'aktif' ORDER BY kode ASC"),
       getMenuItems(),
@@ -138,18 +164,7 @@ exports.home = async (req, res) => {
       db.query("SELECT id, judul, slug, perusahaan, lokasi, kategori, gambar, deadline, kontak FROM bkk_lowongan WHERE status='aktif' ORDER BY created_at DESC LIMIT 6"),
       getSettings(),
       db.query("SELECT id, judul, slug, gambar, tanggal_mulai, tanggal_selesai, waktu_mulai, waktu_selesai, lokasi FROM agenda WHERE status='aktif' AND tampil_home=1 AND (tanggal_selesai >= DATE_SUB(CURDATE(), INTERVAL 3 DAY) OR (tanggal_selesai IS NULL AND tanggal_mulai >= DATE_SUB(CURDATE(), INTERVAL 3 DAY))) ORDER BY tanggal_mulai DESC LIMIT 3"),
-      db.query(`SELECT id, nama, jabatan, mata_pelajaran, foto,
-        CASE
-          WHEN LOWER(jabatan) LIKE '%kepala sekolah%' OR LOWER(jabatan) LIKE '%kepsek%' THEN 1
-          WHEN LOWER(jabatan) LIKE '%wakil kepala%' OR LOWER(jabatan) LIKE '%waka%' THEN 2
-          WHEN LOWER(jabatan) LIKE '%kepala tata usaha%' OR LOWER(jabatan) LIKE '%ktu%' THEN 3
-          WHEN LOWER(jabatan) LIKE '%kepala program%' OR LOWER(jabatan) LIKE '%kaproli%' OR LOWER(jabatan) LIKE '%kaprogli%' OR LOWER(jabatan) LIKE '%kepala jurusan%' OR LOWER(jabatan) LIKE '%kakomli%' THEN 4
-          WHEN LOWER(jabatan) LIKE '%guru%' THEN 5
-          WHEN LOWER(jabatan) LIKE '%staf%' OR LOWER(jabatan) LIKE '%staff%' OR LOWER(jabatan) LIKE '%karyawan%' OR LOWER(jabatan) LIKE '%tata usaha%' THEN 6
-          ELSE 7
-        END AS urutan_jabatan
-        FROM guru
-        ORDER BY urutan_jabatan ASC, nama ASC`)
+      getGuruHome()
     ]);
 
     res.render('frontend/home', {
@@ -238,21 +253,30 @@ exports.beritaDetail = async (req, res) => {
 
 exports.galeri = async (req, res) => {
   try {
-    const [[galeri], profil, menuItems, mediaSosialFooter, relatedBerita] = await Promise.all([
-      db.query('SELECT * FROM galeri ORDER BY created_at DESC'),
+    const cached = cache.get('galeri_page');
+    let galeri, albums;
+    if (cached) {
+      ({ galeri, albums } = cached);
+    } else {
+      const [rows] = await db.query('SELECT id, judul, gambar, kategori, deskripsi, created_at FROM galeri ORDER BY created_at DESC LIMIT 300');
+      galeri = rows;
+      const albumMap = {};
+      galeri.forEach(item => {
+        const key = item.judul + '|' + (item.kategori || '');
+        if (!albumMap[key]) albumMap[key] = { judul: item.judul, kategori: item.kategori, deskripsi: item.deskripsi, cover: item.gambar, fotos: [], created_at: item.created_at };
+        albumMap[key].fotos.push(item);
+      });
+      albums = Object.values(albumMap);
+      cache.set('galeri_page', { galeri, albums }, 180); // cache 3 menit
+    }
+
+    const [profil, menuItems, mediaSosialFooter, relatedBerita] = await Promise.all([
       getProfilSekolah(), getMenuItems(), getMediaSosialFooter(), getRelatedBerita()
     ]);
 
-    const albumMap = {};
-    galeri.forEach(item => {
-      const key = item.judul + '|' + (item.kategori || '');
-      if (!albumMap[key]) albumMap[key] = { judul: item.judul, kategori: item.kategori, deskripsi: item.deskripsi, cover: item.gambar, fotos: [], created_at: item.created_at };
-      albumMap[key].fotos.push(item);
-    });
-
     res.render('frontend/galeri', {
       title: 'Galeri', currentPage: 'galeri',
-      galeri, albums: Object.values(albumMap),
+      galeri, albums,
       profil, menuItems, mediaSosialFooter, relatedBerita
     });
   } catch (error) {

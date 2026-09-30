@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>MOVE – Melayani Komunitas Via Edukasi | SMKN 1 Kras</title>
+  <meta name="description" content="MOVE adalah program pengabdian masyarakat gratis dari SMKN 1 Kras – layanan edukasi, keterampilan, dan konsultasi untuk komunitas sekitar.">
+  <meta property="og:title" content="MOVE – Melayani Komunitas Via Edukasi">
+  <meta property="og:description" content="Layanan pengabdian masyarakat gratis dari siswa-siswi SMKN 1 Kras.">
+  <meta property="og:image" content="/assets/img/logo-sekolah.png">
+
+  <link href="/assets/vendor/bootstrap5/bootstrap.min.css" rel="stylesheet">
+  <link href="/assets/vendor/fontawesome6/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/theme.css">
+
+  <style>
+    :root {
+      --move-primary:   <%= jurusan.warna1 || '#1e3a5f' %>;
+      --move-accent:    <%= jurusan.warna2 || '#f59e0b' %>;
+      --move-light:     <%= jurusan.warnaLight || '#eff6ff' %>;
+      --move-gradient:  <%= jurusan.gradient || 'linear-gradient(135deg,#1e3a5f 0%,#1a56db 100%)' %>;
+    }
+
+    /* ── Reset & base ── */
+    * { box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #1e293b; overflow-x: hidden; }
+    a { text-decoration: none; }
+    img { max-width: 100%; }
+    .section-pad { padding: 80px 0; }
+    .section-pad-sm { padding: 56px 0; }
+
+    /* ── NAVBAR ── */
+    .move-nav {
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(0,0,0,.07);
+      position: sticky; top: 0; z-index: 999;
+      padding: 14px 0;
+    }
+    .move-nav .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.1rem; color: var(--move-primary); }
+    .move-nav .brand .badge-move {
+      background: var(--move-gradient); color: #fff;
+      padding: 4px 12px; border-radius: 20px; font-size: .75rem; font-weight: 700; letter-spacing: .5px;
+    }
+    .move-nav .jurusan-tag {
+      background: var(--move-accent); color: #fff;
+      padding: 3px 10px; border-radius: 20px; font-size: .72rem; font-weight: 700;
+      margin-left: 6px;
+    }
+    .nav-cta {
+      background: var(--move-gradient); color: #fff !important;
+      padding: 8px 20px !important; border-radius: 25px; font-weight: 600 !important;
+      transition: opacity .2s;
+    }
+    .nav-cta:hover { opacity: .88; }
+
+    /* ── HERO ── */
+    .hero {
+      background: var(--move-gradient);
+      min-height: 100vh;
+      display: flex; align-items: center;
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .hero-content { position: relative; z-index: 2; color: #fff; }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3);
+      padding: 6px 16px; border-radius: 30px; font-size: .82rem; font-weight: 600;
+      margin-bottom: 24px; backdrop-filter: blur(8px);
+    }
+    .hero-title {
+      font-size: clamp(2.4rem, 6vw, 4.2rem);
+      font-weight: 900; line-height: 1.1; margin-bottom: 20px;
+    }
+    .hero-title .accent { color: var(--move-accent); }
+    .hero-sub { font-size: 1.15rem; opacity: .88; max-width: 560px; line-height: 1.7; margin-bottom: 36px; }
+    .hero-btns { display: flex; flex-wrap: wrap; gap: 14px; }
+    .btn-hero-primary {
+      background: var(--move-accent); color: #1e293b;
+      padding: 14px 32px; border-radius: 40px; font-weight: 700; font-size: 1rem;
+      display: inline-flex; align-items: center; gap: 8px;
+      transition: transform .2s, box-shadow .2s; border: none;
+    }
+    .btn-hero-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.25); color: #1e293b; }
+    .btn-hero-outline {
+      background: transparent; color: #fff;
+      padding: 13px 30px; border-radius: 40px; font-weight: 600; font-size: 1rem;
+      border: 2px solid rgba(255,255,255,.5);
+      display: inline-flex; align-items: center; gap: 8px;
+      transition: background .2s, border-color .2s;
+    }
+    .btn-hero-outline:hover { background: rgba(255,255,255,.1); border-color: #fff; color: #fff; }
+    .hero-stats { display: flex; flex-wrap: wrap; gap: 28px; margin-top: 48px; }
+    .hero-stat .num { font-size: 2rem; font-weight: 900; color: var(--move-accent); line-height: 1; }
+    .hero-stat .lbl { font-size: .8rem; opacity: .75; margin-top: 2px; }
+    .hero-visual { position: relative; }
+    .hero-card-float {
+      background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2);
+      backdrop-filter: blur(16px); border-radius: 20px;
+      padding: 28px; color: #fff; margin-bottom: 16px;
+    }
+    .hero-card-float .icon-wrap {
+      width: 52px; height: 52px; background: var(--move-accent);
+      border-radius: 14px; display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; color: #1e293b; margin-bottom: 14px;
+    }
+    .hero-card-float h5 { font-weight: 700; font-size: 1rem; margin-bottom: 6px; }
+    .hero-card-float p { font-size: .85rem; opacity: .8; margin: 0; }
+    .float-badge {
+      position: absolute; top: -16px; right: -10px;
+      background: #22c55e; color: #fff; padding: 6px 14px;
+      border-radius: 20px; font-size: .75rem; font-weight: 700;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .float-badge::before { content: '●'; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+    /* ── SECTION HEADING ── */
+    .section-label {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: var(--move-primary); font-weight: 700; font-size: .82rem;
+      letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px;
+    }
+    .section-label::before { content: ''; width: 24px; height: 3px; background: var(--move-accent); border-radius: 2px; display: block; }
+    .section-title { font-size: clamp(1.6rem, 3.5vw, 2.4rem); font-weight: 800; line-height: 1.25; color: #0f172a; }
+    .section-sub { color: #64748b; font-size: 1.05rem; line-height: 1.7; max-width: 600px; }
+
+    /* ── LAYANAN CARDS ── */
+    .layanan-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 24px; }
+    .layanan-card {
+      background: #fff; border-radius: 20px; padding: 32px 28px;
+      border: 1px solid #e8edf4; transition: transform .25s, box-shadow .25s;
+      position: relative; overflow: hidden;
+    }
+    .layanan-card::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 4px;
+      background: var(--move-gradient); transform: scaleX(0); transition: transform .25s;
+    }
+    .layanan-card:hover { transform: translateY(-6px); box-shadow: 0 20px 48px rgba(0,0,0,.1); }
+    .layanan-card:hover::after { transform: scaleX(1); }
+    .layanan-icon {
+      width: 58px; height: 58px; border-radius: 16px;
+      background: var(--move-light); color: var(--move-primary);
+      display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+      margin-bottom: 20px;
+    }
+    .layanan-card h5 { font-weight: 700; font-size: 1rem; margin-bottom: 8px; color: #0f172a; }
+    .layanan-card p { font-size: .88rem; color: #64748b; line-height: 1.6; margin: 0; }
+    .layanan-free {
+      display: inline-block; background: #dcfce7; color: #16a34a;
+      font-size: .7rem; font-weight: 700; padding: 2px 10px; border-radius: 10px; margin-top: 12px;
+    }
+
+    /* ── CARA DAFTAR ── */
+    .steps-wrap { counter-reset: step; }
+    .step-item {
+      display: flex; gap: 24px; align-items: flex-start;
+      padding: 28px 0; border-bottom: 1px solid #f1f5f9;
+    }
+    .step-item:last-child { border-bottom: none; }
+    .step-num {
+      flex-shrink: 0; width: 52px; height: 52px; border-radius: 50%;
+      background: var(--move-gradient); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; font-weight: 900;
+    }
+    .step-body h5 { font-weight: 700; margin-bottom: 6px; color: #0f172a; }
+    .step-body p { color: #64748b; font-size: .9rem; margin: 0; line-height: 1.6; }
+
+    /* ── GALERI ── */
+    .galeri-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap: 16px; }
+    .galeri-item {
+      aspect-ratio: 4/3; border-radius: 14px; overflow: hidden;
+      background: #e2e8f0; position: relative;
+    }
+    .galeri-item img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s; }
+    .galeri-item:hover img { transform: scale(1.06); }
+    .galeri-empty {
+      aspect-ratio: 4/3; border-radius: 14px; border: 2px dashed #cbd5e1;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      color: #94a3b8; font-size: .85rem; gap: 8px;
+    }
+
+    /* ── MEDIA SOSIAL ── */
+    .sosmed-wrap { display: flex; flex-wrap: wrap; gap: 14px; }
+    .sosmed-btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 12px 22px; border-radius: 40px; font-weight: 600; font-size: .9rem;
+      border: 2px solid; transition: transform .2s, box-shadow .2s; color: #fff;
+    }
+    .sosmed-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.15); color: #fff; }
+    .sosmed-btn.instagram { background: linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888); border-color: transparent; }
+    .sosmed-btn.tiktok    { background: #000; border-color: #333; }
+    .sosmed-btn.youtube   { background: #ff0000; border-color: #cc0000; }
+    .sosmed-btn.facebook  { background: #1877f2; border-color: #1462c4; }
+    .sosmed-btn.whatsapp  { background: #25d366; border-color: #1ead52; color: #fff; }
+    .sosmed-embed {
+      border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0;
+      background: #f8fafc;
+    }
+
+    /* ── KONTAK / CTA ── */
+    .cta-section {
+      background: var(--move-gradient); color: #fff;
+      border-radius: 28px; padding: 64px 48px; text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .cta-section::before {
+      content: ''; position: absolute; top: -60px; right: -60px;
+      width: 240px; height: 240px; background: rgba(255,255,255,.06);
+      border-radius: 50%;
+    }
+    .cta-section h2 { font-size: clamp(1.6rem, 3.5vw, 2.4rem); font-weight: 800; margin-bottom: 14px; }
+    .cta-section p { opacity: .85; font-size: 1.05rem; max-width: 520px; margin: 0 auto 32px; }
+    .btn-cta-white {
+      background: #fff; color: var(--move-primary);
+      padding: 14px 36px; border-radius: 40px; font-weight: 700;
+      display: inline-flex; align-items: center; gap: 10px;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .btn-cta-white:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,0,0,.2); color: var(--move-primary); }
+
+    /* ── PROFIL PENGELOLA ── */
+    .pengelola-card {
+      background: #fff; border-radius: 20px; padding: 28px;
+      border: 1px solid #e8edf4; text-align: center;
+      transition: transform .25s, box-shadow .25s;
+    }
+    .pengelola-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,.1); }
+    .pengelola-avatar {
+      width: 80px; height: 80px; border-radius: 50%; object-fit: cover;
+      border: 3px solid var(--move-accent); margin: 0 auto 14px;
+    }
+    .pengelola-card h5 { font-weight: 700; font-size: .95rem; margin-bottom: 4px; }
+    .pengelola-card .role { font-size: .8rem; color: #64748b; }
+
+    /* ── FOOTER ── */
+    .move-footer {
+      background: #0f172a; color: #94a3b8;
+      padding: 48px 0 28px;
+    }
+    .move-footer .brand { color: #fff; font-weight: 800; font-size: 1.15rem; margin-bottom: 8px; }
+    .move-footer .brand span { color: var(--move-accent); }
+    .move-footer p { font-size: .88rem; line-height: 1.7; }
+    .move-footer h6 { color: #fff; font-weight: 700; margin-bottom: 16px; }
+    .move-footer ul { list-style: none; padding: 0; margin: 0; }
+    .move-footer ul li { margin-bottom: 8px; }
+    .move-footer ul li a { color: #94a3b8; font-size: .88rem; transition: color .2s; }
+    .move-footer ul li a:hover { color: #fff; }
+    .move-footer .divider { border-color: #1e293b; margin: 28px 0 20px; }
+    .move-footer .copy { font-size: .8rem; text-align: center; }
+
+    /* ── SWITCH JURUSAN ── */
+    .jurusan-switch { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 32px; }
+    .jurusan-pill {
+      padding: 8px 20px; border-radius: 30px; font-size: .85rem; font-weight: 600;
+      border: 2px solid #e2e8f0; color: #64748b; background: #fff;
+      transition: all .2s; cursor: pointer;
+    }
+    .jurusan-pill:hover, .jurusan-pill.active {
+      background: var(--move-gradient); color: #fff; border-color: transparent;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .hero { min-height: auto; padding: 80px 0 60px; }
+      .hero-visual { margin-top: 48px; }
+      .cta-section { padding: 40px 24px; }
+      .section-pad { padding: 56px 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     NAVBAR
+════════════════════════════════════════════ -->
+<nav class="move-nav">
+  <div class="container d-flex align-items-center justify-content-between">
+    <a href="/move" class="brand">
+      <span class="badge-move">MOVE</span>
+      <span>Melayani Komunitas Via Edukasi</span>
+      <% if (jurusan.nama) { %>
+        <span class="jurusan-tag"><%= jurusan.nama %></span>
+      <% } %>
+    </a>
+    <div class="d-flex align-items-center gap-3">
+      <a href="/move" class="d-none d-md-block" style="color:#64748b;font-size:.88rem;">Semua Jurusan</a>
+      <a href="#daftar" class="nav-cta">Daftar Gratis</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════
+     HERO
+════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="container">
+    <div class="row align-items-center gy-5">
+      <div class="col-lg-7 hero-content">
+        <div class="hero-eyebrow">
+          <i class="fas fa-hands-helping"></i>
+          Pengabdian Masyarakat Gratis · SMKN 1 Kras
+        </div>
+        <h1 class="hero-title">
+          <span class="accent">MOVE</span> –<br>
+          <%= jurusan.hero_title || 'Melayani Komunitas<br>Via Edukasi' %>
+        </h1>
+        <p class="hero-sub">
+          <%= jurusan.hero_sub || 'Program pengabdian masyarakat gratis dari siswa-siswi SMKN 1 Kras. Kami hadir untuk komunitas Anda – berbagi ilmu, keterampilan, dan solusi nyata.' %>
+        </p>
+        <div class="hero-btns">
+          <a href="#daftar" class="btn-hero-primary">
+            <i class="fas fa-hand-holding-heart"></i> Daftar Sekarang – Gratis!
+          </a>
+          <a href="#layanan" class="btn-hero-outline">
+            <i class="fas fa-play-circle"></i> Lihat Layanan
+          </a>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="num"><%= jurusan.stat_penerima || '500+' %></div>
+            <div class="lbl">Penerima Manfaat</div>
+          </div>
+          <div class="hero-stat">
+            <div class="num"><%= jurusan.stat_layanan || '10+' %></div>
+            <div class="lbl">Jenis Layanan</div>
+          </div>
+          <div class="hero-stat">
+            <div class="num"><%= jurusan.stat_relawan || '50+' %></div>
+            <div class="lbl">Siswa Relawan</div>
+          </div>
+          <div class="hero-stat">
+            <div class="num">100%</div>
+            <div class="lbl">Gratis</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-5 hero-visual">
+        <div style="position:relative">
+          <div class="hero-card-float">
+            <div class="float-badge">Live Program</div>
+            <div class="icon-wrap"><i class="<%= jurusan.icon || 'fas fa-graduation-cap' %>"></i></div>
+            <h5><%= jurusan.hero_card_title || 'Program Aktif Berjalan' %></h5>
+            <p><%= jurusan.hero_card_desc || 'Bergabunglah dengan ratusan warga yang sudah merasakan manfaat program MOVE.' %></p>
+          </div>
+          <div style="display:flex;gap:12px">
+            <div class="hero-card-float" style="flex:1">
+              <div style="font-size:1.8rem;margin-bottom:8px">🎓</div>
+              <div style="font-weight:700;font-size:.95rem">Edukatif</div>
+              <div style="font-size:.8rem;opacity:.75">Berbasis kurikulum SMK</div>
+            </div>
+            <div class="hero-card-float" style="flex:1">
+              <div style="font-size:1.8rem;margin-bottom:8px">🤝</div>
+              <div style="font-weight:700;font-size:.95rem">Kolaboratif</div>
+              <div style="font-size:.8rem;opacity:.75">Bersama komunitas</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     SWITCH JURUSAN
+════════════════════════════════════════════ -->
+<section style="background:#f8fafc;padding:40px 0 0">
+  <div class="container">
+    <p style="font-size:.85rem;color:#64748b;margin-bottom:14px;font-weight:600">Lihat layanan dari jurusan lain:</p>
+    <div class="jurusan-switch">
+      <% allJurusan.forEach(function(j){ %>
+        <a href="/move/<%= j.slug %>" class="jurusan-pill <%= j.slug === jurusan.slug ? 'active' : '' %>">
+          <i class="<%= j.icon || 'fas fa-graduation-cap' %> me-1"></i> <%= j.nama %>
+        </a>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     LAYANAN
+════════════════════════════════════════════ -->
+<section class="section-pad" id="layanan" style="background:#f8fafc">
+  <div class="container">
+    <div class="row mb-5">
+      <div class="col-lg-7">
+        <div class="section-label"><i class="fas fa-star"></i> Layanan Kami</div>
+        <h2 class="section-title mb-3">Apa yang Kami Tawarkan?</h2>
+        <p class="section-sub">Semua layanan 100% gratis untuk masyarakat. Didukung oleh siswa terlatih dan dibimbing guru profesional SMKN 1 Kras.</p>
+      </div>
+    </div>
+    <div class="layanan-grid">
+      <% jurusan.layanan.forEach(function(l){ %>
+        <div class="layanan-card">
+          <div class="layanan-icon"><i class="<%= l.icon %>"></i></div>
+          <h5><%= l.nama %></h5>
+          <p><%= l.deskripsi %></p>
+          <span class="layanan-free">✓ GRATIS</span>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     CARA DAFTAR
+════════════════════════════════════════════ -->
+<section class="section-pad" id="daftar">
+  <div class="container">
+    <div class="row align-items-center gy-5">
+      <div class="col-lg-5">
+        <div class="section-label"><i class="fas fa-list-check"></i> Cara Mendapatkan Layanan</div>
+        <h2 class="section-title mb-3">Mudah, Cepat, dan Gratis</h2>
+        <p class="section-sub">Tidak perlu birokrasi rumit. Cukup hubungi kami dan layanan siap hadir ke komunitas Anda.</p>
+        <div class="mt-4 d-flex flex-wrap gap-3">
+          <% if (jurusan.kontak_wa) { %>
+            <a href="https://wa.me/<%= jurusan.kontak_wa %>?text=Halo%20MOVE%20<%= jurusan.nama %>%2C%20saya%20ingin%20mendaftar%20layanan"
+               class="btn-hero-primary" style="background:var(--move-gradient);color:#fff" target="_blank">
+              <i class="fab fa-whatsapp"></i> Hubungi via WhatsApp
+            </a>
+          <% } %>
+        </div>
+      </div>
+      <div class="col-lg-6 offset-lg-1">
+        <div class="steps-wrap">
+          <% var steps = [
+            { num:'01', icon:'fas fa-mobile-alt',       judul:'Hubungi Kami', desc:'Kirim pesan WhatsApp atau isi formulir online. Tim kami akan membalas dalam 1×24 jam.' },
+            { num:'02', icon:'fas fa-clipboard-list',   judul:'Diskusi Kebutuhan', desc:'Ceritakan kebutuhan komunitas Anda. Kami sesuaikan program dengan kondisi lapangan.' },
+            { num:'03', icon:'fas fa-calendar-check',   judul:'Jadwal Kegiatan', desc:'Tentukan waktu dan lokasi yang nyaman. Kami yang datang ke komunitas Anda.' },
+            { num:'04', icon:'fas fa-hand-holding-heart', judul:'Terima Manfaat', desc:'Program berjalan, komunitas merasakan manfaat nyata. Semuanya gratis!' }
+          ]; %>
+          <% steps.forEach(function(s){ %>
+            <div class="step-item">
+              <div class="step-num"><%= s.num %></div>
+              <div class="step-body">
+                <h5><i class="<%= s.icon %> me-2" style="color:var(--move-accent)"></i><%= s.judul %></h5>
+                <p><%= s.desc %></p>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     GALERI KEGIATAN
+════════════════════════════════════════════ -->
+<section class="section-pad-sm" style="background:#f8fafc">
+  <div class="container">
+    <div class="section-label"><i class="fas fa-images"></i> Dokumentasi</div>
+    <h2 class="section-title mb-2">Galeri Kegiatan</h2>
+    <p class="section-sub mb-5">Momen nyata dari program MOVE di lapangan bersama komunitas.</p>
+    <div class="galeri-grid">
+      <% if (jurusan.galeri && jurusan.galeri.length > 0) { %>
+        <% jurusan.galeri.forEach(function(g){ %>
+          <div class="galeri-item">
+            <img src="/uploads/<%= g.gambar %>" alt="<%= g.judul || 'Kegiatan MOVE' %>" loading="lazy">
+          </div>
+        <% }) %>
+      <% } else { %>
+        <% for(var gi=0; gi<6; gi++) { %>
+          <div class="galeri-empty">
+            <i class="fas fa-image fa-2x" style="opacity:.4"></i>
+            <span>Foto segera hadir</span>
+          </div>
+        <% } %>
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     MEDIA SOSIAL
+════════════════════════════════════════════ -->
+<% if (jurusan.sosmed && (jurusan.sosmed.instagram || jurusan.sosmed.tiktok || jurusan.sosmed.youtube || jurusan.sosmed.facebook || jurusan.sosmed.whatsapp)) { %>
+<section class="section-pad">
+  <div class="container">
+    <div class="row align-items-center gy-4">
+      <div class="col-lg-5">
+        <div class="section-label"><i class="fas fa-share-alt"></i> Media Sosial</div>
+        <h2 class="section-title mb-3">Ikuti Kami di Media Sosial</h2>
+        <p class="section-sub mb-4">Update kegiatan, tips edukatif, dan informasi program MOVE tersedia di semua platform. Tinggal klik dan ikuti!</p>
+        <div class="sosmed-wrap">
+          <% if(jurusan.sosmed.instagram){ %>
+            <a href="<%= jurusan.sosmed.instagram %>" target="_blank" class="sosmed-btn instagram">
+              <i class="fab fa-instagram"></i> Instagram
+            </a>
+          <% } %>
+          <% if(jurusan.sosmed.tiktok){ %>
+            <a href="<%= jurusan.sosmed.tiktok %>" target="_blank" class="sosmed-btn tiktok">
+              <i class="fab fa-tiktok"></i> TikTok
+            </a>
+          <% } %>
+          <% if(jurusan.sosmed.youtube){ %>
+            <a href="<%= jurusan.sosmed.youtube %>" target="_blank" class="sosmed-btn youtube">
+              <i class="fab fa-youtube"></i> YouTube
+            </a>
+          <% } %>
+          <% if(jurusan.sosmed.facebook){ %>
+            <a href="<%= jurusan.sosmed.facebook %>" target="_blank" class="sosmed-btn facebook">
+              <i class="fab fa-facebook"></i> Facebook
+            </a>
+          <% } %>
+          <% if(jurusan.sosmed.whatsapp){ %>
+            <a href="https://wa.me/<%= jurusan.sosmed.whatsapp %>" target="_blank" class="sosmed-btn whatsapp">
+              <i class="fab fa-whatsapp"></i> WhatsApp
+            </a>
+          <% } %>
+        </div>
+      </div>
+      <% if(jurusan.sosmed.embed){ %>
+        <div class="col-lg-6 offset-lg-1">
+          <div class="sosmed-embed">
+            <%- jurusan.sosmed.embed %>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</section>
+<% } %>
+
+<!-- ═══════════════════════════════════════════
+     TIM PENGELOLA
+════════════════════════════════════════════ -->
+<% if (jurusan.pengelola && jurusan.pengelola.length > 0) { %>
+<section class="section-pad-sm" style="background:#f8fafc">
+  <div class="container">
+    <div class="text-center mb-5">
+      <div class="section-label justify-content-center"><i class="fas fa-users"></i> Tim</div>
+      <h2 class="section-title">Pengelola Program</h2>
+    </div>
+    <div class="row g-4 justify-content-center">
+      <% jurusan.pengelola.forEach(function(p){ %>
+        <div class="col-6 col-md-4 col-lg-3">
+          <div class="pengelola-card">
+            <img src="<%= p.foto ? '/uploads/'+p.foto : '/assets/img/undraw_profile.svg' %>"
+                 alt="<%= p.nama %>" class="pengelola-avatar">
+            <h5><%= p.nama %></h5>
+            <div class="role"><%= p.jabatan %></div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</section>
+<% } %>
+
+<!-- ═══════════════════════════════════════════
+     CTA SECTION
+════════════════════════════════════════════ -->
+<section class="section-pad">
+  <div class="container">
+    <div class="cta-section">
+      <div style="position:relative;z-index:2">
+        <div class="hero-eyebrow justify-content-center mb-4" style="display:inline-flex">
+          <i class="fas fa-gift"></i> 100% Gratis, Tidak Ada Biaya Apapun
+        </div>
+        <h2>Siap Mendapatkan Layanan Gratis?</h2>
+        <p>Komunitas Anda layak mendapatkan yang terbaik. MOVE hadir untuk membuktikan bahwa pendidikan vokasi bisa menjadi solusi nyata bagi masyarakat.</p>
+        <div class="d-flex flex-wrap gap-3 justify-content-center">
+          <% if (jurusan.kontak_wa) { %>
+            <a href="https://wa.me/<%= jurusan.kontak_wa %>?text=Halo%20MOVE%20<%= jurusan.nama %>%2C%20saya%20ingin%20mendaftar%20layanan"
+               class="btn-cta-white" target="_blank">
+              <i class="fab fa-whatsapp"></i> Daftar via WhatsApp
+            </a>
+          <% } else { %>
+            <a href="#daftar" class="btn-cta-white">
+              <i class="fas fa-hand-holding-heart"></i> Daftar Sekarang
+            </a>
+          <% } %>
+          <a href="/move" class="btn-hero-outline">
+            <i class="fas fa-th-large"></i> Lihat Semua Jurusan
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════ -->
+<footer class="move-footer">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="brand">MOVE <span>SMKN 1 Kras</span></div>
+        <p>Program pengabdian masyarakat gratis dari siswa-siswi SMKN 1 Kras, Kediri, Jawa Timur. Melayani Komunitas Via Edukasi.</p>
+      </div>
+      <div class="col-md-2">
+        <h6>Program</h6>
+        <ul>
+          <% allJurusan.forEach(function(j){ %>
+            <li><a href="/move/<%= j.slug %>"><%= j.nama %></a></li>
+          <% }) %>
+        </ul>
+      </div>
+      <div class="col-md-3">
+        <h6>Navigasi</h6>
+        <ul>
+          <li><a href="/move">Beranda MOVE</a></li>
+          <li><a href="#layanan">Layanan</a></li>
+          <li><a href="#daftar">Cara Daftar</a></li>
+          <li><a href="/">Website Sekolah</a></li>
+        </ul>
+      </div>
+      <div class="col-md-3">
+        <h6>Kontak</h6>
+        <ul>
+          <li><i class="fas fa-map-marker-alt me-2"></i>Kras, Kediri, Jawa Timur</li>
+          <li><i class="fas fa-envelope me-2"></i>info@smkn1kras.sch.id</li>
+          <li><a href="https://smkn1kras.sch.id"><i class="fas fa-globe me-2"></i>smkn1kras.sch.id</a></li>
+        </ul>
+      </div>
+    </div>
+    <hr class="divider">
+    <p class="copy">© <%= new Date().getFullYear() %> MOVE – SMKN 1 Kras. Melayani Komunitas Via Edukasi. Semua Layanan Gratis.</p>
+  </div>
+</footer>
+
+<script>
+  // Smooth scroll
+  document.querySelectorAll('a[href^="#"]').forEach(function(el){
+    el.addEventListener('click', function(e){
+      var target = document.querySelector(this.getAttribute('href'));
+      if (target) { e.preventDefault(); target.scrollIntoView({ behavior:'smooth', block:'start' }); }
+    });
+  });
+</script>
+</body>
+</html>

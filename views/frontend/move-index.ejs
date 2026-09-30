@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>MOVE – Melayani Komunitas Via Edukasi | SMKN 1 Kras</title>
+  <meta name="description" content="MOVE adalah program pengabdian masyarakat gratis dari SMKN 1 Kras – 4 jurusan, ratusan layanan untuk komunitas.">
+  <link href="/assets/vendor/bootstrap5/bootstrap.min.css" rel="stylesheet">
+  <link href="/assets/vendor/fontawesome6/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/theme.css">
+  <style>
+    body { font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; color:#1e293b; }
+    .hero-index {
+      background: linear-gradient(135deg,#0f172a 0%,#1e3a5f 60%,#1a56db 100%);
+      min-height: 70vh; display:flex; align-items:center; color:#fff;
+      position:relative; overflow:hidden;
+    }
+    .hero-index::before {
+      content:''; position:absolute; inset:0;
+      background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E");
+    }
+    .hero-index-content { position:relative; z-index:2; text-align:center; padding:80px 0; }
+    .move-logo { font-size:clamp(3rem,10vw,6rem); font-weight:900; letter-spacing:-2px; line-height:1; }
+    .move-logo span { color:#f59e0b; }
+    .move-tagline { font-size:1.2rem; opacity:.85; margin:16px 0 32px; }
+    .move-tagline strong { color:#f59e0b; }
+    .hero-index-stats { display:flex; justify-content:center; flex-wrap:wrap; gap:40px; margin-top:48px; }
+    .hidx-stat .num { font-size:2.2rem; font-weight:900; color:#f59e0b; }
+    .hidx-stat .lbl { font-size:.8rem; opacity:.7; }
+
+    /* Jurusan cards */
+    .jurusan-cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:28px; }
+    .j-card {
+      border-radius:24px; overflow:hidden; position:relative;
+      min-height:340px; display:flex; flex-direction:column; justify-content:flex-end;
+      cursor:pointer; transition:transform .3s, box-shadow .3s;
+      text-decoration:none;
+    }
+    .j-card:hover { transform:translateY(-8px); box-shadow:0 24px 60px rgba(0,0,0,.2); }
+    .j-card-bg {
+      position:absolute; inset:0;
+      background:var(--jgrad);
+    }
+    .j-card-bg::after {
+      content:''; position:absolute; inset:0;
+      background:linear-gradient(to top, rgba(0,0,0,.7) 0%, transparent 60%);
+    }
+    .j-card-body { position:relative; z-index:2; padding:28px; color:#fff; }
+    .j-icon { width:52px; height:52px; border-radius:14px; background:rgba(255,255,255,.2); display:flex; align-items:center; justify-content:center; font-size:1.4rem; margin-bottom:14px; backdrop-filter:blur(8px); }
+    .j-card h3 { font-size:1.3rem; font-weight:800; margin-bottom:6px; }
+    .j-card p { font-size:.85rem; opacity:.8; margin-bottom:16px; line-height:1.5; }
+    .j-badge { display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,.2); backdrop-filter:blur(8px); padding:6px 14px; border-radius:20px; font-size:.78rem; font-weight:600; }
+
+    .section-pad { padding:80px 0; }
+    .section-label { display:inline-flex; align-items:center; gap:8px; color:#1e3a5f; font-weight:700; font-size:.82rem; letter-spacing:1px; text-transform:uppercase; margin-bottom:12px; }
+    .section-label::before { content:''; width:24px; height:3px; background:#f59e0b; border-radius:2px; display:block; }
+    .section-title { font-size:clamp(1.6rem,3.5vw,2.4rem); font-weight:800; color:#0f172a; }
+
+    .nilai-card { background:#fff; border-radius:20px; padding:32px 28px; border:1px solid #e8edf4; text-align:center; }
+    .nilai-icon { width:64px; height:64px; border-radius:50%; background:linear-gradient(135deg,#1e3a5f,#1a56db); color:#fff; display:flex; align-items:center; justify-content:center; font-size:1.6rem; margin:0 auto 18px; }
+
+    footer.mf { background:#0f172a; color:#94a3b8; padding:40px 0 24px; }
+    footer.mf .brand { color:#fff; font-weight:800; font-size:1.1rem; margin-bottom:8px; }
+    footer.mf .brand span { color:#f59e0b; }
+    footer.mf .copy { font-size:.8rem; text-align:center; border-top:1px solid #1e293b; padding-top:20px; margin-top:28px; }
+  </style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero-index">
+  <div class="container hero-index-content">
+    <div class="move-logo">M<span>O</span>VE</div>
+    <div style="font-size:1rem;opacity:.7;margin-top:4px;letter-spacing:3px;text-transform:uppercase">Melayani Komunitas Via Edukasi</div>
+    <p class="move-tagline">Program <strong>pengabdian masyarakat gratis</strong> dari siswa-siswi SMKN 1 Kras.<br>4 Jurusan · 1 Tujuan · Semua Gratis untuk Komunitas.</p>
+    <a href="#jurusan" style="display:inline-flex;align-items:center;gap:10px;background:#f59e0b;color:#1e293b;padding:14px 36px;border-radius:40px;font-weight:700;font-size:1rem;text-decoration:none;transition:transform .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+      <i class="fas fa-hands-helping"></i> Pilih Jurusan & Daftar Gratis
+    </a>
+    <div class="hero-index-stats">
+      <div class="hidx-stat"><div class="num">4</div><div class="lbl">Jurusan Aktif</div></div>
+      <div class="hidx-stat"><div class="num">500+</div><div class="lbl">Penerima Manfaat</div></div>
+      <div class="hidx-stat"><div class="num">100%</div><div class="lbl">Gratis</div></div>
+      <div class="hidx-stat"><div class="num">SMKN 1</div><div class="lbl">Kras, Kediri</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PILIH JURUSAN -->
+<section class="section-pad" id="jurusan" style="background:#f8fafc">
+  <div class="container">
+    <div class="text-center mb-5">
+      <div class="section-label justify-content-center"><i class="fas fa-graduation-cap"></i> 4 Jurusan</div>
+      <h2 class="section-title">Pilih Jurusan, Dapatkan Layanan Gratis</h2>
+      <p style="color:#64748b;max-width:540px;margin:12px auto 0;line-height:1.7">Setiap jurusan punya keahlian dan layanan unik. Klik untuk melihat detail dan mendaftar.</p>
+    </div>
+    <div class="jurusan-cards">
+      <% allJurusan.forEach(function(j){ %>
+        <a href="/move/<%= j.slug %>" class="j-card" style="--jgrad:<%= j.gradient || 'linear-gradient(135deg,#1e3a5f,#1a56db)' %>">
+          <div class="j-card-bg"></div>
+          <div class="j-card-body">
+            <div class="j-icon"><i class="<%= j.icon || 'fas fa-graduation-cap' %>"></i></div>
+            <h3><%= j.nama %></h3>
+            <p><%= j.deskripsi_singkat || 'Layanan pengabdian masyarakat gratis dari jurusan ini.' %></p>
+            <div class="j-badge"><i class="fas fa-arrow-right"></i> Lihat Layanan & Daftar</div>
+          </div>
+        </a>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<!-- NILAI UTAMA -->
+<section class="section-pad">
+  <div class="container">
+    <div class="text-center mb-5">
+      <div class="section-label justify-content-center"><i class="fas fa-heart"></i> Nilai Kami</div>
+      <h2 class="section-title">Mengapa Memilih MOVE?</h2>
+    </div>
+    <div class="row g-4">
+      <% var nilai = [
+        { icon:'fas fa-gift',            judul:'100% Gratis',       desc:'Tidak ada biaya apapun. Semua layanan diberikan sebagai wujud pengabdian masyarakat.' },
+        { icon:'fas fa-user-graduate',   judul:'Tenaga Terlatih',   desc:'Dilaksanakan oleh siswa SMK yang telah mendapat pelatihan dan dibimbing guru profesional.' },
+        { icon:'fas fa-map-marker-alt',  judul:'Datang ke Komunitas', desc:'Kami yang datang ke lokasi Anda. Tidak perlu repot ke sekolah.' },
+        { icon:'fas fa-certificate',     judul:'Berorientasi Hasil', desc:'Setiap kegiatan dirancang memberikan manfaat nyata dan terukur bagi komunitas.' }
+      ]; %>
+      <% nilai.forEach(function(n){ %>
+        <div class="col-6 col-md-3">
+          <div class="nilai-card">
+            <div class="nilai-icon"><i class="<%= n.icon %>"></i></div>
+            <h5 style="font-weight:700;margin-bottom:8px"><%= n.judul %></h5>
+            <p style="font-size:.85rem;color:#64748b;margin:0;line-height:1.6"><%= n.desc %></p>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="mf">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-5">
+        <div class="brand">MOVE <span>SMKN 1 Kras</span></div>
+        <p style="font-size:.88rem;line-height:1.7">Program pengabdian masyarakat gratis dari siswa-siswi SMK Negeri 1 Kras, Kediri, Jawa Timur.</p>
+      </div>
+      <div class="col-md-4">
+        <p style="color:#fff;font-weight:700;margin-bottom:14px">Program Jurusan</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <% allJurusan.forEach(function(j){ %>
+            <a href="/move/<%= j.slug %>" style="color:#94a3b8;font-size:.85rem;display:block;width:100%;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">
+              <i class="<%= j.icon || 'fas fa-graduation-cap' %> me-2"></i><%= j.nama %>
+            </a>
+          <% }) %>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <p style="color:#fff;font-weight:700;margin-bottom:14px">Kontak</p>
+        <p style="font-size:.85rem;line-height:2">
+          <i class="fas fa-map-marker-alt me-2"></i>Kras, Kediri, Jawa Timur<br>
+          <i class="fas fa-globe me-2"></i><a href="https://smkn1kras.sch.id" style="color:#94a3b8">smkn1kras.sch.id</a>
+        </p>
+      </div>
+    </div>
+    <div class="copy">© <%= new Date().getFullYear() %> MOVE – SMKN 1 Kras · Melayani Komunitas Via Edukasi · Semua Layanan Gratis</div>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('a[href^="#"]').forEach(function(el){
+    el.addEventListener('click',function(e){
+      var t=document.querySelector(this.getAttribute('href'));
+      if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'});}
+    });
+  });
+</script>
+</body>
+</html>

@@ -312,4 +312,8 @@ ${urlEntries.join('\n')}
   }
 });
 
+// ── MOVE – Melayani Komunitas Via Edukasi ──────────────────────────────────
+router.get('/move', frontendController.moveIndex);
+router.get('/move/:slug', frontendController.moveJurusan);
+
 module.exports = router;

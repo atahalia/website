@@ -71,7 +71,13 @@
                       <div class="d-flex align-items-center justify-content-between">
                         <strong style="font-size:.92rem"><%= l.nama %></strong>
                         <div style="display:flex;gap:6px;flex-shrink:0">
-                          <button class="btn btn-xs btn-outline-primary" onclick="editLayanan(<%= l.id %>,'<%= l.icon.replace(/'/g,\\'') %>','<%= l.nama.replace(/'/g,\\'') %>','<%= (l.deskripsi||'').replace(/'/g,\\'').replace(/\n/g,' ') %>',<%= l.urutan %>)" style="font-size:.75rem;padding:3px 10px">
+                          <button class="btn btn-xs btn-outline-primary edit-layanan-btn"
+                            data-id="<%= l.id %>"
+                            data-icon="<%= l.icon %>"
+                            data-nama="<%= encodeURIComponent(l.nama) %>"
+                            data-deskripsi="<%= encodeURIComponent(l.deskripsi||'') %>"
+                            data-urutan="<%= l.urutan %>"
+                            style="font-size:.75rem;padding:3px 10px">
                             <i class="fas fa-edit"></i> Edit
                           </button>
                           <form action="/admin/move/layanan/<%= l.id %>/delete" method="POST" onsubmit="return confirm('Hapus layanan ini?')" style="margin:0">
@@ -182,6 +188,16 @@
     var activeForm = $('#formEdit').is(':visible') ? '#iconEditInput' : '#iconAddInput';
     $(activeForm).val(ic).trigger('input');
   }
+
+  // Klik tombol edit via data attributes
+  $(document).on('click', '.edit-layanan-btn', function(){
+    var id       = $(this).data('id');
+    var icon     = $(this).data('icon');
+    var nama     = decodeURIComponent($(this).data('nama'));
+    var deskripsi= decodeURIComponent($(this).data('deskripsi'));
+    var urutan   = $(this).data('urutan');
+    editLayanan(id, icon, nama, deskripsi, urutan);
+  });
 
   function editLayanan(id, icon, nama, deskripsi, urutan) {
     $('#formTambah').hide();

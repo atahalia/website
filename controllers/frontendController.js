@@ -516,9 +516,21 @@ async function getMovePrograms() {
 exports.moveIndex = async (req, res) => {
   try {
     const allJurusan = await getMovePrograms();
+
+    // Ambil semua proyek gabungan semua jurusan
+    const [allProyek] = await db.query(`
+      SELECT mp.*, pr.nama as program_nama, pr.slug as program_slug,
+             pr.warna1 as program_warna1, pr.gradient as program_gradient
+      FROM move_proyek mp
+      JOIN move_program pr ON pr.id = mp.program_id
+      WHERE mp.status = 'published' AND pr.status = 'aktif'
+      ORDER BY mp.tahun DESC, mp.id DESC
+    `);
+
     res.render('frontend/move-index', {
       title: 'MOVE – Melayani Komunitas Via Edukasi',
-      allJurusan
+      allJurusan,
+      allProyek
     });
   } catch (err) {
     console.error('MOVE index error:', err);

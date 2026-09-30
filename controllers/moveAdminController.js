@@ -39,6 +39,10 @@ async function getProgram(id) {
   return rows[0] || null;
 }
 
+// Helper: ambil csrfToken dari req (di-inject oleh csrfMiddleware)
+function csrf(req) {
+  return req.csrfToken ? req.csrfToken() : (req.session.csrfToken || '');
+}
 // ── INDEX ─────────────────────────────────────────────────────────────────────
 exports.index = async (req, res) => {
   try {
@@ -71,6 +75,7 @@ exports.editPage = async (req, res) => {
       title: 'Edit Program MOVE – ' + program.nama,
       user: req.session,
       program,
+      csrfToken: req.session.csrfToken,
       success: req.query.success,
       error: req.query.error,
       activeTab: req.query.tab || 'info'
@@ -131,6 +136,7 @@ exports.layananPage = async (req, res) => {
       title: 'Layanan – ' + program.nama,
       user: req.session,
       program, layanan,
+      csrfToken: req.session.csrfToken,
       success: req.query.success,
       error: req.query.error
     });
@@ -201,6 +207,7 @@ exports.sosmedPage = async (req, res) => {
       title: 'Media Sosial – ' + program.nama,
       user: req.session,
       program, sosmed,
+      csrfToken: req.session.csrfToken,
       success: req.query.success,
       error: req.query.error
     });
@@ -243,6 +250,7 @@ exports.galeriPage = async (req, res) => {
       title: 'Galeri – ' + program.nama,
       user: req.session,
       program, galeri,
+      csrfToken: req.session.csrfToken,
       success: req.query.success,
       error: req.query.error
     });
@@ -300,6 +308,7 @@ exports.pengelolaPage = async (req, res) => {
       title: 'Tim Pengelola – ' + program.nama,
       user: req.session,
       program, pengelola,
+      csrfToken: req.session.csrfToken,
       success: req.query.success,
       error: req.query.error
     });

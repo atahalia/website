@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title><%= title %> - Admin Panel</title>
+  <link rel="icon" type="image/png" href="/assets/img/favicon.png?v=4">
+  <link href="/assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="/assets/css/sb-admin-2.min.css" rel="stylesheet">
+  <style>
+    .preview-img{width:100%;max-height:200px;object-fit:cover;border-radius:12px}
+    .upload-zone{border:2px dashed #d1d3e2;border-radius:12px;padding:24px;text-align:center;cursor:pointer;transition:all .2s}
+    .upload-zone:hover{border-color:#4e73df;background:#f0f4ff}
+    #kontenEditor{min-height:300px;border:1px solid #d1d3e2;border-radius:0 0 8px 8px;padding:16px;font-size:.9rem;line-height:1.7}
+  </style>
+</head>
+<body id="page-top">
+<div id="wrapper">
+  <%- include('../partials/sidebar') %>
+  <div id="content-wrapper" class="d-flex flex-column">
+    <div id="content">
+      <%- include('../partials/topbar', { user }) %>
+      <div class="container-fluid">
+
+        <nav aria-label="breadcrumb" class="mb-3">
+          <ol class="breadcrumb" style="background:transparent;padding:0;font-size:.85rem">
+            <li class="breadcrumb-item"><a href="/admin/move">Program MOVE</a></li>
+            <li class="breadcrumb-item"><a href="/admin/move/<%= program.id %>/berita"><%= program.nama %> – Berita</a></li>
+            <li class="breadcrumb-item active"><%= berita ? 'Edit' : 'Tulis' %></li>
+          </ol>
+        </nav>
+
+        <div class="d-flex align-items-center mb-4" style="gap:16px">
+          <div style="width:48px;height:48px;border-radius:12px;background:<%= program.warna1 %>;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#fff;flex-shrink:0"><i class="<%= program.icon %>"></i></div>
+          <h1 class="h3 mb-0 text-gray-800"><%= berita ? 'Edit' : 'Tulis' %> Berita MOVE</h1>
+        </div>
+
+        <% if (error) { %><div class="alert alert-danger"><i class="fas fa-exclamation-circle mr-2"></i><%= error %></div><% } %>
+
+        <form action="/admin/move/<%= program.id %>/berita/<%= berita ? berita.id+'/edit' : 'create' %>" method="POST" enctype="multipart/form-data">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <div class="row">
+            <div class="col-lg-8">
+              <div class="card shadow mb-4">
+                <div class="card-body">
+                  <div class="form-group">
+                    <label class="font-weight-bold" style="font-size:.85rem">Judul Berita *</label>
+                    <input type="text" name="judul" class="form-control form-control-lg" value="<%= berita ? berita.judul : '' %>" required placeholder="cth: Tim TKJ MOVE Berhasil Pasang WiFi di 3 Masjid">
+                  </div>
+                  <div class="form-group">
+                    <label class="font-weight-bold" style="font-size:.85rem">Ringkasan <small class="text-muted font-weight-normal">(tampil di daftar & beranda, maks 300 karakter)</small></label>
+                    <textarea name="ringkasan" class="form-control" rows="2" maxlength="300" placeholder="Deskripsi singkat yang menarik..."><%= berita ? berita.ringkasan||'' : '' %></textarea>
+                  </div>
+                  <div class="form-group">
+                    <label class="font-weight-bold" style="font-size:.85rem">Isi Berita</label>
+                    <!-- Toolbar sederhana -->
+                    <div style="border:1px solid #d1d3e2;border-radius:8px 8px 0 0;padding:8px 12px;background:#f8f9fc;display:flex;flex-wrap:wrap;gap:4px">
+                      <button type="button" onclick="execCmd('bold')"           class="btn btn-xs btn-light" title="Bold"><b>B</b></button>
+                      <button type="button" onclick="execCmd('italic')"         class="btn btn-xs btn-light" title="Italic"><i>I</i></button>
+                      <button type="button" onclick="execCmd('underline')"      class="btn btn-xs btn-light" title="Underline"><u>U</u></button>
+                      <button type="button" onclick="execCmd('insertUnorderedList')" class="btn btn-xs btn-light" title="Bullet list"><i class="fas fa-list-ul"></i></button>
+                      <button type="button" onclick="execCmd('insertOrderedList')"   class="btn btn-xs btn-light" title="Numbered list"><i class="fas fa-list-ol"></i></button>
+                      <button type="button" onclick="insertH3()"                class="btn btn-xs btn-light" title="Heading">H3</button>
+                    </div>
+                    <div id="kontenEditor" contenteditable="true"><%- berita ? berita.konten||'' : '' %></div>
+                    <textarea name="konten" id="kontenHidden" style="display:none"><%= berita ? berita.konten||'' : '' %></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-4">
+              <!-- Foto -->
+              <div class="card shadow mb-4">
+                <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-image mr-2"></i>Foto Berita</h6></div>
+                <div class="card-body">
+                  <% if (berita && berita.gambar) { %>
+                    <img src="/uploads/<%= berita.gambar %>" class="preview-img mb-3" id="previewImg">
+                  <% } else { %>
+                    <img src="" class="preview-img mb-3" id="previewImg" style="display:none">
+                  <% } %>
+                  <div class="upload-zone" onclick="$('#fileInput').click()">
+                    <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
+                    <p class="text-muted mb-0" style="font-size:.82rem">Klik untuk upload foto</p>
+                  </div>
+                  <input type="file" id="fileInput" name="gambar" accept="image/*" style="display:none">
+                </div>
+              </div>
+
+              <!-- Pengaturan -->
+              <div class="card shadow mb-4">
+                <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-cog mr-2"></i>Pengaturan</h6></div>
+                <div class="card-body">
+                  <div class="form-group">
+                    <label class="font-weight-bold" style="font-size:.85rem">Status</label>
+                    <select name="status" class="form-control">
+                      <option value="published" <%= (!berita||berita.status==='published')?'selected':'' %>>Published</option>
+                      <option value="draft"     <%= (berita&&berita.status==='draft')?'selected':'' %>>Draft</option>
+                    </select>
+                  </div>
+                  <div class="form-group mb-0">
+                    <label class="font-weight-bold d-block" style="font-size:.85rem">Tampilkan di Beranda</label>
+                    <div class="custom-control custom-switch mt-1">
+                      <input type="hidden" name="tampil_beranda" value="0">
+                      <input type="checkbox" class="custom-control-input" id="berandaSwitch" name="tampil_beranda" value="1"
+                             <%= (!berita||berita.tampil_beranda)?'checked':'' %>>
+                      <label class="custom-control-label" for="berandaSwitch">Tampil di beranda website</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card shadow mb-4">
+                <div class="card-body">
+                  <button type="submit" class="btn btn-primary btn-block btn-lg"><i class="fas fa-save mr-2"></i>Simpan Berita</button>
+                  <a href="/admin/move/<%= program.id %>/berita" class="btn btn-outline-secondary btn-block mt-2"><i class="fas fa-arrow-left mr-2"></i>Kembali</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    <%- include('../partials/footer') %>
+  </div>
+</div>
+<script src="/assets/vendor/jquery/jquery.min.js"></script>
+<script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/sb-admin-2.min.js"></script>
+<script>
+  function execCmd(cmd) { document.execCommand(cmd, false, null); document.getElementById('kontenEditor').focus(); }
+  function insertH3() { document.execCommand('formatBlock', false, 'h3'); }
+  $('#fileInput').on('change', function(){
+    var file = this.files[0];
+    if (file) { var r = new FileReader(); r.onload = function(e){ $('#previewImg').attr('src',e.target.result).show(); }; r.readAsDataURL(file); }
+  });
+  // Sync editor ke hidden textarea sebelum submit
+  $('form').on('submit', function(){
+    $('#kontenHidden').val($('#kontenEditor').html());
+  });
+</script>
+</body>
+</html>

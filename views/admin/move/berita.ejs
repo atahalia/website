@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title><%= title %> - Admin Panel</title>
+  <link rel="icon" type="image/png" href="/assets/img/favicon.png?v=4">
+  <link href="/assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="/assets/css/sb-admin-2.min.css" rel="stylesheet">
+  <link href="/assets/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+</head>
+<body id="page-top">
+<div id="wrapper">
+  <%- include('../partials/sidebar') %>
+  <div id="content-wrapper" class="d-flex flex-column">
+    <div id="content">
+      <%- include('../partials/topbar', { user }) %>
+      <div class="container-fluid">
+
+        <nav aria-label="breadcrumb" class="mb-3">
+          <ol class="breadcrumb" style="background:transparent;padding:0;font-size:.85rem">
+            <li class="breadcrumb-item"><a href="/admin/move">Program MOVE</a></li>
+            <li class="breadcrumb-item"><a href="/admin/move/<%= program.id %>/edit"><%= program.nama %></a></li>
+            <li class="breadcrumb-item active">Berita</li>
+          </ol>
+        </nav>
+
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div class="d-flex align-items-center" style="gap:16px">
+            <div style="width:48px;height:48px;border-radius:12px;background:<%= program.warna1 %>;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#fff;flex-shrink:0"><i class="<%= program.icon %>"></i></div>
+            <div><h1 class="h3 mb-0 text-gray-800">Berita & Update</h1><p class="text-muted mb-0" style="font-size:.85rem"><%= program.nama %></p></div>
+          </div>
+          <a href="/admin/move/<%= program.id %>/berita/create" class="btn btn-primary shadow-sm">
+            <i class="fas fa-plus mr-1"></i> Tulis Berita
+          </a>
+        </div>
+
+        <div class="d-flex flex-wrap mb-4" style="gap:8px">
+          <a href="/admin/move/<%= program.id %>/edit"      class="btn btn-sm btn-outline-primary"><i class="fas fa-info-circle mr-1"></i>Info</a>
+          <a href="/admin/move/<%= program.id %>/layanan"   class="btn btn-sm btn-outline-success"><i class="fas fa-list-check mr-1"></i>Layanan</a>
+          <a href="/admin/move/<%= program.id %>/proyek"    class="btn btn-sm btn-outline-info"><i class="fas fa-project-diagram mr-1"></i>Proyek</a>
+          <a href="/admin/move/<%= program.id %>/berita"    class="btn btn-sm btn-secondary text-white"><i class="fas fa-newspaper mr-1"></i>Berita</a>
+          <a href="/admin/move/<%= program.id %>/pelanggan" class="btn btn-sm btn-outline-warning"><i class="fas fa-map-marker-alt mr-1"></i>Peta</a>
+          <a href="/admin/move/<%= program.id %>/galeri"    class="btn btn-sm btn-outline-warning"><i class="fas fa-images mr-1"></i>Galeri</a>
+          <a href="/admin/move/<%= program.id %>/sosmed"    class="btn btn-sm btn-outline-danger"><i class="fas fa-share-alt mr-1"></i>Sosmed</a>
+          <a href="/admin/move/<%= program.id %>/pengelola" class="btn btn-sm btn-outline-secondary"><i class="fas fa-users mr-1"></i>Tim</a>
+        </div>
+
+        <% if (success) { %><div class="alert alert-success alert-dismissible fade show"><i class="fas fa-check-circle mr-2"></i>Berhasil!<button type="button" class="close" data-dismiss="alert"><span>&times;</span></button></div><% } %>
+
+        <div class="card shadow mb-4">
+          <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-newspaper mr-2"></i>Daftar Berita (<%= berita.length %>)</h6></div>
+          <div class="card-body">
+            <% if (!berita.length) { %>
+              <div class="text-center py-5 text-muted">
+                <i class="fas fa-newspaper fa-3x mb-3 d-block" style="opacity:.3"></i>
+                Belum ada berita. Klik <strong>Tulis Berita</strong> untuk membuat artikel pertama.
+              </div>
+            <% } else { %>
+              <div class="table-responsive">
+                <table class="table table-bordered" id="beritaTable" width="100%">
+                  <thead><tr><th>Gambar</th><th>Judul</th><th>Status</th><th>Beranda</th><th>Tanggal</th><th>Aksi</th></tr></thead>
+                  <tbody>
+                    <% berita.forEach(function(b){ %>
+                      <tr>
+                        <td style="width:80px">
+                          <% if(b.gambar){ %>
+                            <img src="/uploads/<%= b.gambar %>" style="width:70px;height:50px;object-fit:cover;border-radius:6px">
+                          <% } else { %>
+                            <div style="width:70px;height:50px;background:#f8f9fc;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#adb5bd"><i class="fas fa-image"></i></div>
+                          <% } %>
+                        </td>
+                        <td>
+                          <strong style="font-size:.9rem"><%= b.judul %></strong>
+                          <% if(b.ringkasan){ %><br><small class="text-muted"><%= b.ringkasan.substring(0,80) %>...</small><% } %>
+                        </td>
+                        <td><span class="badge <%= b.status==='published'?'badge-success':'badge-secondary' %>"><%= b.status %></span></td>
+                        <td class="text-center"><% if(b.tampil_beranda){ %><i class="fas fa-check text-success"></i><% } else { %><i class="fas fa-times text-muted"></i><% } %></td>
+                        <td style="white-space:nowrap;font-size:.82rem"><%= new Date(b.created_at).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) %></td>
+                        <td>
+                          <a href="/admin/move/<%= program.id %>/berita/<%= b.id %>/edit" class="btn btn-xs btn-outline-primary mr-1" style="font-size:.75rem;padding:3px 10px"><i class="fas fa-edit"></i></a>
+                          <form action="/admin/move/<%= program.id %>/berita/<%= b.id %>/delete" method="POST" onsubmit="return confirm('Hapus berita ini?')" style="display:inline">
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                            <button class="btn btn-xs btn-outline-danger" style="font-size:.75rem;padding:3px 10px"><i class="fas fa-trash"></i></button>
+                          </form>
+                        </td>
+                      </tr>
+                    <% }) %>
+                  </tbody>
+                </table>
+              </div>
+            <% } %>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <%- include('../partials/footer') %>
+  </div>
+</div>
+<script src="/assets/vendor/jquery/jquery.min.js"></script>
+<script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/vendor/datatables/jquery.dataTables.min.js"></script>
+<script src="/assets/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+<script src="/assets/js/sb-admin-2.min.js"></script>
+<script>
+  $('#beritaTable').DataTable({ language: { url: '/assets/vendor/datatables/i18n/id.json' }, order: [[4,'desc']], pageLength: 10 });
+</script>
+</body>
+</html>

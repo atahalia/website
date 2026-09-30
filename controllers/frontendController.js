@@ -147,7 +147,8 @@ exports.home = async (req, res) => {
       [bkkHome],
       siteSettings,
       [agendaHome],
-      guruHome
+      guruHome,
+      [moveBeritaHome]
     ] = await Promise.all([
       getProfilSekolah(),
       db.query('SELECT id, judul, slug, gambar, konten, kategori, created_at FROM berita WHERE status = "published" ORDER BY created_at DESC LIMIT 6'),
@@ -164,13 +165,17 @@ exports.home = async (req, res) => {
       db.query("SELECT id, judul, slug, perusahaan, lokasi, kategori, gambar, deadline, kontak FROM bkk_lowongan WHERE status='aktif' ORDER BY created_at DESC LIMIT 6"),
       getSettings(),
       db.query("SELECT id, judul, slug, gambar, tanggal_mulai, tanggal_selesai, waktu_mulai, waktu_selesai, lokasi FROM agenda WHERE status='aktif' AND tampil_home=1 AND (tanggal_selesai >= DATE_SUB(CURDATE(), INTERVAL 3 DAY) OR (tanggal_selesai IS NULL AND tanggal_mulai >= DATE_SUB(CURDATE(), INTERVAL 3 DAY))) ORDER BY tanggal_mulai DESC LIMIT 3"),
-      getGuruHome()
+      getGuruHome(),
+      db.query(`SELECT mb.id, mb.judul, mb.ringkasan, mb.gambar, mb.created_at, mp.nama as program_nama, mp.slug as program_slug, mp.warna1, mp.gradient
+        FROM move_berita mb JOIN move_program mp ON mp.id = mb.program_id
+        WHERE mb.status='published' AND mb.tampil_beranda=1
+        ORDER BY mb.created_at DESC LIMIT 4`)
     ]);
 
     res.render('frontend/home', {
       title: 'Beranda', currentPage: 'home',
       profil, berita: beritaTerbaru, galeri, slider, jurusan, menuItems, mediaSosialFooter, linkTerkait, alumniHome, fasilitasHome,
-      artikelHome, fileDownloadHome, bkkHome, siteSettings, agendaHome, guruHome
+      artikelHome, fileDownloadHome, bkkHome, siteSettings, agendaHome, guruHome, moveBeritaHome
     });
   } catch (error) {
     console.error(error);
@@ -475,26 +480,31 @@ async function getMovePrograms() {
     "SELECT * FROM move_program WHERE status='aktif' ORDER BY urutan ASC, id ASC"
   );
 
-  // Untuk setiap program, ambil layanan, sosmed, galeri, pengelola secara paralel
+  // Untuk setiap program, ambil layanan, sosmed, galeri, pengelola, proyek, berita secara paralel
   await Promise.all(programs.map(async (p) => {
     const [
       [layanan],
       [sosmedRows],
       [galeri],
-      [pengelola]
+      [pengelola],
+      [proyek],
+      [berita]
     ] = await Promise.all([
       db.query('SELECT * FROM move_layanan WHERE program_id=? ORDER BY urutan ASC, id ASC', [p.id]),
       db.query('SELECT * FROM move_sosmed WHERE program_id=?', [p.id]),
       db.query('SELECT * FROM move_galeri WHERE program_id=? ORDER BY created_at DESC', [p.id]),
-      db.query('SELECT * FROM move_pengelola WHERE program_id=? ORDER BY urutan ASC, id ASC', [p.id])
+      db.query('SELECT * FROM move_pengelola WHERE program_id=? ORDER BY urutan ASC, id ASC', [p.id]),
+      db.query("SELECT * FROM move_proyek WHERE program_id=? AND status='published' ORDER BY tahun DESC, id DESC", [p.id]),
+      db.query("SELECT id,judul,ringkasan,gambar,created_at FROM move_berita WHERE program_id=? AND status='published' ORDER BY created_at DESC LIMIT 4", [p.id])
     ]);
     p.layanan   = layanan;
     p.sosmed    = sosmedRows[0] || { instagram:'', tiktok:'', youtube:'', facebook:'', whatsapp:'', embed:'' };
     p.galeri    = galeri;
     p.pengelola = pengelola;
+    p.proyek    = proyek;
+    p.berita    = berita;
     // Alias warna_light → warnaLight agar kompatibel dengan template EJS
     p.warnaLight = p.warna_light || '#eff6ff';
-    // deskripsi_singkat → alias
     p.deskripsi_singkat = p.deskripsi_singkat || '';
   }));
 
@@ -531,6 +541,20 @@ exports.moveJurusan = async (req, res) => {
     });
   } catch (err) {
     console.error('MOVE jurusan error:', err);
+    res.status(500).send('Terjadi kesalahan');
+  }
+};
+
+/** GET /move/peta — halaman peta gabungan semua program */
+exports.movePeta = async (req, res) => {
+  try {
+    const allJurusan = await getMovePrograms();
+    res.render('frontend/move-peta', {
+      title: 'Peta Sebaran Layanan MOVE | SMKN 1 Kras',
+      allJurusan
+    });
+  } catch (err) {
+    console.error('MOVE peta error:', err);
     res.status(500).send('Terjadi kesalahan');
   }
 };

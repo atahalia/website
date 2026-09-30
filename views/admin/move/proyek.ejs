@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title><%= title %> - Admin Panel</title>
+  <link rel="icon" type="image/png" href="/assets/img/favicon.png?v=4">
+  <link href="/assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="/assets/css/sb-admin-2.min.css" rel="stylesheet">
+  <style>
+    .proyek-card{border-radius:12px;overflow:hidden;border:1px solid #e3e6f0;background:#fff;transition:box-shadow .2s}
+    .proyek-card:hover{box-shadow:0 6px 20px rgba(0,0,0,.1)}
+    .proyek-img{width:100%;height:160px;object-fit:cover;background:#f8f9fc}
+    .proyek-img-placeholder{width:100%;height:160px;background:linear-gradient(135deg,#f8f9fc,#e9ecef);display:flex;align-items:center;justify-content:center;color:#adb5bd;font-size:2rem}
+    .tahun-badge{display:inline-block;background:<%= program.gradient %>;color:#fff;padding:3px 12px;border-radius:20px;font-size:.72rem;font-weight:700}
+    .filter-btn{border-radius:20px;padding:5px 16px;font-size:.82rem;font-weight:600;border:2px solid #e3e6f0;background:#fff;color:#5a5c69;cursor:pointer;transition:all .2s}
+    .filter-btn.active,.filter-btn:hover{background:var(--jgrad,#4e73df);color:#fff;border-color:transparent}
+  </style>
+</head>
+<body id="page-top">
+<div id="wrapper">
+  <%- include('../partials/sidebar') %>
+  <div id="content-wrapper" class="d-flex flex-column">
+    <div id="content">
+      <%- include('../partials/topbar', { user }) %>
+      <div class="container-fluid">
+
+        <nav aria-label="breadcrumb" class="mb-3">
+          <ol class="breadcrumb" style="background:transparent;padding:0;font-size:.85rem">
+            <li class="breadcrumb-item"><a href="/admin/move">Program MOVE</a></li>
+            <li class="breadcrumb-item"><a href="/admin/move/<%= program.id %>/edit"><%= program.nama %></a></li>
+            <li class="breadcrumb-item active">Proyek</li>
+          </ol>
+        </nav>
+
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div class="d-flex align-items-center" style="gap:16px">
+            <div style="width:48px;height:48px;border-radius:12px;background:<%= program.warna1 %>;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#fff;flex-shrink:0"><i class="<%= program.icon %>"></i></div>
+            <div><h1 class="h3 mb-0 text-gray-800">Proyek Kegiatan</h1><p class="text-muted mb-0" style="font-size:.85rem"><%= program.nama %> · <%= proyek.length %> proyek</p></div>
+          </div>
+          <a href="/admin/move/<%= program.id %>/proyek/create" class="btn btn-primary shadow-sm">
+            <i class="fas fa-plus mr-1"></i> Tambah Proyek
+          </a>
+        </div>
+
+        <!-- Nav tab -->
+        <div class="d-flex flex-wrap mb-4" style="gap:8px">
+          <a href="/admin/move/<%= program.id %>/edit"      class="btn btn-sm btn-outline-primary"><i class="fas fa-info-circle mr-1"></i>Info</a>
+          <a href="/admin/move/<%= program.id %>/layanan"   class="btn btn-sm btn-outline-success"><i class="fas fa-list-check mr-1"></i>Layanan</a>
+          <a href="/admin/move/<%= program.id %>/proyek"    class="btn btn-sm btn-info text-white"><i class="fas fa-project-diagram mr-1"></i>Proyek</a>
+          <a href="/admin/move/<%= program.id %>/berita"    class="btn btn-sm btn-outline-secondary"><i class="fas fa-newspaper mr-1"></i>Berita</a>
+          <a href="/admin/move/<%= program.id %>/pelanggan" class="btn btn-sm btn-outline-warning"><i class="fas fa-map-marker-alt mr-1"></i>Peta</a>
+          <a href="/admin/move/<%= program.id %>/galeri"    class="btn btn-sm btn-outline-warning"><i class="fas fa-images mr-1"></i>Galeri</a>
+          <a href="/admin/move/<%= program.id %>/sosmed"    class="btn btn-sm btn-outline-danger"><i class="fas fa-share-alt mr-1"></i>Sosmed</a>
+          <a href="/admin/move/<%= program.id %>/pengelola" class="btn btn-sm btn-outline-secondary"><i class="fas fa-users mr-1"></i>Tim</a>
+        </div>
+
+        <% if (success) { %><div class="alert alert-success alert-dismissible fade show"><i class="fas fa-check-circle mr-2"></i>Berhasil!<button type="button" class="close" data-dismiss="alert"><span>&times;</span></button></div><% } %>
+        <% if (error) { %><div class="alert alert-danger alert-dismissible fade show"><i class="fas fa-exclamation-circle mr-2"></i><%= error %><button type="button" class="close" data-dismiss="alert"><span>&times;</span></button></div><% } %>
+
+        <!-- Filter tahun -->
+        <% if (tahunList.length > 1) { %>
+          <div class="mb-4 d-flex flex-wrap align-items-center" style="gap:8px">
+            <span class="text-muted mr-2" style="font-size:.85rem;font-weight:600">Filter tahun:</span>
+            <button class="filter-btn active" data-tahun="all" style="--jgrad:<%= program.warna1 %>">Semua</button>
+            <% tahunList.forEach(function(t){ %>
+              <button class="filter-btn" data-tahun="<%= t %>" style="--jgrad:<%= program.warna1 %>"><%= t %></button>
+            <% }) %>
+          </div>
+        <% } %>
+
+        <% if (!proyek.length) { %>
+          <div class="text-center py-5 text-muted">
+            <i class="fas fa-project-diagram fa-3x mb-3 d-block" style="opacity:.3"></i>
+            Belum ada proyek. Klik <strong>Tambah Proyek</strong> untuk mulai mendokumentasikan kegiatan.
+          </div>
+        <% } else { %>
+          <div class="row" id="proyekGrid">
+            <% proyek.forEach(function(p){ %>
+              <div class="col-md-6 col-lg-4 mb-4 proyek-item" data-tahun="<%= p.tahun %>">
+                <div class="proyek-card">
+                  <% if (p.gambar) { %>
+                    <img src="/uploads/<%= p.gambar %>" alt="<%= p.judul %>" class="proyek-img">
+                  <% } else { %>
+                    <div class="proyek-img-placeholder"><i class="fas fa-project-diagram"></i></div>
+                  <% } %>
+                  <div style="padding:16px">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                      <span class="tahun-badge"><%= p.tahun %></span>
+                      <div class="d-flex" style="gap:6px">
+                        <% if (p.featured) { %><span class="badge badge-warning" title="Featured"><i class="fas fa-star"></i></span><% } %>
+                        <span class="badge <%= p.status==='published'?'badge-success':'badge-secondary' %>" style="font-size:.7rem"><%= p.status %></span>
+                      </div>
+                    </div>
+                    <h6 class="font-weight-bold mb-1" style="font-size:.92rem"><%= p.judul %></h6>
+                    <% if (p.lokasi) { %><p class="text-muted mb-2" style="font-size:.78rem"><i class="fas fa-map-marker-alt mr-1"></i><%= p.lokasi %></p><% } %>
+                    <p class="text-muted mb-3" style="font-size:.82rem;line-height:1.5"><%= (p.deskripsi||'').substring(0,120) %><%= (p.deskripsi||'').length>120?'...':'' %></p>
+                    <div class="d-flex" style="gap:8px">
+                      <a href="/admin/move/<%= program.id %>/proyek/<%= p.id %>/edit" class="btn btn-sm btn-outline-primary flex-fill" style="font-size:.78rem"><i class="fas fa-edit mr-1"></i>Edit</a>
+                      <form action="/admin/move/<%= program.id %>/proyek/<%= p.id %>/delete" method="POST" onsubmit="return confirm('Hapus proyek ini?')" style="margin:0">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <button class="btn btn-sm btn-outline-danger" style="font-size:.78rem"><i class="fas fa-trash"></i></button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        <% } %>
+
+      </div>
+    </div>
+    <%- include('../partials/footer') %>
+  </div>
+</div>
+<script src="/assets/vendor/jquery/jquery.min.js"></script>
+<script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/sb-admin-2.min.js"></script>
+<script>
+  $('.filter-btn').on('click', function(){
+    $('.filter-btn').removeClass('active');
+    $(this).addClass('active');
+    var tahun = $(this).data('tahun');
+    if (tahun === 'all') {
+      $('.proyek-item').show();
+    } else {
+      $('.proyek-item').each(function(){
+        $(this).toggle($(this).data('tahun') == tahun);
+      });
+    }
+  });
+</script>
+</body>
+</html>

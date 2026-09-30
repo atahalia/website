@@ -434,7 +434,8 @@ router.post('/sk-guru/edit/:id', isAuthenticated, csrfProtect, validateIdParam, 
 router.post('/sk-guru/delete/:id', isAuthenticated, csrfProtect, validateIdParam, skGuruController.adminDelete);
 
 // ── MOVE – Melayani Komunitas Via Edukasi ────────────────────────────────────
-const moveAdminController = require('../controllers/moveAdminController');
+const moveAdminController   = require('../controllers/moveAdminController');
+const moveContentController = require('../controllers/moveContentController');
 
 router.get('/move', isAuthenticated, moveAdminController.index);
 
@@ -461,5 +462,26 @@ router.post('/move/galeri/:gid/delete',   isAuthenticated, csrfProtect, validate
 router.get('/move/:id/pengelola',           isAuthenticated, validateIdParam, moveAdminController.pengelolaPage);
 router.post('/move/:id/pengelola/add',      isAuthenticated, csrfProtect, uploadLimiter, validateIdParam, moveAdminController.pengelolaAdd);
 router.post('/move/pengelola/:pid/delete',  isAuthenticated, csrfProtect, validateIdParam, moveAdminController.pengelolaDelete);
+
+// ── MOVE Content: Proyek ─────────────────────────────────────────────────────
+router.get('/move/:id/proyek',                isAuthenticated, validateIdParam, moveContentController.proyekPage);
+router.get('/move/:id/proyek/create',         isAuthenticated, validateIdParam, moveContentController.proyekCreatePage);
+router.post('/move/:id/proyek/create',        isAuthenticated, csrfProtect, uploadLimiter, validateIdParam, moveContentController.proyekCreate);
+router.get('/move/:id/proyek/:pid/edit',      isAuthenticated, validateIdParam, moveContentController.proyekEditPage);
+router.post('/move/:id/proyek/:pid/edit',     isAuthenticated, csrfProtect, uploadLimiter, validateIdParam, moveContentController.proyekUpdate);
+router.post('/move/:id/proyek/:pid/delete',   isAuthenticated, csrfProtect, validateIdParam, moveContentController.proyekDelete);
+
+// ── MOVE Content: Berita ─────────────────────────────────────────────────────
+router.get('/move/:id/berita',                isAuthenticated, validateIdParam, moveContentController.beritaPage);
+router.get('/move/:id/berita/create',         isAuthenticated, validateIdParam, moveContentController.beritaCreatePage);
+router.post('/move/:id/berita/create',        isAuthenticated, csrfProtect, uploadLimiter, validateIdParam, moveContentController.beritaCreate);
+router.get('/move/:id/berita/:bid/edit',      isAuthenticated, validateIdParam, moveContentController.beritaEditPage);
+router.post('/move/:id/berita/:bid/edit',     isAuthenticated, csrfProtect, uploadLimiter, validateIdParam, moveContentController.beritaUpdate);
+router.post('/move/:id/berita/:bid/delete',   isAuthenticated, csrfProtect, validateIdParam, moveContentController.beritaDelete);
+
+// ── MOVE Content: Pelanggan/Peta ─────────────────────────────────────────────
+router.get('/move/:id/pelanggan',             isAuthenticated, validateIdParam, moveContentController.pelangganPage);
+router.post('/move/:id/pelanggan/add',        isAuthenticated, csrfProtect, validateIdParam, moveContentController.pelangganAdd);
+router.post('/move/pelanggan/:klid/delete',   isAuthenticated, csrfProtect, validateIdParam, moveContentController.pelangganDelete);
 
 module.exports = router;

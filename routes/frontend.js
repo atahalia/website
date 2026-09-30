@@ -314,6 +314,11 @@ ${urlEntries.join('\n')}
 
 // ── MOVE – Melayani Komunitas Via Edukasi ──────────────────────────────────
 router.get('/move', frontendController.moveIndex);
+router.get('/move/peta', frontendController.movePeta);
 router.get('/move/:slug', frontendController.moveJurusan);
+
+// API: data pelanggan untuk peta (JSON)
+const moveContentController = require('../controllers/moveContentController');
+router.get('/api/move/pelanggan', moveContentController.apiPelanggan);
 
 module.exports = router;

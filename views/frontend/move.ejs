@@ -12,6 +12,7 @@
   <link href="/assets/vendor/bootstrap5/bootstrap.min.css" rel="stylesheet">
   <link href="/assets/vendor/fontawesome6/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="/theme.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 
   <style>
     :root {
@@ -477,6 +478,126 @@
   </div>
 </section>
 
+<!-- ═══ PROYEK KEGIATAN ═══════════════════════════════════════════════ -->
+<% if (jurusan.proyek && jurusan.proyek.length > 0) { %>
+<section class="section-pad" style="background:#f8fafc" id="proyek">
+  <div class="container">
+    <div class="row mb-4 align-items-end">
+      <div class="col-lg-7">
+        <div class="section-label"><i class="fas fa-project-diagram"></i> Jejak Kegiatan</div>
+        <h2 class="section-title mb-2">Proyek yang Pernah Kami Tangani</h2>
+        <p class="section-sub">Dokumentasi nyata kontribusi siswa-siswi SMKN 1 Kras untuk komunitas dari tahun ke tahun.</p>
+      </div>
+      <% var tahunProyek = [...new Set(jurusan.proyek.map(function(p){return p.tahun}))].sort(function(a,b){return b-a}); %>
+      <% if (tahunProyek.length > 1) { %>
+        <div class="col-lg-5 text-lg-right mt-3 mt-lg-0">
+          <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end">
+            <button class="proyek-filter active" data-tahun="all"
+              style="padding:6px 18px;border-radius:20px;border:2px solid var(--move-primary);background:var(--move-primary);color:#fff;font-size:.82rem;font-weight:600;cursor:pointer">
+              Semua
+            </button>
+            <% tahunProyek.forEach(function(t){ %>
+              <button class="proyek-filter" data-tahun="<%= t %>"
+                style="padding:6px 18px;border-radius:20px;border:2px solid #e2e8f0;background:#fff;color:#64748b;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s">
+                <%= t %>
+              </button>
+            <% }) %>
+          </div>
+        </div>
+      <% } %>
+    </div>
+    <div class="row" id="proyekGrid">
+      <% jurusan.proyek.forEach(function(p){ %>
+        <div class="col-md-6 col-lg-4 mb-4 proyek-item" data-tahun="<%= p.tahun %>">
+          <div style="background:#fff;border-radius:20px;overflow:hidden;border:1px solid #e8edf4;height:100%;transition:transform .25s,box-shadow .25s">
+            <% if (p.gambar) { %>
+              <div style="height:200px;overflow:hidden"><img src="/uploads/<%= p.gambar %>" alt="<%= p.judul %>" style="width:100%;height:100%;object-fit:cover;transition:transform .4s" loading="lazy"></div>
+            <% } else { %>
+              <div style="height:200px;background:var(--move-gradient);display:flex;align-items:center;justify-content:center;font-size:3rem;color:rgba(255,255,255,.4)"><i class="fas fa-project-diagram"></i></div>
+            <% } %>
+            <div style="padding:20px">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+                <span style="background:var(--move-gradient);color:#fff;padding:3px 12px;border-radius:20px;font-size:.72rem;font-weight:700"><%= p.tahun %></span>
+                <% if (p.lokasi) { %><span style="font-size:.75rem;color:#94a3b8"><i class="fas fa-map-marker-alt" style="margin-right:4px"></i><%= p.lokasi %></span><% } %>
+              </div>
+              <h5 style="font-weight:700;font-size:.95rem;margin-bottom:8px;color:#0f172a"><%= p.judul %></h5>
+              <% if (p.deskripsi) { %><p style="font-size:.85rem;color:#64748b;line-height:1.6;margin:0"><%= p.deskripsi.substring(0,120) %><%= p.deskripsi.length>120?'...':'' %></p><% } %>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</section>
+<% } %>
+
+<!-- ═══ BERITA & UPDATE ═══════════════════════════════════════════════ -->
+<% if (jurusan.berita && jurusan.berita.length > 0) { %>
+<section class="section-pad" id="berita">
+  <div class="container">
+    <div class="section-label"><i class="fas fa-newspaper"></i> Terbaru</div>
+    <h2 class="section-title mb-2">Berita & Update Program</h2>
+    <p class="section-sub mb-5">Informasi terkini dari kegiatan program MOVE di lapangan.</p>
+    <div class="row">
+      <% jurusan.berita.forEach(function(b, idx){ %>
+        <% if (idx === 0) { %>
+          <div class="col-lg-6 mb-4">
+            <div style="background:#fff;border-radius:20px;overflow:hidden;border:1px solid #e8edf4;height:100%">
+              <% if (b.gambar) { %><div style="height:260px;overflow:hidden"><img src="/uploads/<%= b.gambar %>" alt="<%= b.judul %>" style="width:100%;height:100%;object-fit:cover" loading="lazy"></div><% } else { %><div style="height:260px;background:var(--move-gradient);display:flex;align-items:center;justify-content:center"><i class="fas fa-newspaper" style="font-size:3rem;color:rgba(255,255,255,.4)"></i></div><% } %>
+              <div style="padding:24px">
+                <span style="background:var(--move-light);color:var(--move-primary);font-size:.72rem;font-weight:700;padding:3px 12px;border-radius:20px"><i class="fas fa-star" style="margin-right:4px"></i>Terbaru</span>
+                <h4 style="font-weight:800;margin:12px 0 8px;font-size:1.1rem;color:#0f172a"><%= b.judul %></h4>
+                <% if (b.ringkasan) { %><p style="font-size:.88rem;color:#64748b;line-height:1.6;margin-bottom:12px"><%= b.ringkasan %></p><% } %>
+                <span style="font-size:.75rem;color:#94a3b8"><i class="fas fa-calendar" style="margin-right:4px"></i><%= new Date(b.created_at).toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'}) %></span>
+              </div>
+            </div>
+          </div>
+        <% } else if (idx <= 3) { %>
+          <div class="col-lg-3 col-md-6 mb-4">
+            <div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid #e8edf4;height:100%">
+              <% if (b.gambar) { %><div style="height:140px;overflow:hidden"><img src="/uploads/<%= b.gambar %>" alt="<%= b.judul %>" style="width:100%;height:100%;object-fit:cover" loading="lazy"></div><% } else { %><div style="height:140px;background:var(--move-gradient);display:flex;align-items:center;justify-content:center"><i class="fas fa-newspaper" style="font-size:2rem;color:rgba(255,255,255,.4)"></i></div><% } %>
+              <div style="padding:16px">
+                <h6 style="font-weight:700;font-size:.88rem;margin-bottom:6px;color:#0f172a"><%= b.judul %></h6>
+                <% if (b.ringkasan) { %><p style="font-size:.78rem;color:#64748b;line-height:1.5;margin-bottom:8px"><%= b.ringkasan.substring(0,80) %>...</p><% } %>
+                <span style="font-size:.72rem;color:#94a3b8"><%= new Date(b.created_at).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) %></span>
+              </div>
+            </div>
+          </div>
+        <% } %>
+      <% }) %>
+    </div>
+  </div>
+</section>
+<% } %>
+
+<!-- ═══ PETA PELANGGAN ════════════════════════════════════════════════ -->
+<section class="section-pad-sm" style="background:#f8fafc" id="peta">
+  <div class="container">
+    <div class="row mb-4 align-items-end">
+      <div class="col-lg-7">
+        <div class="section-label"><i class="fas fa-map-marker-alt"></i> Sebaran Layanan</div>
+        <h2 class="section-title mb-2">Peta Lokasi yang Pernah Kami Tangani</h2>
+        <p class="section-sub">Setiap titik adalah komunitas nyata yang sudah merasakan manfaat program MOVE dari SMKN 1 Kras.</p>
+      </div>
+      <div class="col-lg-5 mt-3 mt-lg-0" style="display:flex;flex-wrap:wrap;gap:12px;justify-content:flex-end;align-items:center">
+        <% allJurusan.forEach(function(j){ %>
+          <div style="display:flex;align-items:center;gap:6px;font-size:.8rem;font-weight:600;color:#475569">
+            <span style="width:12px;height:12px;border-radius:50%;background:<%= j.warna1 %>;display:inline-block;flex-shrink:0"></span>
+            <%= j.nama.replace('Teknik Komputer Jaringan','TKJ').replace('Teknik Kendaraan Ringan','TKR').replace('Teknik dan Produk Tekstil Umum','TPTUP').replace('Tata Busana','Busana').replace('Tata Boga','Boga') %>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+    <div style="border-radius:20px;overflow:hidden;border:2px solid #e2e8f0;box-shadow:0 4px 24px rgba(0,0,0,.08)">
+      <div id="moveMap" style="height:460px"></div>
+    </div>
+    <p style="font-size:.8rem;color:#94a3b8;margin-top:12px;text-align:center">
+      <i class="fas fa-info-circle" style="margin-right:4px"></i>
+      Klik titik untuk detail lokasi. Peta menggunakan <a href="https://openstreetmap.org" target="_blank" style="color:#94a3b8">OpenStreetMap</a> — gratis & open source.
+    </p>
+  </div>
+</section>
+
 <!-- ═══════════════════════════════════════════
      MEDIA SOSIAL
 ════════════════════════════════════════════ -->
@@ -635,6 +756,77 @@
       if (target) { e.preventDefault(); target.scrollIntoView({ behavior:'smooth', block:'start' }); }
     });
   });
+</script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN/WLEo=" crossorigin=""></script>
+<script>
+// ── Filter Proyek ─────────────────────────────────────────────────────
+document.querySelectorAll('.proyek-filter').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var tahun = this.dataset.tahun;
+    // Update active style
+    document.querySelectorAll('.proyek-filter').forEach(function(b){
+      b.style.background = '#fff'; b.style.color = '#64748b'; b.style.borderColor = '#e2e8f0';
+      b.classList.remove('active');
+    });
+    this.style.background = 'var(--move-primary)'; this.style.color = '#fff'; this.style.borderColor = 'var(--move-primary)';
+    this.classList.add('active');
+    // Filter tampilan
+    document.querySelectorAll('.proyek-item').forEach(function(item){
+      item.style.display = (tahun === 'all' || item.dataset.tahun == tahun) ? '' : 'none';
+    });
+  });
+});
+
+// ── Peta Leaflet ─────────────────────────────────────────────────────
+if (document.getElementById('moveMap')) {
+  var mapEl = document.getElementById('moveMap');
+  var moveMap = L.map('moveMap').setView([-7.822, 112.012], 12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
+  }).addTo(moveMap);
+
+  function makePin(color) {
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="38" viewBox="0 0 28 38">'
+      + '<ellipse cx="14" cy="35" rx="5" ry="2" fill="rgba(0,0,0,0.15)"/>'
+      + '<path d="M14 0C8.477 0 4 4.477 4 10c0 7.5 10 24 10 24S24 17.5 24 10C24 4.477 19.523 0 14 0z" fill="' + color + '" stroke="rgba(0,0,0,.15)" stroke-width="0.5"/>'
+      + '<circle cx="14" cy="10" r="5" fill="white" opacity="0.9"/>'
+      + '</svg>';
+    return L.divIcon({ html: svg, iconSize:[28,38], iconAnchor:[14,38], popupAnchor:[0,-36], className:'' });
+  }
+
+  fetch('/api/move/pelanggan')
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if (!data.length) {
+        mapEl.style.background = '#f8fafc';
+        mapEl.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#94a3b8"><i class="fas fa-map-marker-alt" style="font-size:3rem;margin-bottom:12px;opacity:.3"></i><p style="font-size:.9rem">Belum ada data lokasi pelanggan</p></div>';
+        return;
+      }
+      var bounds = [];
+      data.forEach(function(k){
+        var icon = makePin(k.warna1 || '#4e73df');
+        var googleUrl = 'https://www.google.com/maps?q=' + k.lat + ',' + k.lng;
+        var popup = '<div style="min-width:200px;font-family:Inter,sans-serif">'
+          + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
+          + '<span style="width:10px;height:10px;border-radius:50%;background:' + (k.warna1||'#4e73df') + ';display:inline-block;flex-shrink:0"></span>'
+          + '<span style="font-size:.72rem;font-weight:700;color:' + (k.warna1||'#4e73df') + '">' + k.program_nama + '</span>'
+          + '</div>'
+          + '<strong style="font-size:.92rem;color:#0f172a;line-height:1.4;display:block;margin-bottom:6px">' + k.nama + '</strong>'
+          + (k.alamat ? '<div style="font-size:.78rem;color:#64748b;margin-bottom:4px"><i style="margin-right:4px"></i>' + k.alamat + '</div>' : '')
+          + (k.layanan ? '<div style="font-size:.78rem;color:#64748b;margin-bottom:4px">Layanan: <strong>' + k.layanan + '</strong></div>' : '')
+          + '<div style="font-size:.75rem;color:#94a3b8;margin-bottom:10px">Tahun ' + k.tahun + '</div>'
+          + '<a href="' + googleUrl + '" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#1a56db;color:#fff;padding:6px 14px;border-radius:20px;font-size:.75rem;font-weight:600;text-decoration:none">'
+          + '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M14 3v2H7v14h14v-7h2v9H5V3h9zm5 0h4v4h-2V6.414l-9.293 9.293-1.414-1.414L19.586 5H17V3z"/></svg>'
+          + 'Buka di Google Maps</a>'
+          + '</div>';
+        var marker = L.marker([k.lat, k.lng], { icon: icon }).addTo(moveMap).bindPopup(popup, { maxWidth: 240 });
+        bounds.push([k.lat, k.lng]);
+      });
+      if (bounds.length) moveMap.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
+    })
+    .catch(function(){ console.warn('Gagal memuat data peta'); });
+}
 </script>
 </body>
 </html>

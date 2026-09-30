@@ -79,6 +79,9 @@
                   </div>
                   <div class="mt-2">
                     <span class="stat-pill"><i class="fas fa-layer-group"></i> <%= p.jml_layanan %> Layanan</span>
+                    <span class="stat-pill"><i class="fas fa-project-diagram"></i> <%= p.jml_proyek || 0 %> Proyek</span>
+                    <span class="stat-pill"><i class="fas fa-newspaper"></i> <%= p.jml_berita || 0 %> Berita</span>
+                    <span class="stat-pill"><i class="fas fa-map-marker-alt"></i> <%= p.jml_pelanggan || 0 %> Peta</span>
                     <span class="stat-pill"><i class="fas fa-images"></i> <%= p.jml_galeri %> Foto</span>
                     <span class="stat-pill"><i class="fas fa-users"></i> <%= p.jml_pengelola %> Tim</span>
                   </div>
@@ -97,8 +100,17 @@
                     <a href="/admin/move/<%= p.id %>/layanan" class="action-btn" style="background:#1cc88a;color:#fff">
                       <i class="fas fa-list-check"></i> Layanan
                     </a>
+                    <a href="/admin/move/<%= p.id %>/proyek" class="action-btn" style="background:#36b9cc;color:#fff">
+                      <i class="fas fa-project-diagram"></i> Proyek
+                    </a>
+                    <a href="/admin/move/<%= p.id %>/berita" class="action-btn" style="background:#5a5c69;color:#fff">
+                      <i class="fas fa-newspaper"></i> Berita
+                    </a>
                     <a href="/admin/move/<%= p.id %>/galeri" class="action-btn" style="background:#f6c23e;color:#333">
                       <i class="fas fa-images"></i> Galeri
+                    </a>
+                    <a href="/admin/move/<%= p.id %>/pelanggan" class="action-btn" style="background:#fd7e14;color:#fff">
+                      <i class="fas fa-map-marker-alt"></i> Peta
                     </a>
                     <a href="/admin/move/<%= p.id %>/sosmed" class="action-btn" style="background:#e74a3b;color:#fff">
                       <i class="fas fa-share-alt"></i> Sosmed

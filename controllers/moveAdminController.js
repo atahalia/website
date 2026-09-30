@@ -50,7 +50,10 @@ exports.index = async (req, res) => {
       SELECT p.*,
         (SELECT COUNT(*) FROM move_layanan WHERE program_id = p.id) as jml_layanan,
         (SELECT COUNT(*) FROM move_galeri  WHERE program_id = p.id) as jml_galeri,
-        (SELECT COUNT(*) FROM move_pengelola WHERE program_id = p.id) as jml_pengelola
+        (SELECT COUNT(*) FROM move_pengelola WHERE program_id = p.id) as jml_pengelola,
+        (SELECT COUNT(*) FROM move_proyek WHERE program_id = p.id AND status='published') as jml_proyek,
+        (SELECT COUNT(*) FROM move_berita WHERE program_id = p.id AND status='published') as jml_berita,
+        (SELECT COUNT(*) FROM move_pelanggan WHERE program_id = p.id) as jml_pelanggan
       FROM move_program p ORDER BY p.urutan ASC, p.id ASC
     `);
     res.render('admin/move/index', {

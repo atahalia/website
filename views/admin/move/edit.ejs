@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title><%= title %> - Admin Panel</title>
+  <link rel="icon" type="image/png" href="/assets/img/favicon.png?v=4">
+  <link href="/assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="/assets/css/sb-admin-2.min.css" rel="stylesheet">
+  <style>
+    .nav-tabs .nav-link { border-radius: 8px 8px 0 0; font-weight: 600; font-size: .88rem; }
+    .nav-tabs .nav-link.active { color: #4e73df; border-bottom-color: #fff; }
+    .preview-gradient { height: 80px; border-radius: 12px; transition: all .3s; }
+    .form-label-custom { font-weight: 600; font-size: .85rem; color: #5a5c69; margin-bottom: 4px; }
+    .icon-preview { font-size: 1.8rem; padding: 10px; background: #f8f9fc; border-radius: 10px; }
+  </style>
+</head>
+<body id="page-top">
+<div id="wrapper">
+  <%- include('../partials/sidebar') %>
+  <div id="content-wrapper" class="d-flex flex-column">
+    <div id="content">
+      <%- include('../partials/topbar', { user }) %>
+      <div class="container-fluid">
+
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-3">
+          <ol class="breadcrumb" style="background:transparent;padding:0;font-size:.85rem">
+            <li class="breadcrumb-item"><a href="/admin/move">Program MOVE</a></li>
+            <li class="breadcrumb-item active"><%= program.nama %></li>
+          </ol>
+        </nav>
+
+        <!-- Page header -->
+        <div class="d-flex align-items-center mb-4" style="gap:16px">
+          <div style="width:52px;height:52px;border-radius:14px;background:<%= program.warna1 %>;display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:#fff;flex-shrink:0">
+            <i class="<%= program.icon %>"></i>
+          </div>
+          <div>
+            <h1 class="h3 mb-0 text-gray-800">Edit Info Program</h1>
+            <p class="text-muted mb-0" style="font-size:.85rem"><%= program.nama %></p>
+          </div>
+        </div>
+
+        <% if (success) { %>
+          <div class="alert alert-success alert-dismissible fade show">
+            <i class="fas fa-check-circle mr-2"></i> Perubahan berhasil disimpan!
+            <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+          </div>
+        <% } %>
+
+        <!-- Shortcut navigasi tab -->
+        <div class="d-flex flex-wrap mb-4" style="gap:8px">
+          <a href="/admin/move/<%= program.id %>/edit" class="btn btn-sm btn-primary"><i class="fas fa-info-circle mr-1"></i>Info Utama</a>
+          <a href="/admin/move/<%= program.id %>/layanan" class="btn btn-sm btn-outline-success"><i class="fas fa-list-check mr-1"></i>Layanan</a>
+          <a href="/admin/move/<%= program.id %>/galeri" class="btn btn-sm btn-outline-warning"><i class="fas fa-images mr-1"></i>Galeri</a>
+          <a href="/admin/move/<%= program.id %>/sosmed" class="btn btn-sm btn-outline-danger"><i class="fas fa-share-alt mr-1"></i>Sosmed</a>
+          <a href="/admin/move/<%= program.id %>/pengelola" class="btn btn-sm btn-outline-secondary"><i class="fas fa-users mr-1"></i>Tim</a>
+          <a href="/move/<%= program.slug %>" target="_blank" class="btn btn-sm btn-outline-primary ml-auto"><i class="fas fa-eye mr-1"></i>Preview Halaman</a>
+        </div>
+
+        <form action="/admin/move/<%= program.id %>/edit" method="POST">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+          <div class="row">
+            <!-- Kolom kiri -->
+            <div class="col-lg-8">
+
+              <!-- Info Dasar -->
+              <div class="card shadow mb-4">
+                <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-info-circle mr-2"></i>Informasi Dasar</h6></div>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-8">
+                      <div class="form-group">
+                        <label class="form-label-custom">Nama Program *</label>
+                        <input type="text" name="nama" class="form-control" value="<%= program.nama %>" required>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label class="form-label-custom">Status</label>
+                        <select name="status" class="form-control">
+                          <option value="aktif" <%= program.status==='aktif'?'selected':'' %>>Aktif</option>
+                          <option value="nonaktif" <%= program.status==='nonaktif'?'selected':'' %>>Nonaktif</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label-custom">Deskripsi Singkat <small class="text-muted">(tampil di halaman utama MOVE)</small></label>
+                    <textarea name="deskripsi_singkat" class="form-control" rows="2"><%= program.deskripsi_singkat || '' %></textarea>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label class="form-label-custom">Nomor WhatsApp <small class="text-muted">(tanpa +, cth: 62812...)</small></label>
+                        <input type="text" name="kontak_wa" class="form-control" value="<%= program.kontak_wa || '' %>" placeholder="628xxxxxxxxxx">
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label class="form-label-custom">Urutan Tampil</label>
+                        <input type="number" name="urutan" class="form-control" value="<%= program.urutan || 0 %>" min="0">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Teks Hero -->
+              <div class="card shadow mb-4">
+                <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-heading mr-2"></i>Teks Hero (Banner Utama)</h6></div>
+                <div class="card-body">
+                  <div class="form-group">
+                    <label class="form-label-custom">Judul Hero <small class="text-muted">(bisa pakai &lt;br&gt; untuk baris baru)</small></label>
+                    <input type="text" name="hero_title" class="form-control" value="<%= program.hero_title || '' %>">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label-custom">Sub-judul Hero</label>
+                    <textarea name="hero_sub" class="form-control" rows="3"><%= program.hero_sub || '' %></textarea>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label class="form-label-custom">Judul Kartu Kanan</label>
+                        <input type="text" name="hero_card_title" class="form-control" value="<%= program.hero_card_title || '' %>">
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label class="form-label-custom">Deskripsi Kartu Kanan</label>
+                        <input type="text" name="hero_card_desc" class="form-control" value="<%= program.hero_card_desc || '' %>">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Statistik -->
+              <div class="card shadow mb-4">
+                <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-chart-bar mr-2"></i>Statistik (tampil di hero)</h6></div>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label class="form-label-custom">Penerima Manfaat</label>
+                        <input type="text" name="stat_penerima" class="form-control" value="<%= program.stat_penerima || '0' %>" placeholder="cth: 500+">
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label class="form-label-custom">Jenis Layanan</label>
+                        <input type="text" name="stat_layanan" class="form-control" value="<%= program.stat_layanan || '0' %>" placeholder="cth: 10">
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label class="form-label-custom">Siswa Relawan</label>
+                        <input type="text" name="stat_relawan" class="form-control" value="<%= program.stat_relawan || '0' %>" placeholder="cth: 50">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Kolom kanan: Tampilan -->
+            <div class="col-lg-4">
+              <div class="card shadow mb-4">
+                <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-palette mr-2"></i>Tampilan & Ikon</h6></div>
+                <div class="card-body">
+
+                  <!-- Preview gradient -->
+                  <label class="form-label-custom">Preview Warna</label>
+                  <div class="preview-gradient mb-3 d-flex align-items-center justify-content-center text-white font-weight-bold"
+                       id="gradientPreview" style="background:<%= program.gradient %>">
+                    <i class="<%= program.icon %> mr-2" id="iconPreview"></i>
+                    <span id="namaPreview"><%= program.nama %></span>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label-custom">Ikon <small class="text-muted">(FontAwesome class)</small></label>
+                    <input type="text" name="icon" id="iconInput" class="form-control" value="<%= program.icon %>" placeholder="fas fa-graduation-cap">
+                    <small class="text-muted">Cari ikon di <a href="https://fontawesome.com/icons" target="_blank">fontawesome.com/icons</a></small>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label-custom">Gradient CSS</label>
+                    <input type="text" name="gradient" id="gradientInput" class="form-control" value="<%= program.gradient %>" placeholder="linear-gradient(...)">
+                  </div>
+
+                  <div class="row">
+                    <div class="col-6">
+                      <div class="form-group">
+                        <label class="form-label-custom">Warna Utama</label>
+                        <div class="d-flex align-items-center gap-2" style="gap:8px">
+                          <input type="color" name="warna1" id="warna1" class="form-control form-control-color p-0" value="<%= program.warna1 %>" style="width:40px;height:38px;border-radius:8px;cursor:pointer">
+                          <input type="text" id="warna1txt" class="form-control" value="<%= program.warna1 %>" style="font-family:monospace;font-size:.82rem">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <div class="form-group">
+                        <label class="form-label-custom">Warna Aksen</label>
+                        <div class="d-flex align-items-center" style="gap:8px">
+                          <input type="color" name="warna2" id="warna2" class="form-control form-control-color p-0" value="<%= program.warna2 %>" style="width:40px;height:38px;border-radius:8px;cursor:pointer">
+                          <input type="text" id="warna2txt" class="form-control" value="<%= program.warna2 %>" style="font-family:monospace;font-size:.82rem">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label-custom">Warna Light (background section)</label>
+                    <input type="text" name="warna_light" class="form-control" value="<%= program.warna_light %>" placeholder="#eff6ff" style="font-family:monospace">
+                  </div>
+
+                  <!-- Preset warna -->
+                  <label class="form-label-custom">Preset Cepat</label>
+                  <div class="d-flex flex-wrap" style="gap:6px">
+                    <% var presets = [
+                      {label:'Biru',  g:'linear-gradient(135deg,#1e3a5f 0%,#1a56db 100%)',w1:'#1e3a5f',w2:'#f59e0b',wl:'#eff6ff'},
+                      {label:'Merah', g:'linear-gradient(135deg,#7f1d1d 0%,#dc2626 100%)',w1:'#7f1d1d',w2:'#fbbf24',wl:'#fff1f2'},
+                      {label:'Ungu',  g:'linear-gradient(135deg,#4a1d96 0%,#7c3aed 100%)',w1:'#4a1d96',w2:'#f59e0b',wl:'#f5f3ff'},
+                      {label:'Hijau', g:'linear-gradient(135deg,#064e3b 0%,#059669 100%)',w1:'#064e3b',w2:'#fbbf24',wl:'#ecfdf5'},
+                      {label:'Oranye',g:'linear-gradient(135deg,#92400e 0%,#f59e0b 100%)',w1:'#92400e',w2:'#fbbf24',wl:'#fffbeb'},
+                      {label:'Cyan',  g:'linear-gradient(135deg,#164e63 0%,#0891b2 100%)',w1:'#164e63',w2:'#22d3ee',wl:'#ecfeff'}
+                    ]; %>
+                    <% presets.forEach(function(pr){ %>
+                      <button type="button" class="btn btn-sm preset-btn"
+                        style="background:<%= pr.g %>;color:#fff;border:none;border-radius:8px;padding:4px 12px;font-size:.75rem;font-weight:600"
+                        data-gradient="<%= pr.g %>" data-w1="<%= pr.w1 %>" data-w2="<%= pr.w2 %>" data-wl="<%= pr.wl %>">
+                        <%= pr.label %>
+                      </button>
+                    <% }) %>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- Tombol simpan -->
+              <div class="card shadow mb-4">
+                <div class="card-body">
+                  <button type="submit" class="btn btn-primary btn-block btn-lg">
+                    <i class="fas fa-save mr-2"></i>Simpan Perubahan
+                  </button>
+                  <a href="/admin/move" class="btn btn-outline-secondary btn-block mt-2">
+                    <i class="fas fa-arrow-left mr-2"></i>Kembali
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    <%- include('../partials/footer') %>
+  </div>
+</div>
+<script src="/assets/vendor/jquery/jquery.min.js"></script>
+<script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/sb-admin-2.min.js"></script>
+<script>
+  // Live preview gradient & icon
+  $('#gradientInput').on('input', function(){
+    var v = $(this).val();
+    $('#gradientPreview').css('background', v);
+  });
+  $('#iconInput').on('input', function(){
+    var v = $(this).val();
+    $('#iconPreview').attr('class', v + ' mr-2');
+  });
+  // Color picker sync
+  $('#warna1').on('input', function(){ $('#warna1txt').val($(this).val()); });
+  $('#warna2').on('input', function(){ $('#warna2txt').val($(this).val()); });
+  $('#warna1txt').on('input', function(){ $('#warna1').val($(this).val()); });
+  $('#warna2txt').on('input', function(){ $('#warna2').val($(this).val()); });
+  // Preset warna
+  $('.preset-btn').on('click', function(){
+    var g = $(this).data('gradient');
+    var w1 = $(this).data('w1');
+    var w2 = $(this).data('w2');
+    var wl = $(this).data('wl');
+    $('[name=gradient]').val(g);
+    $('[name=warna1]').val(w1); $('#warna1txt').val(w1);
+    $('[name=warna2]').val(w2); $('#warna2txt').val(w2);
+    $('[name=warna_light]').val(wl);
+    $('#gradientPreview').css('background', g);
+  });
+</script>
+</body>
+</html>

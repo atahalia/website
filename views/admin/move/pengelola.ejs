@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title><%= title %> - Admin Panel</title>
+  <link rel="icon" type="image/png" href="/assets/img/favicon.png?v=4">
+  <link href="/assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="/assets/css/sb-admin-2.min.css" rel="stylesheet">
+  <style>
+    .pengelola-card { border-radius:12px;border:1px solid #e3e6f0;overflow:hidden;text-align:center;background:#fff;padding:20px 16px;transition:box-shadow .2s }
+    .pengelola-card:hover { box-shadow:0 6px 20px rgba(0,0,0,.1) }
+    .pengelola-avatar { width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid #e3e6f0;margin:0 auto 12px }
+  </style>
+</head>
+<body id="page-top">
+<div id="wrapper">
+  <%- include('../partials/sidebar') %>
+  <div id="content-wrapper" class="d-flex flex-column">
+    <div id="content">
+      <%- include('../partials/topbar', { user }) %>
+      <div class="container-fluid">
+
+        <nav aria-label="breadcrumb" class="mb-3">
+          <ol class="breadcrumb" style="background:transparent;padding:0;font-size:.85rem">
+            <li class="breadcrumb-item"><a href="/admin/move">Program MOVE</a></li>
+            <li class="breadcrumb-item"><a href="/admin/move/<%= program.id %>/edit"><%= program.nama %></a></li>
+            <li class="breadcrumb-item active">Tim Pengelola</li>
+          </ol>
+        </nav>
+
+        <div class="d-flex align-items-center mb-4" style="gap:16px">
+          <div style="width:48px;height:48px;border-radius:12px;background:<%= program.warna1 %>;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#fff;flex-shrink:0"><i class="<%= program.icon %>"></i></div>
+          <div><h1 class="h3 mb-0 text-gray-800">Tim Pengelola</h1><p class="text-muted mb-0" style="font-size:.85rem"><%= program.nama %></p></div>
+        </div>
+
+        <div class="d-flex flex-wrap mb-4" style="gap:8px">
+          <a href="/admin/move/<%= program.id %>/edit" class="btn btn-sm btn-outline-primary"><i class="fas fa-info-circle mr-1"></i>Info</a>
+          <a href="/admin/move/<%= program.id %>/layanan" class="btn btn-sm btn-outline-success"><i class="fas fa-list-check mr-1"></i>Layanan</a>
+          <a href="/admin/move/<%= program.id %>/galeri" class="btn btn-sm btn-outline-warning"><i class="fas fa-images mr-1"></i>Galeri</a>
+          <a href="/admin/move/<%= program.id %>/sosmed" class="btn btn-sm btn-outline-danger"><i class="fas fa-share-alt mr-1"></i>Sosmed</a>
+          <a href="/admin/move/<%= program.id %>/pengelola" class="btn btn-sm btn-secondary"><i class="fas fa-users mr-1"></i>Tim</a>
+        </div>
+
+        <% if (success) { %><div class="alert alert-success alert-dismissible fade show"><i class="fas fa-check-circle mr-2"></i>Berhasil disimpan!<button type="button" class="close" data-dismiss="alert"><span>&times;</span></button></div><% } %>
+        <% if (error) { %><div class="alert alert-danger alert-dismissible fade show"><i class="fas fa-exclamation-circle mr-2"></i><%= error %><button type="button" class="close" data-dismiss="alert"><span>&times;</span></button></div><% } %>
+
+        <div class="row">
+          <!-- Form tambah -->
+          <div class="col-lg-4 mb-4">
+            <div class="card shadow">
+              <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-user-plus mr-2"></i>Tambah Anggota Tim</h6></div>
+              <div class="card-body">
+                <form action="/admin/move/<%= program.id %>/pengelola/add" method="POST" enctype="multipart/form-data">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+                  <div class="text-center mb-3">
+                    <img id="fotoPreview" src="/assets/img/undraw_profile.svg" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid #e3e6f0;cursor:pointer" onclick="$('#fotoInput').click()">
+                    <p class="text-muted mt-2 mb-0" style="font-size:.78rem">Klik foto untuk upload</p>
+                    <input type="file" id="fotoInput" name="foto" accept="image/*" style="display:none">
+                  </div>
+
+                  <div class="form-group">
+                    <label class="font-weight-bold" style="font-size:.85rem">Nama Lengkap *</label>
+                    <input type="text" name="nama" class="form-control" placeholder="Nama guru/siswa" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="font-weight-bold" style="font-size:.85rem">Jabatan / Peran</label>
+                    <input type="text" name="jabatan" class="form-control" placeholder="cth: Koordinator Program, Guru Pembimbing">
+                  </div>
+                  <div class="form-group">
+                    <label class="font-weight-bold" style="font-size:.85rem">Urutan</label>
+                    <input type="number" name="urutan" class="form-control" value="<%= pengelola.length + 1 %>" min="0">
+                  </div>
+                  <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-user-plus mr-2"></i>Tambah Anggota
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Daftar pengelola -->
+          <div class="col-lg-8">
+            <div class="card shadow">
+              <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-users mr-2"></i>Anggota Tim (<%= pengelola.length %>)</h6></div>
+              <div class="card-body">
+                <% if (!pengelola.length) { %>
+                  <div class="text-center py-5 text-muted">
+                    <i class="fas fa-users fa-3x mb-3 d-block" style="opacity:.3"></i>
+                    Belum ada anggota tim. Tambah via form di sebelah kiri.
+                  </div>
+                <% } else { %>
+                  <div class="row">
+                    <% pengelola.forEach(function(p){ %>
+                      <div class="col-6 col-md-4 mb-3">
+                        <div class="pengelola-card">
+                          <img src="<%= p.foto ? '/uploads/'+p.foto : '/assets/img/undraw_profile.svg' %>"
+                               alt="<%= p.nama %>" class="pengelola-avatar">
+                          <h6 class="font-weight-bold mb-1" style="font-size:.88rem"><%= p.nama %></h6>
+                          <p class="text-muted mb-2" style="font-size:.78rem"><%= p.jabatan || '-' %></p>
+                          <form action="/admin/move/pengelola/<%= p.id %>/delete" method="POST" onsubmit="return confirm('Hapus anggota ini?')" style="margin:0">
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                            <button class="btn btn-sm btn-outline-danger" style="font-size:.75rem;padding:3px 12px">
+                              <i class="fas fa-trash mr-1"></i>Hapus
+                            </button>
+                          </form>
+                        </div>
+                      </div>
+                    <% }) %>
+                  </div>
+                <% } %>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <%- include('../partials/footer') %>
+  </div>
+</div>
+<script src="/assets/vendor/jquery/jquery.min.js"></script>
+<script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/sb-admin-2.min.js"></script>
+<script>
+  $('#fotoInput').on('change', function(){
+    var file = this.files[0];
+    if (file) {
+      var reader = new FileReader();
+      reader.onload = function(e){ $('#fotoPreview').attr('src', e.target.result); };
+      reader.readAsDataURL(file);
+    }
+  });
+</script>
+</body>
+</html>

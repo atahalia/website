@@ -433,4 +433,33 @@ router.get('/sk-guru/edit/:id', isAuthenticated, validateIdParam, skGuruControll
 router.post('/sk-guru/edit/:id', isAuthenticated, csrfProtect, validateIdParam, uploadLimiter, skGuruController.adminUpdate);
 router.post('/sk-guru/delete/:id', isAuthenticated, csrfProtect, validateIdParam, skGuruController.adminDelete);
 
+// ── MOVE – Melayani Komunitas Via Edukasi ────────────────────────────────────
+const moveAdminController = require('../controllers/moveAdminController');
+
+router.get('/move', isAuthenticated, moveAdminController.index);
+
+// Program info
+router.get('/move/:id/edit',  isAuthenticated, validateIdParam, moveAdminController.editPage);
+router.post('/move/:id/edit', isAuthenticated, csrfProtect, validateIdParam, moveAdminController.editSave);
+
+// Layanan
+router.get('/move/:id/layanan',          isAuthenticated, validateIdParam, moveAdminController.layananPage);
+router.post('/move/:id/layanan/add',     isAuthenticated, csrfProtect, validateIdParam, moveAdminController.layananAdd);
+router.post('/move/layanan/:lid/edit',   isAuthenticated, csrfProtect, validateIdParam, moveAdminController.layananEdit);
+router.post('/move/layanan/:lid/delete', isAuthenticated, csrfProtect, validateIdParam, moveAdminController.layananDelete);
+
+// Media Sosial
+router.get('/move/:id/sosmed',  isAuthenticated, validateIdParam, moveAdminController.sosmedPage);
+router.post('/move/:id/sosmed', isAuthenticated, csrfProtect, validateIdParam, moveAdminController.sosmedSave);
+
+// Galeri
+router.get('/move/:id/galeri',            isAuthenticated, validateIdParam, moveAdminController.galeriPage);
+router.post('/move/:id/galeri/upload',    isAuthenticated, csrfProtect, uploadLimiter, validateIdParam, moveAdminController.galeriUpload);
+router.post('/move/galeri/:gid/delete',   isAuthenticated, csrfProtect, validateIdParam, moveAdminController.galeriDelete);
+
+// Tim Pengelola
+router.get('/move/:id/pengelola',           isAuthenticated, validateIdParam, moveAdminController.pengelolaPage);
+router.post('/move/:id/pengelola/add',      isAuthenticated, csrfProtect, uploadLimiter, validateIdParam, moveAdminController.pengelolaAdd);
+router.post('/move/pengelola/:pid/delete',  isAuthenticated, csrfProtect, validateIdParam, moveAdminController.pengelolaDelete);
+
 module.exports = router;

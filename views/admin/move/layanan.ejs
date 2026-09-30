@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title><%= title %> - Admin Panel</title>
+  <link rel="icon" type="image/png" href="/assets/img/favicon.png?v=4">
+  <link href="/assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="/assets/css/sb-admin-2.min.css" rel="stylesheet">
+  <style>
+    .layanan-row { background:#fff; border-radius:12px; padding:16px; border:1px solid #e3e6f0; margin-bottom:12px; transition:box-shadow .2s; }
+    .layanan-row:hover { box-shadow: 0 4px 16px rgba(0,0,0,.08); }
+    .icon-badge { width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0 }
+  </style>
+</head>
+<body id="page-top">
+<div id="wrapper">
+  <%- include('../partials/sidebar') %>
+  <div id="content-wrapper" class="d-flex flex-column">
+    <div id="content">
+      <%- include('../partials/topbar', { user }) %>
+      <div class="container-fluid">
+
+        <nav aria-label="breadcrumb" class="mb-3">
+          <ol class="breadcrumb" style="background:transparent;padding:0;font-size:.85rem">
+            <li class="breadcrumb-item"><a href="/admin/move">Program MOVE</a></li>
+            <li class="breadcrumb-item"><a href="/admin/move/<%= program.id %>/edit"><%= program.nama %></a></li>
+            <li class="breadcrumb-item active">Layanan</li>
+          </ol>
+        </nav>
+
+        <div class="d-flex align-items-center mb-4" style="gap:16px">
+          <div style="width:48px;height:48px;border-radius:12px;background:<%= program.warna1 %>;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#fff;flex-shrink:0"><i class="<%= program.icon %>"></i></div>
+          <div>
+            <h1 class="h3 mb-0 text-gray-800">Kelola Layanan</h1>
+            <p class="text-muted mb-0" style="font-size:.85rem"><%= program.nama %></p>
+          </div>
+        </div>
+
+        <!-- Nav tab jurusan -->
+        <div class="d-flex flex-wrap mb-4" style="gap:8px">
+          <a href="/admin/move/<%= program.id %>/edit" class="btn btn-sm btn-outline-primary"><i class="fas fa-info-circle mr-1"></i>Info</a>
+          <a href="/admin/move/<%= program.id %>/layanan" class="btn btn-sm btn-success"><i class="fas fa-list-check mr-1"></i>Layanan</a>
+          <a href="/admin/move/<%= program.id %>/galeri" class="btn btn-sm btn-outline-warning"><i class="fas fa-images mr-1"></i>Galeri</a>
+          <a href="/admin/move/<%= program.id %>/sosmed" class="btn btn-sm btn-outline-danger"><i class="fas fa-share-alt mr-1"></i>Sosmed</a>
+          <a href="/admin/move/<%= program.id %>/pengelola" class="btn btn-sm btn-outline-secondary"><i class="fas fa-users mr-1"></i>Tim</a>
+        </div>
+
+        <% if (success) { %><div class="alert alert-success alert-dismissible fade show"><i class="fas fa-check-circle mr-2"></i>Berhasil disimpan!<button type="button" class="close" data-dismiss="alert"><span>&times;</span></button></div><% } %>
+        <% if (error) { %><div class="alert alert-danger alert-dismissible fade show"><i class="fas fa-exclamation-circle mr-2"></i><%= error %><button type="button" class="close" data-dismiss="alert"><span>&times;</span></button></div><% } %>
+
+        <div class="row">
+          <!-- Daftar layanan -->
+          <div class="col-lg-7">
+            <div class="card shadow mb-4">
+              <div class="card-header py-3 d-flex align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Daftar Layanan (<%= layanan.length %>)</h6>
+              </div>
+              <div class="card-body">
+                <% if (!layanan.length) { %>
+                  <div class="text-center py-4 text-muted">
+                    <i class="fas fa-inbox fa-2x mb-2"></i><br>Belum ada layanan. Tambah di form sebelah.
+                  </div>
+                <% } %>
+                <% layanan.forEach(function(l){ %>
+                  <div class="layanan-row d-flex align-items-start" style="gap:14px">
+                    <div class="icon-badge" style="background:<%= program.warna_light || '#eff6ff' %>;color:<%= program.warna1 %>">
+                      <i class="<%= l.icon %>"></i>
+                    </div>
+                    <div style="flex:1;min-width:0">
+                      <div class="d-flex align-items-center justify-content-between">
+                        <strong style="font-size:.92rem"><%= l.nama %></strong>
+                        <div style="display:flex;gap:6px;flex-shrink:0">
+                          <button class="btn btn-xs btn-outline-primary" onclick="editLayanan(<%= l.id %>,'<%= l.icon.replace(/'/g,\\'') %>','<%= l.nama.replace(/'/g,\\'') %>','<%= (l.deskripsi||'').replace(/'/g,\\'').replace(/\n/g,' ') %>',<%= l.urutan %>)" style="font-size:.75rem;padding:3px 10px">
+                            <i class="fas fa-edit"></i> Edit
+                          </button>
+                          <form action="/admin/move/layanan/<%= l.id %>/delete" method="POST" onsubmit="return confirm('Hapus layanan ini?')" style="margin:0">
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                            <button class="btn btn-xs btn-outline-danger" style="font-size:.75rem;padding:3px 10px"><i class="fas fa-trash"></i></button>
+                          </form>
+                        </div>
+                      </div>
+                      <p class="text-muted mb-1" style="font-size:.82rem;line-height:1.5"><%= l.deskripsi %></p>
+                      <span class="badge badge-light" style="font-size:.7rem"><i class="<%= l.icon %> mr-1"></i><%= l.icon %> · Urutan: <%= l.urutan %></span>
+                    </div>
+                  </div>
+                <% }) %>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form tambah/edit -->
+          <div class="col-lg-5">
+            <div class="card shadow mb-4" id="formCard">
+              <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-success" id="formCardTitle"><i class="fas fa-plus mr-2"></i>Tambah Layanan</h6></div>
+              <div class="card-body">
+                <!-- Form tambah -->
+                <form id="formTambah" action="/admin/move/<%= program.id %>/layanan/add" method="POST">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <div class="form-group">
+                    <label class="font-weight-bold" style="font-size:.85rem">Ikon <small class="text-muted font-weight-normal">(FontAwesome)</small></label>
+                    <div class="input-group">
+                      <div class="input-group-prepend"><span class="input-group-text" id="iconPreviewAdd"><i class="fas fa-star"></i></span></div>
+                      <input type="text" name="icon" id="iconAddInput" class="form-control" value="fas fa-star" placeholder="fas fa-star">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="font-weight-bold" style="font-size:.85rem">Nama Layanan *</label>
+                    <input type="text" name="nama" class="form-control" placeholder="cth: Instalasi Jaringan WiFi" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="font-weight-bold" style="font-size:.85rem">Deskripsi</label>
+                    <textarea name="deskripsi" class="form-control" rows="3" placeholder="Penjelasan singkat layanan..."></textarea>
+                  </div>
+                  <div class="form-group">
+                    <label class="font-weight-bold" style="font-size:.85rem">Urutan Tampil</label>
+                    <input type="number" name="urutan" class="form-control" value="<%= layanan.length + 1 %>" min="0">
+                  </div>
+                  <button type="submit" class="btn btn-success btn-block"><i class="fas fa-plus mr-2"></i>Tambah Layanan</button>
+                </form>
+
+                <!-- Form edit (hidden by default) -->
+                <form id="formEdit" style="display:none" action="" method="POST">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <div class="form-group">
+                    <label class="font-weight-bold" style="font-size:.85rem">Ikon</label>
+                    <div class="input-group">
+                      <div class="input-group-prepend"><span class="input-group-text" id="iconPreviewEdit"><i class="fas fa-star"></i></span></div>
+                      <input type="text" name="icon" id="iconEditInput" class="form-control" value="fas fa-star">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="font-weight-bold" style="font-size:.85rem">Nama Layanan *</label>
+                    <input type="text" name="nama" id="editNama" class="form-control" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="font-weight-bold" style="font-size:.85rem">Deskripsi</label>
+                    <textarea name="deskripsi" id="editDeskripsi" class="form-control" rows="3"></textarea>
+                  </div>
+                  <div class="form-group">
+                    <label class="font-weight-bold" style="font-size:.85rem">Urutan</label>
+                    <input type="number" name="urutan" id="editUrutan" class="form-control" min="0">
+                  </div>
+                  <div class="d-flex" style="gap:8px">
+                    <button type="submit" class="btn btn-primary flex-fill"><i class="fas fa-save mr-1"></i>Simpan</button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="cancelEdit()"><i class="fas fa-times"></i></button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Panduan ikon -->
+            <div class="card border-left-info shadow mb-4">
+              <div class="card-body py-3">
+                <p class="mb-1 font-weight-bold" style="font-size:.85rem"><i class="fas fa-lightbulb text-warning mr-2"></i>Ikon populer:</p>
+                <div class="d-flex flex-wrap" style="gap:6px;font-size:.78rem">
+                  <% ['fas fa-wifi','fas fa-laptop','fas fa-tools','fas fa-car','fas fa-utensils','fas fa-cut','fas fa-store','fas fa-leaf','fas fa-graduation-cap','fas fa-heart','fas fa-shield-alt','fas fa-globe','fas fa-mug-hot','fas fa-birthday-cake'].forEach(function(ic){ %>
+                    <span class="badge badge-light p-2" style="cursor:pointer;border:1px solid #e3e6f0" onclick="insertIcon('<%= ic %>')">
+                      <i class="<%= ic %> mr-1"></i><%= ic.replace('fas fa-','') %>
+                    </span>
+                  <% }) %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <%- include('../partials/footer') %>
+  </div>
+</div>
+<script src="/assets/vendor/jquery/jquery.min.js"></script>
+<script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/sb-admin-2.min.js"></script>
+<script>
+  // Live icon preview
+  $('#iconAddInput').on('input', function(){ $('#iconPreviewAdd i').attr('class', $(this).val()); });
+  $('#iconEditInput').on('input', function(){ $('#iconPreviewEdit i').attr('class', $(this).val()); });
+
+  function insertIcon(ic) {
+    var activeForm = $('#formEdit').is(':visible') ? '#iconEditInput' : '#iconAddInput';
+    $(activeForm).val(ic).trigger('input');
+  }
+
+  function editLayanan(id, icon, nama, deskripsi, urutan) {
+    $('#formTambah').hide();
+    $('#formEdit').show().attr('action', '/admin/move/layanan/' + id + '/edit');
+    $('#iconEditInput').val(icon).trigger('input');
+    $('#editNama').val(nama);
+    $('#editDeskripsi').val(deskripsi);
+    $('#editUrutan').val(urutan);
+    $('#formCardTitle').html('<i class="fas fa-edit mr-2"></i>Edit Layanan');
+    $('html,body').animate({scrollTop: $('#formCard').offset().top - 80}, 300);
+  }
+
+  function cancelEdit() {
+    $('#formEdit').hide();
+    $('#formTambah').show();
+    $('#formCardTitle').html('<i class="fas fa-plus mr-2"></i>Tambah Layanan');
+  }
+</script>
+</body>
+</html>

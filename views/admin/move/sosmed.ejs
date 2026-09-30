@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title><%= title %> - Admin Panel</title>
+  <link rel="icon" type="image/png" href="/assets/img/favicon.png?v=4">
+  <link href="/assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="/assets/css/sb-admin-2.min.css" rel="stylesheet">
+  <style>
+    .sosmed-row { display:flex; align-items:center; gap:14px; padding:16px; border-radius:12px; border:1px solid #e3e6f0; margin-bottom:12px; background:#fff; }
+    .sosmed-icon { width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;color:#fff }
+  </style>
+</head>
+<body id="page-top">
+<div id="wrapper">
+  <%- include('../partials/sidebar') %>
+  <div id="content-wrapper" class="d-flex flex-column">
+    <div id="content">
+      <%- include('../partials/topbar', { user }) %>
+      <div class="container-fluid">
+
+        <nav aria-label="breadcrumb" class="mb-3">
+          <ol class="breadcrumb" style="background:transparent;padding:0;font-size:.85rem">
+            <li class="breadcrumb-item"><a href="/admin/move">Program MOVE</a></li>
+            <li class="breadcrumb-item"><a href="/admin/move/<%= program.id %>/edit"><%= program.nama %></a></li>
+            <li class="breadcrumb-item active">Media Sosial</li>
+          </ol>
+        </nav>
+
+        <div class="d-flex align-items-center mb-4" style="gap:16px">
+          <div style="width:48px;height:48px;border-radius:12px;background:<%= program.warna1 %>;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#fff;flex-shrink:0"><i class="<%= program.icon %>"></i></div>
+          <div><h1 class="h3 mb-0 text-gray-800">Media Sosial</h1><p class="text-muted mb-0" style="font-size:.85rem"><%= program.nama %></p></div>
+        </div>
+
+        <div class="d-flex flex-wrap mb-4" style="gap:8px">
+          <a href="/admin/move/<%= program.id %>/edit" class="btn btn-sm btn-outline-primary"><i class="fas fa-info-circle mr-1"></i>Info</a>
+          <a href="/admin/move/<%= program.id %>/layanan" class="btn btn-sm btn-outline-success"><i class="fas fa-list-check mr-1"></i>Layanan</a>
+          <a href="/admin/move/<%= program.id %>/galeri" class="btn btn-sm btn-outline-warning"><i class="fas fa-images mr-1"></i>Galeri</a>
+          <a href="/admin/move/<%= program.id %>/sosmed" class="btn btn-sm btn-danger"><i class="fas fa-share-alt mr-1"></i>Sosmed</a>
+          <a href="/admin/move/<%= program.id %>/pengelola" class="btn btn-sm btn-outline-secondary"><i class="fas fa-users mr-1"></i>Tim</a>
+        </div>
+
+        <% if (success) { %><div class="alert alert-success alert-dismissible fade show"><i class="fas fa-check-circle mr-2"></i>Berhasil disimpan!<button type="button" class="close" data-dismiss="alert"><span>&times;</span></button></div><% } %>
+
+        <div class="card shadow mb-4">
+          <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-share-alt mr-2"></i>Link Media Sosial</h6></div>
+          <div class="card-body">
+            <form action="/admin/move/<%= program.id %>/sosmed" method="POST">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+              <div class="alert alert-info" style="border-radius:10px;font-size:.85rem">
+                <i class="fas fa-info-circle mr-2"></i>
+                Isi URL lengkap termasuk <code>https://</code>. Kosongkan jika tidak punya akun di platform tersebut.
+              </div>
+
+              <div class="sosmed-row">
+                <div class="sosmed-icon" style="background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)"><i class="fab fa-instagram"></i></div>
+                <div style="flex:1">
+                  <label class="font-weight-bold mb-1" style="font-size:.85rem">Instagram</label>
+                  <input type="url" name="instagram" class="form-control" value="<%= sosmed.instagram || '' %>" placeholder="https://instagram.com/namaakun">
+                </div>
+              </div>
+
+              <div class="sosmed-row">
+                <div class="sosmed-icon" style="background:#000"><i class="fab fa-tiktok"></i></div>
+                <div style="flex:1">
+                  <label class="font-weight-bold mb-1" style="font-size:.85rem">TikTok</label>
+                  <input type="url" name="tiktok" class="form-control" value="<%= sosmed.tiktok || '' %>" placeholder="https://tiktok.com/@namaakun">
+                </div>
+              </div>
+
+              <div class="sosmed-row">
+                <div class="sosmed-icon" style="background:#ff0000"><i class="fab fa-youtube"></i></div>
+                <div style="flex:1">
+                  <label class="font-weight-bold mb-1" style="font-size:.85rem">YouTube</label>
+                  <input type="url" name="youtube" class="form-control" value="<%= sosmed.youtube || '' %>" placeholder="https://youtube.com/@namaakun">
+                </div>
+              </div>
+
+              <div class="sosmed-row">
+                <div class="sosmed-icon" style="background:#1877f2"><i class="fab fa-facebook"></i></div>
+                <div style="flex:1">
+                  <label class="font-weight-bold mb-1" style="font-size:.85rem">Facebook</label>
+                  <input type="url" name="facebook" class="form-control" value="<%= sosmed.facebook || '' %>" placeholder="https://facebook.com/namaakun">
+                </div>
+              </div>
+
+              <div class="sosmed-row">
+                <div class="sosmed-icon" style="background:#25d366"><i class="fab fa-whatsapp"></i></div>
+                <div style="flex:1">
+                  <label class="font-weight-bold mb-1" style="font-size:.85rem">WhatsApp <small class="text-muted font-weight-normal">(nomor tanpa +, cth: 62812...)</small></label>
+                  <input type="text" name="whatsapp" class="form-control" value="<%= sosmed.whatsapp || '' %>" placeholder="628xxxxxxxxxx">
+                  <small class="text-muted">Ini khusus untuk tombol WhatsApp di halaman sosmed. Kontak WA utama ada di tab Info.</small>
+                </div>
+              </div>
+
+              <div class="form-group mt-3">
+                <label class="font-weight-bold" style="font-size:.85rem">
+                  <i class="fas fa-code mr-1"></i>Embed Media Sosial
+                  <small class="text-muted font-weight-normal">(opsional — paste kode embed dari Instagram/TikTok/YouTube)</small>
+                </label>
+                <textarea name="embed" class="form-control" rows="5" style="font-family:monospace;font-size:.82rem" placeholder='<iframe src="..." ...></iframe>'><%= sosmed.embed || '' %></textarea>
+                <small class="text-muted">
+                  Cara mendapatkan embed: di Instagram → ••• → Embed. Di YouTube → Share → Embed. Paste kode iframe di sini.
+                </small>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-lg">
+                <i class="fas fa-save mr-2"></i>Simpan Media Sosial
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <%- include('../partials/footer') %>
+  </div>
+</div>
+<script src="/assets/vendor/jquery/jquery.min.js"></script>
+<script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/sb-admin-2.min.js"></script>
+</body>
+</html>

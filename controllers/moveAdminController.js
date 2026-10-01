@@ -355,3 +355,53 @@ exports.pengelolaDelete = async (req, res) => {
     res.status(500).send('Terjadi kesalahan');
   }
 };
+
+// ── TENTANG MOVE ──────────────────────────────────────────────────────────────
+
+const MOVE_TENTANG_KEYS = [
+  'move_tentang_p1', 'move_tentang_p2',
+  'move_visi', 'move_misi',
+  'move_step1_judul', 'move_step1_desc',
+  'move_step2_judul', 'move_step2_desc',
+  'move_step3_judul', 'move_step3_desc',
+  'move_step4_judul', 'move_step4_desc'
+];
+
+exports.tentangPage = async (req, res) => {
+  try {
+    const [rows] = await db.query(
+      `SELECT setting_key, setting_value FROM website_settings WHERE setting_key IN (${MOVE_TENTANG_KEYS.map(() => '?').join(',')})`,
+      MOVE_TENTANG_KEYS
+    );
+    const settings = {};
+    rows.forEach(r => { settings[r.setting_key] = r.setting_value; });
+    res.render('admin/move/tentang', {
+      title: 'Edit Tentang MOVE',
+      user: req.session,
+      settings,
+      csrfToken: req.session.csrfToken,
+      success: req.query.success
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Terjadi kesalahan');
+  }
+};
+
+exports.tentangSave = async (req, res) => {
+  try {
+    for (const key of MOVE_TENTANG_KEYS) {
+      const value = req.body[key] !== undefined ? req.body[key] : '';
+      await db.query(
+        'INSERT INTO website_settings (setting_key, setting_value) VALUES (?,?) ON DUPLICATE KEY UPDATE setting_value=?',
+        [key, value, value]
+      );
+    }
+    // Invalidate cache MOVE agar halaman publik langsung update
+    cache.delByPrefix('move_');
+    res.redirect('/admin/move/tentang?success=1');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Terjadi kesalahan');
+  }
+};

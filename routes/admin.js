@@ -439,6 +439,10 @@ const moveContentController = require('../controllers/moveContentController');
 
 router.get('/move', isAuthenticated, moveAdminController.index);
 
+// Tentang MOVE
+router.get('/move/tentang',  isAuthenticated, moveAdminController.tentangPage);
+router.post('/move/tentang', isAuthenticated, csrfProtect, moveAdminController.tentangSave);
+
 // Program info
 router.get('/move/:id/edit',  isAuthenticated, validateIdParam, moveAdminController.editPage);
 router.post('/move/:id/edit', isAuthenticated, csrfProtect, validateIdParam, moveAdminController.editSave);

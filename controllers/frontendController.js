@@ -518,19 +518,45 @@ exports.moveIndex = async (req, res) => {
     const allJurusan = await getMovePrograms();
 
     // Ambil semua proyek gabungan semua jurusan
-    const [allProyek] = await db.query(`
-      SELECT mp.*, pr.nama as program_nama, pr.slug as program_slug,
-             pr.warna1 as program_warna1, pr.gradient as program_gradient
-      FROM move_proyek mp
-      JOIN move_program pr ON pr.id = mp.program_id
-      WHERE mp.status = 'published' AND pr.status = 'aktif'
-      ORDER BY mp.tahun DESC, mp.id DESC
-    `);
+    const [[allProyek], [rows]] = await Promise.all([
+      db.query(`
+        SELECT mp.*, pr.nama as program_nama, pr.slug as program_slug,
+               pr.warna1 as program_warna1, pr.gradient as program_gradient
+        FROM move_proyek mp
+        JOIN move_program pr ON pr.id = mp.program_id
+        WHERE mp.status = 'published' AND pr.status = 'aktif'
+        ORDER BY mp.tahun DESC, mp.id DESC
+      `),
+      db.query(
+        `SELECT setting_key, setting_value FROM website_settings WHERE setting_key LIKE 'move_%'`
+      )
+    ]);
+
+    // Susun settings ke object
+    const tentang = {};
+    rows.forEach(r => { tentang[r.setting_key] = r.setting_value; });
+
+    // Parse misi jadi array
+    const misiRaw = tentang.move_misi || 'Memberikan layanan berkualitas gratis kepada masyarakat\nMengembangkan kompetensi siswa melalui praktik lapangan\nMembangun kepercayaan komunitas terhadap pendidikan vokasi\nMendokumentasikan setiap kegiatan sebagai portofolio nyata';
+    tentang.move_misi_arr = misiRaw.split('\n').map(s => s.trim()).filter(Boolean).slice(0, 6);
+
+    // Langkah cara kerja default jika belum diisi
+    const defaultSteps = [
+      { judul: 'Komunitas Mengajukan', desc: 'Komunitas, lembaga, atau warga mengajukan kebutuhan layanan melalui WhatsApp atau formulir online.' },
+      { judul: 'Tim Dibentuk',         desc: 'Guru pembimbing membentuk tim siswa dari jurusan yang sesuai dengan kebutuhan layanan yang diminta.' },
+      { judul: 'Kami Datang ke Lokasi',desc: 'Tim berangkat ke lokasi komunitas — tidak perlu komunitas datang ke sekolah. Kami yang hadir.' },
+      { judul: 'Layanan Diberikan',    desc: 'Layanan dikerjakan secara profesional, terdokumentasi, dan dilaporkan sebagai bagian dari portofolio siswa.' }
+    ];
+    tentang.steps = defaultSteps.map((d, i) => ({
+      judul: tentang[`move_step${i+1}_judul`] || d.judul,
+      desc:  tentang[`move_step${i+1}_desc`]  || d.desc
+    }));
 
     res.render('frontend/move-index', {
       title: 'MOVE – Melayani Komunitas Via Edukasi',
       allJurusan,
-      allProyek
+      allProyek,
+      tentang
     });
   } catch (err) {
     console.error('MOVE index error:', err);

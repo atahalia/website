@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title><%= title %> - Admin Panel</title>
+  <link rel="icon" type="image/png" href="/assets/img/favicon.png?v=4">
+  <link href="/assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+  <link href="/assets/css/sb-admin-2.min.css" rel="stylesheet">
+  <style>
+    .preview-box { background: linear-gradient(135deg,#1e3a5f,#1a56db); border-radius: 16px; padding: 28px; color: #fff; }
+    .preview-box h5 { font-weight: 700; margin-bottom: 10px; }
+    .misi-item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; font-size: .88rem; opacity: .9; }
+    .misi-item i { color: #f59e0b; margin-top: 3px; flex-shrink: 0; }
+    .tab-btn { border-radius: 8px 8px 0 0; border: none; padding: 10px 20px; font-weight: 600; font-size: .85rem; background: #f8f9fc; color: #858796; cursor: pointer; border-bottom: 3px solid transparent; }
+    .tab-btn.active { background: #fff; color: #4e73df; border-bottom-color: #4e73df; }
+    .tab-pane { display: none; } .tab-pane.active { display: block; }
+  </style>
+</head>
+<body id="page-top">
+<div id="wrapper">
+  <%- include('../partials/sidebar') %>
+  <div id="content-wrapper" class="d-flex flex-column">
+    <div id="content">
+      <%- include('../partials/topbar', { user }) %>
+      <div class="container-fluid">
+
+        <nav aria-label="breadcrumb" class="mb-3">
+          <ol class="breadcrumb" style="background:transparent;padding:0;font-size:.85rem">
+            <li class="breadcrumb-item"><a href="/admin/move">Program MOVE</a></li>
+            <li class="breadcrumb-item active">Tentang MOVE</li>
+          </ol>
+        </nav>
+
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div>
+            <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-info-circle text-primary mr-2"></i>Edit Konten "Tentang MOVE"</h1>
+            <p class="text-muted mb-0" style="font-size:.85rem">Tampil di halaman utama <a href="/move" target="_blank">/move</a> — section "Apa Itu MOVE?"</p>
+          </div>
+          <a href="/move" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fas fa-eye mr-1"></i>Lihat Halaman</a>
+        </div>
+
+        <% if (success) { %>
+          <div class="alert alert-success alert-dismissible fade show"><i class="fas fa-check-circle mr-2"></i>Berhasil disimpan! Perubahan langsung tampil di halaman /move.<button type="button" class="close" data-dismiss="alert"><span>&times;</span></button></div>
+        <% } %>
+
+        <div class="alert alert-info" style="border-radius:10px;font-size:.85rem">
+          <i class="fas fa-lightbulb mr-2"></i>
+          Konten ini tampil di bagian <strong>"Apa Itu MOVE?"</strong> — antara statistik hero dan pilih jurusan.
+          Untuk <strong>misi</strong>, tulis satu per baris. Maksimal 6 poin misi.
+        </div>
+
+        <form action="/admin/move/tentang" method="POST">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+          <div class="row">
+            <!-- Kolom kiri: form -->
+            <div class="col-lg-7">
+
+              <!-- Tab navigasi -->
+              <div style="border-bottom:1px solid #e3e6f0;margin-bottom:0">
+                <button type="button" class="tab-btn active" data-tab="deskripsi">📝 Deskripsi</button>
+                <button type="button" class="tab-btn" data-tab="visi">🎯 Visi</button>
+                <button type="button" class="tab-btn" data-tab="misi">🚀 Misi</button>
+                <button type="button" class="tab-btn" data-tab="langkah">⚙️ Cara Kerja</button>
+              </div>
+
+              <!-- Tab: Deskripsi -->
+              <div class="card shadow-sm mb-4 tab-pane active" id="tab-deskripsi" style="border-radius:0 8px 8px 8px">
+                <div class="card-body">
+                  <div class="form-group">
+                    <label class="font-weight-bold" style="font-size:.85rem">Paragraf 1 <small class="text-muted font-weight-normal">(penjelasan utama MOVE)</small></label>
+                    <textarea name="move_tentang_p1" class="form-control" rows="4"><%= settings.move_tentang_p1 || 'MOVE – Melayani Komunitas Via Edukasi adalah program pengabdian masyarakat gratis yang dijalankan oleh siswa-siswi SMK Negeri 1 Kras, Kediri. Program ini hadir sebagai wujud nyata bahwa pendidikan vokasi bukan hanya tentang belajar di kelas — tapi juga tentang memberikan dampak nyata bagi komunitas sekitar.' %></textarea>
+                    <small class="text-muted">Boleh gunakan <code>&lt;strong&gt;</code> dan <code>&lt;em&gt;</code> untuk penekanan teks.</small>
+                  </div>
+                  <div class="form-group mb-0">
+                    <label class="font-weight-bold" style="font-size:.85rem">Paragraf 2 <small class="text-muted font-weight-normal">(opsional)</small></label>
+                    <textarea name="move_tentang_p2" class="form-control" rows="3"><%= settings.move_tentang_p2 || 'Setiap jurusan membawa keahliannya masing-masing langsung ke tengah masyarakat: mulai dari instalasi jaringan WiFi, servis AC, pelatihan memasak, hingga perawatan kendaraan — semuanya gratis, tanpa syarat.' %></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tab: Visi -->
+              <div class="card shadow-sm mb-4 tab-pane" id="tab-visi" style="border-radius:0 8px 8px 8px">
+                <div class="card-body">
+                  <div class="form-group mb-0">
+                    <label class="font-weight-bold" style="font-size:.85rem">Teks Visi Program</label>
+                    <textarea name="move_visi" class="form-control" rows="4"><%= settings.move_visi || 'Menjadi program pengabdian masyarakat terdepan di Jawa Timur yang membuktikan bahwa siswa SMK mampu memberikan solusi nyata dan berkelanjutan bagi komunitas.' %></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tab: Misi -->
+              <div class="card shadow-sm mb-4 tab-pane" id="tab-misi" style="border-radius:0 8px 8px 8px">
+                <div class="card-body">
+                  <div class="form-group mb-0">
+                    <label class="font-weight-bold" style="font-size:.85rem">Poin-poin Misi <small class="text-muted font-weight-normal">(tulis satu poin per baris, maks 6 poin)</small></label>
+                    <textarea name="move_misi" class="form-control" rows="7" placeholder="Memberikan layanan berkualitas gratis kepada masyarakat
+Mengembangkan kompetensi siswa melalui praktik lapangan
+..."><%= settings.move_misi || 'Memberikan layanan berkualitas gratis kepada masyarakat\nMengembangkan kompetensi siswa melalui praktik lapangan\nMembangun kepercayaan komunitas terhadap pendidikan vokasi\nMendokumentasikan setiap kegiatan sebagai portofolio nyata' %></textarea>
+                    <small class="text-muted"><i class="fas fa-info-circle mr-1"></i>Setiap baris = 1 poin misi yang tampil dengan tanda panah kuning.</small>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tab: Cara Kerja -->
+              <div class="card shadow-sm mb-4 tab-pane" id="tab-langkah" style="border-radius:0 8px 8px 8px">
+                <div class="card-body">
+                  <p class="text-muted mb-3" style="font-size:.85rem">4 langkah cara kerja MOVE yang tampil di section "Bagaimana Program MOVE Bekerja?"</p>
+                  <% for(var i=1; i<=4; i++) { %>
+                    <div class="card border mb-3">
+                      <div class="card-body py-3">
+                        <div class="d-flex align-items-center mb-2" style="gap:10px">
+                          <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#1e3a5f,#1a56db);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;flex-shrink:0"><%= '0'+i %></div>
+                          <strong style="font-size:.85rem">Langkah <%= i %></strong>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-4">
+                            <div class="form-group mb-2">
+                              <label style="font-size:.78rem;color:#858796;font-weight:600">Judul</label>
+                              <input type="text" name="move_step<%= i %>_judul" class="form-control form-control-sm"
+                                value="<%= settings['move_step'+i+'_judul'] || ['Komunitas Mengajukan','Tim Dibentuk','Kami Datang ke Lokasi','Layanan Diberikan'][i-1] %>">
+                            </div>
+                          </div>
+                          <div class="col-md-8">
+                            <div class="form-group mb-0">
+                              <label style="font-size:.78rem;color:#858796;font-weight:600">Deskripsi</label>
+                              <textarea name="move_step<%= i %>_desc" class="form-control form-control-sm" rows="2"><%= settings['move_step'+i+'_desc'] || ['Komunitas, lembaga, atau warga mengajukan kebutuhan layanan melalui WhatsApp atau formulir online.','Guru pembimbing membentuk tim siswa dari jurusan yang sesuai dengan kebutuhan layanan yang diminta.','Tim berangkat ke lokasi komunitas — tidak perlu komunitas datang ke sekolah. Kami yang hadir.','Layanan dikerjakan secara profesional, terdokumentasi, dan dilaporkan sebagai bagian dari portofolio siswa.'][i-1] %></textarea>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  <% } %>
+                </div>
+              </div>
+
+              <div class="card shadow mb-4">
+                <div class="card-body d-flex" style="gap:12px">
+                  <button type="submit" class="btn btn-primary btn-lg flex-fill"><i class="fas fa-save mr-2"></i>Simpan Semua Perubahan</button>
+                  <a href="/admin/move" class="btn btn-outline-secondary"><i class="fas fa-arrow-left mr-1"></i>Kembali</a>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Kolom kanan: preview -->
+            <div class="col-lg-5">
+              <div class="card shadow mb-4 sticky-top" style="top:80px">
+                <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-eye mr-2"></i>Preview Kartu Visi & Misi</h6></div>
+                <div class="card-body p-3">
+                  <div class="preview-box">
+                    <h5><i class="fas fa-bullseye mr-2" style="color:#f59e0b"></i>Visi Program</h5>
+                    <p id="previewVisi" style="font-size:.88rem;opacity:.9;line-height:1.7;margin-bottom:20px"><%= settings.move_visi || 'Menjadi program pengabdian masyarakat terdepan di Jawa Timur...' %></p>
+                    <h5><i class="fas fa-rocket mr-2" style="color:#f59e0b"></i>Misi Kami</h5>
+                    <div id="previewMisi">
+                      <% var misiList = (settings.move_misi || 'Memberikan layanan berkualitas gratis kepada masyarakat\nMengembangkan kompetensi siswa melalui praktik lapangan\nMembangun kepercayaan komunitas terhadap pendidikan vokasi\nMendokumentasikan setiap kegiatan sebagai portofolio nyata').split('\n').filter(function(m){return m.trim()}); %>
+                      <% misiList.forEach(function(m){ %>
+                        <div class="misi-item"><i class="fas fa-arrow-right"></i><span><%= m %></span></div>
+                      <% }) %>
+                    </div>
+                  </div>
+                  <div class="alert alert-light border mt-3 mb-0" style="font-size:.78rem;border-radius:8px">
+                    <i class="fas fa-info-circle mr-1 text-info"></i>
+                    Preview akan update otomatis saat Anda mengetik di field Visi dan Misi.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    <%- include('../partials/footer') %>
+  </div>
+</div>
+<script src="/assets/vendor/jquery/jquery.min.js"></script>
+<script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/sb-admin-2.min.js"></script>
+<script>
+  // Tab switching
+  document.querySelectorAll('.tab-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+      document.querySelectorAll('.tab-pane').forEach(function(p){ p.classList.remove('active'); });
+      this.classList.add('active');
+      document.getElementById('tab-' + this.dataset.tab).classList.add('active');
+    });
+  });
+
+  // Live preview visi
+  document.querySelector('[name=move_visi]').addEventListener('input', function(){
+    document.getElementById('previewVisi').textContent = this.value;
+  });
+
+  // Live preview misi
+  document.querySelector('[name=move_misi]').addEventListener('input', function(){
+    var lines = this.value.split('\n').filter(function(l){ return l.trim(); });
+    var html = lines.map(function(l){
+      return '<div class="misi-item"><i class="fas fa-arrow-right"></i><span>' + l + '</span></div>';
+    }).join('');
+    document.getElementById('previewMisi').innerHTML = html;
+  });
+</script>
+</body>
+</html>

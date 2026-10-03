@@ -226,23 +226,18 @@
 
                   <!-- Upload foto baru (auto-submit saat file dipilih) -->
                   <% if (proyek) { %>
-                    <form action="/admin/move/<%= program.id %>/proyek/<%= proyek.id %>/foto/upload"
-                          method="POST" enctype="multipart/form-data" id="formFotoUpload">
-                      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                      <label for="fotoMultiInput" id="uploadZoneFoto"
-                        style="display:block;border:2px dashed #d1d3e2;border-radius:12px;padding:28px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:0"
-                        onmouseover="this.style.borderColor='#4e73df';this.style.background='#f0f4ff'"
-                        onmouseout="this.style.borderColor='#d1d3e2';this.style.background=''">
-                        <i class="fas fa-cloud-upload-alt fa-2x mb-2" style="color:#4e73df"></i>
-                        <p class="mb-1" style="font-size:.9rem;font-weight:600;color:#4e73df">Klik di sini untuk pilih foto</p>
-                        <p class="mb-0 text-muted" style="font-size:.75rem">Bisa pilih beberapa foto sekaligus · Maks 5 · Rasio 4:5</p>
-                      </label>
-                      <input type="file" id="fotoMultiInput" name="foto_baru" accept="image/*" multiple style="display:none"
-                        onchange="document.getElementById('formFotoUpload').submit()">
-                    </form>
+                  <!-- Upload foto (form TERPISAH ada di luar form utama) -->
+                  <% if (proyek) { %>
+                    <label for="fotoMultiInput" id="uploadZoneFoto"
+                      style="display:block;border:2px dashed #d1d3e2;border-radius:12px;padding:28px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:0"
+                      onmouseover="this.style.borderColor='#4e73df';this.style.background='#f0f4ff'"
+                      onmouseout="this.style.borderColor='#d1d3e2';this.style.background=''">
+                      <i class="fas fa-cloud-upload-alt fa-2x mb-2" style="color:#4e73df"></i>
+                      <p class="mb-1" style="font-size:.9rem;font-weight:600;color:#4e73df">Klik di sini untuk pilih foto</p>
+                      <p class="mb-0 text-muted" style="font-size:.75rem">Bisa pilih beberapa sekaligus (maks 5, rasio 4:5)</p>
+                    </label>
                     <p class="text-muted mt-2 mb-0" style="font-size:.75rem;text-align:center">
-                      <i class="fas fa-magic mr-1 text-success"></i>
-                      Foto otomatis di-compress ke WebP portrait 800×1000px
+                      <i class="fas fa-magic mr-1 text-success"></i>Foto auto-compress ke WebP 800x1000px
                     </p>
                   <% } else { %>
                     <div style="border:2px dashed #d1d3e2;border-radius:12px;padding:28px;text-align:center;background:#f8f9fc">
@@ -286,6 +281,16 @@
             </div>
           </div>
         </form>
+
+<%# Form upload foto TERPISAH dari form utama � di luar agar tidak nested %>
+<% if (proyek) { %>
+<form action="/admin/move/<%= program.id %>/proyek/<%= proyek.id %>/foto/upload"
+      method="POST" enctype="multipart/form-data" id="formFotoUpload" style="display:none">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <input type="file" id="fotoMultiInput" name="foto_baru" accept="image/*" multiple
+    onchange="this.form.submit()">
+</form>
+<% } %>
       </div>
     </div>
     <%- include('../partials/footer') %>

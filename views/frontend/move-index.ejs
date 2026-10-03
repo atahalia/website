@@ -48,6 +48,9 @@
 
     #lightboxOverlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.92); z-index:9999; align-items:center; justify-content:center; flex-direction:column; }
     #lightboxOverlay.open { display:flex; }
+    /* Galeri hover zoom */
+    .gi img { transition:transform .4s ease; }
+    .gi:hover img { transform:scale(1.07); }
   </style>
 </head>
 <body>
@@ -223,12 +226,23 @@
             <% var pfBg = p.program_gradient || 'linear-gradient(135deg,#1e3a5f,#1a56db)'; %>
             <% var fotos = p.fotos && p.fotos.length > 0 ? p.fotos : (p.gambar ? [{gambar:p.gambar}] : []); %>
             <% if (fotos.length > 0) { %>
-              <div style="aspect-ratio:4/5;position:relative;overflow:hidden">
-                <img src="/uploads/<%= fotos[0].gambar %>" alt="<%= p.judul %>" style="width:100%;height:100%;object-fit:cover" loading="lazy">
-                <div style="position:absolute;top:10px;left:10px;display:flex;gap:6px">
+              <div class="idx-slider" style="aspect-ratio:4/5;position:relative;overflow:hidden;background:#f8fafc">
+                <% fotos.forEach(function(f,fi){ %>
+                  <div class="idx-slide" style="position:absolute;inset:0;transition:opacity .6s;opacity:<%= fi===0?1:0 %>;z-index:<%= fi===0?1:0 %>">
+                    <img src="/uploads/<%= f.gambar %>" alt="<%= p.judul %>" style="width:100%;height:100%;object-fit:cover" loading="lazy">
+                  </div>
+                <% }) %>
+                <div style="position:absolute;top:10px;left:10px;display:flex;gap:6px;z-index:10">
                   <span style="background:<%= p.program_warna1 %>;color:#fff;padding:3px 10px;border-radius:20px;font-size:.68rem;font-weight:700"><%= p.tahun %></span>
                   <span style="background:rgba(255,255,255,.9);color:<%= p.program_warna1 %>;padding:3px 10px;border-radius:20px;font-size:.68rem;font-weight:700"><%= singkatJurusan(p.program_nama) %></span>
                 </div>
+                <% if (fotos.length > 1) { %>
+                  <div style="position:absolute;bottom:8px;left:0;right:0;display:flex;justify-content:center;gap:5px;z-index:10">
+                    <% fotos.forEach(function(f,fi){ %>
+                      <span class="idx-dot" data-idx="<%= fi %>" style="width:<%= fi===0?'18px':'7px' %>;height:7px;border-radius:4px;background:rgba(255,255,255,<%= fi===0?.95:.5 %>);transition:all .3s;cursor:pointer"></span>
+                    <% }) %>
+                  </div>
+                <% } %>
               </div>
             <% } else { %>
               <div style="aspect-ratio:4/5;background:<%= pfBg %>;display:flex;align-items:center;justify-content:center;position:relative">
@@ -377,13 +391,10 @@
 <section class="section-pad" id="peta-gabungan">
   <div class="container">
 
-    <!-- Label -->
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-      <div style="height:2px;width:24px;background:linear-gradient(90deg,#1e3a5f,#1a56db);border-radius:2px"></div>
-      <span style="font-size:.72rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#1e3a5f">DATA MOVE SMKN 1 KRAS SEJAK <%= moveStats.tahun_mulai %></span>
-    </div>
-
-    <!-- Statistik tepat di atas peta -->
+    <!-- Statistik + label tepat di atas peta -->
+    <p style="font-size:.68rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#94a3b8;text-align:center;margin-bottom:12px">
+      DATA MOVE SMKN 1 KRAS SEJAK <%= moveStats.tahun_mulai %>
+    </p>
     <div style="display:flex;flex-wrap:wrap;justify-content:space-evenly;align-items:center;background:#f8fafc;border-radius:16px;border:1px solid #e2e8f0;padding:20px 0;margin-bottom:12px">
       <% var statsArr = [
         { icon:'fas fa-project-diagram',    val: moveStats.total_proyek,    lbl:'Proyek',         color:'#1a56db' },
@@ -404,23 +415,14 @@
       <% }) %>
     </div>
 
-    <!-- Heading peta -->
-    <div class="row mb-2 align-items-end">
-      <div class="col-lg-7">
-        <div class="section-label"><i class="fas fa-map-marked-alt"></i> Sebaran Layanan</div>
-        <h2 class="section-title mb-2">Peta Semua Lokasi yang Pernah Kami Tangani</h2>
-        <p style="color:#64748b;font-size:.95rem;line-height:1.7;max-width:560px">Setiap titik adalah komunitas nyata yang sudah merasakan manfaat program MOVE.</p>
-      </div>
-      <div class="col-lg-5 mt-3 mt-lg-0">
-        <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end">
-          <% allJurusan.forEach(function(j){ %>
-            <div style="display:flex;align-items:center;gap:6px;font-size:.8rem;font-weight:600;color:#475569">
-              <span style="width:12px;height:12px;border-radius:50%;background:<%= j.warna1 %>;display:inline-block;flex-shrink:0"></span>
-              <%= singkatJurusan(j.nama) %>
-            </div>
-          <% }) %>
+    <!-- Legend jurusan kanan atas peta -->
+    <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;margin-bottom:8px">
+      <% allJurusan.forEach(function(j){ %>
+        <div style="display:flex;align-items:center;gap:6px;font-size:.8rem;font-weight:600;color:#475569">
+          <span style="width:12px;height:12px;border-radius:50%;background:<%= j.warna1 %>;display:inline-block;flex-shrink:0"></span>
+          <%= singkatJurusan(j.nama) %>
         </div>
-      </div>
+      <% }) %>
     </div>
     <div style="border-radius:20px;overflow:hidden;border:2px solid #e2e8f0;box-shadow:0 4px 24px rgba(0,0,0,.08)">
       <div id="moveIndexMap" style="height:500px"></div>
@@ -466,6 +468,25 @@
 
 <script src="/assets/vendor/leaflet/leaflet.js"></script>
 <script>
+// Slider proyek (idx-slider)
+document.querySelectorAll('.idx-slider').forEach(function(slider){
+  var slides = slider.querySelectorAll('.idx-slide');
+  var dots   = slider.querySelectorAll('.idx-dot');
+  if (slides.length <= 1) return;
+  var cur = 0;
+  function goTo(n) {
+    slides[cur].style.opacity = '0'; slides[cur].style.zIndex = '0';
+    dots[cur] && (dots[cur].style.width='7px', dots[cur].style.background='rgba(255,255,255,.5)');
+    cur = (n + slides.length) % slides.length;
+    slides[cur].style.opacity = '1'; slides[cur].style.zIndex = '1';
+    dots[cur] && (dots[cur].style.width='18px', dots[cur].style.background='rgba(255,255,255,.95)');
+  }
+  var t = setInterval(function(){ goTo(cur+1); }, 3000);
+  dots.forEach(function(d,i){ d.addEventListener('click',function(e){ e.stopPropagation(); clearInterval(t); goTo(i); t=setInterval(function(){goTo(cur+1);},3000); }); });
+  slider.addEventListener('mouseenter', function(){ clearInterval(t); });
+  slider.addEventListener('mouseleave', function(){ t=setInterval(function(){goTo(cur+1);},3000); });
+});
+
 // Smooth scroll
 document.querySelectorAll('a[href^="#"]').forEach(function(el){
   el.addEventListener('click',function(e){ var t=document.querySelector(this.getAttribute('href')); if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'});} });

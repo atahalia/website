@@ -257,8 +257,10 @@
                             <% } %>
                           </div>
                           <div class="d-flex" style="gap:4px;flex-shrink:0">
-                            <button type="button" class="btn btn-xs btn-outline-primary"
-                              onclick="editAnggota(<%= a.id %>,'<%= a.nama.replace(/'/g, \\'\\') %>','<%= (a.link_publikasi||'').replace(/'/g, \\'\\') %>')"
+                            <button type="button" class="btn btn-xs btn-outline-primary btn-edit-anggota"
+                              data-id="<%= a.id %>"
+                              data-nama="<%= encodeURIComponent(a.nama) %>"
+                              data-link="<%= encodeURIComponent(a.link_publikasi||'') %>"
                               style="font-size:.72rem;padding:3px 8px"><i class="fas fa-edit"></i></button>
                             <form action="/admin/move/<%= program.id %>/proyek/<%= proyek.id %>/anggota/<%= a.id %>/delete" method="POST" onsubmit="return confirm('Hapus anggota ini?')" style="margin:0">
                               <input type="hidden" name="_csrf" value="<%= csrfToken %>">
@@ -484,6 +486,16 @@ function detectPlatform(url) {
   el.textContent = '🔗 Link Lainnya';
   el.style.color = '#64748b';
 }
+
+// Klik tombol edit anggota via data attributes
+document.addEventListener('click', function(e) {
+  var btn = e.target.closest('.btn-edit-anggota');
+  if (!btn) return;
+  var id   = btn.dataset.id;
+  var nama = decodeURIComponent(btn.dataset.nama || '');
+  var link = decodeURIComponent(btn.dataset.link || '');
+  editAnggota(id, nama, link);
+});
 
 // Edit anggota (isi form tambah dengan data existing, ganti action ke edit)
 function editAnggota(id, nama, link) {

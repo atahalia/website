@@ -395,16 +395,17 @@
                     <div style="display:flex;flex-wrap:wrap;gap:5px">
                       <% p.anggota.forEach(function(a){ %>
                         <%
+                          var lnk = (a.link_publikasi||'').toLowerCase();
                           var platform = {icon:'fas fa-user', color:'#94a3b8', bg:'#f8fafc'};
-                          if (a.link_publikasi) {
-                            if (/instagram\.com/i.test(a.link_publikasi))  platform = {icon:'fab fa-instagram', color:'#e1306c', bg:'#fce7f3'};
-                            else if (/tiktok\.com/i.test(a.link_publikasi)) platform = {icon:'fab fa-tiktok', color:'#0f172a', bg:'#f1f5f9'};
-                            else if (/youtube\.com|youtu\.be/i.test(a.link_publikasi)) platform = {icon:'fab fa-youtube', color:'#ff0000', bg:'#fee2e2'};
-                            else if (/facebook\.com/i.test(a.link_publikasi)) platform = {icon:'fab fa-facebook', color:'#1877f2', bg:'#eff6ff'};
-                            else if (/twitter\.com|x\.com/i.test(a.link_publikasi)) platform = {icon:'fab fa-twitter', color:'#1da1f2', bg:'#e7f3fd'};
-                            else if (/threads\.net/i.test(a.link_publikasi)) platform = {icon:'fas fa-at', color:'#0f172a', bg:'#f1f5f9'};
-                            else if (/wa\.me|whatsapp/i.test(a.link_publikasi)) platform = {icon:'fab fa-whatsapp', color:'#25d366', bg:'#f0fdf4'};
-                            else platform = {icon:'fas fa-link', color:'#64748b', bg:'#f1f5f9'};
+                          if (lnk) {
+                            if (lnk.indexOf('instagram.com') >= 0)                    platform = {icon:'fab fa-instagram', color:'#e1306c', bg:'#fce7f3'};
+                            else if (lnk.indexOf('tiktok.com') >= 0)                  platform = {icon:'fab fa-tiktok',    color:'#0f172a', bg:'#f1f5f9'};
+                            else if (lnk.indexOf('youtube.com') >= 0 || lnk.indexOf('youtu.be') >= 0) platform = {icon:'fab fa-youtube', color:'#ff0000', bg:'#fee2e2'};
+                            else if (lnk.indexOf('facebook.com') >= 0)                platform = {icon:'fab fa-facebook',  color:'#1877f2', bg:'#eff6ff'};
+                            else if (lnk.indexOf('twitter.com') >= 0 || lnk.indexOf('x.com') >= 0)    platform = {icon:'fab fa-twitter',  color:'#1da1f2', bg:'#e7f3fd'};
+                            else if (lnk.indexOf('threads.net') >= 0)                 platform = {icon:'fas fa-at',        color:'#0f172a', bg:'#f1f5f9'};
+                            else if (lnk.indexOf('wa.me') >= 0 || lnk.indexOf('whatsapp') >= 0)        platform = {icon:'fab fa-whatsapp', color:'#25d366', bg:'#f0fdf4'};
+                            else                                                       platform = {icon:'fas fa-link',      color:'#64748b', bg:'#f1f5f9'};
                           }
                         %>
                         <% if (a.link_publikasi) { %>

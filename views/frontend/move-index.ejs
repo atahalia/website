@@ -472,14 +472,12 @@
           { icon:'fas fa-hand-holding-heart', val:'100%',                     lbl:'Gratis',         color:'#d97706' }
         ]; %>
         <% statsArr.forEach(function(s, si){ %>
-          <div style="display:flex;align-items:center;gap:10px;padding:0 28px;<%= si < statsArr.length-1 ? 'border-right:1px solid #e2e8f0;' : '' %>">
-            <i class="<%= s.icon %>" style="font-size:1.3rem;color:<%= s.color %>"></i>
-            <div>
-              <div style="font-size:1.5rem;font-weight:900;color:<%= s.color %>;line-height:1">
-                <%= typeof s.val === 'number' ? s.val.toLocaleString('id-ID') : s.val %>
-              </div>
-              <div style="font-size:.65rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px"><%= s.lbl %></div>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:12px 28px;text-align:center;<%= si < statsArr.length-1 ? 'border-right:1px solid #e2e8f0;' : '' %>">
+            <i class="<%= s.icon %>" style="font-size:1.5rem;color:<%= s.color %>"></i>
+            <div style="font-size:1.5rem;font-weight:900;color:<%= s.color %>;line-height:1">
+              <%= typeof s.val === 'number' ? s.val.toLocaleString('id-ID') : s.val %>
             </div>
+            <div style="font-size:.65rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px"><%= s.lbl %></div>
           </div>
         <% }) %>
       </div>

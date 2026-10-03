@@ -633,7 +633,7 @@ exports.moveIndex = async (req, res) => {
     // Statistik agregat untuk banner di atas peta
     let moveStats = {
       total_proyek: 0, total_pelanggan: 0, total_siswa: 0,
-      total_jurusan: allJurusan.length, tahun_mulai: new Date().getFullYear(),
+      total_jurusan: allJurusan.length, tahun_mulai: 2025,
       total_lokasi: 0
     };
     try {
@@ -647,11 +647,11 @@ exports.moveIndex = async (req, res) => {
         WHERE mp.status='published' AND pr.status='aktif'
       `);
       const [[pelRow]] = await db.query(`SELECT COUNT(*) AS cnt FROM move_pelanggan`);
-      moveStats.total_proyek   = statsRow.total_proyek || 0;
-      moveStats.total_siswa    = statsRow.total_siswa  || 0;
-      moveStats.tahun_mulai    = statsRow.tahun_mulai  || new Date().getFullYear();
-      moveStats.total_pelanggan= pelRow.cnt || 0;
-      moveStats.total_lokasi   = pelRow.cnt || 0;
+      moveStats.total_proyek    = statsRow.total_proyek || 0;
+      moveStats.total_siswa     = statsRow.total_siswa  || 0;
+      moveStats.tahun_mulai     = statsRow.tahun_mulai  || 2025;
+      moveStats.total_pelanggan = pelRow.cnt || 0;
+      moveStats.total_lokasi    = pelRow.cnt || 0;
     } catch(e) { /* tabel mungkin belum ada kolom baru */ }
 
     res.render('frontend/move-index', {

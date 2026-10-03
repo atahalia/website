@@ -644,6 +644,41 @@
                   <% } %>
                 </div>
               <% } %>
+
+              <!-- Anggota tim proyek -->
+              <% if (p.anggota && p.anggota.length > 0) { %>
+                <div style="margin-top:14px;padding-top:12px;border-top:1px solid #f1f5f9">
+                  <p style="font-size:.7rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Tim Siswa</p>
+                  <div style="display:flex;flex-wrap:wrap;gap:6px">
+                    <% p.anggota.forEach(function(a){ %>
+                      <%
+                        var platform = {icon:'fas fa-link', color:'#64748b', bg:'#f1f5f9'};
+                        if (a.link_publikasi) {
+                          if (/instagram\.com/i.test(a.link_publikasi))  { platform = {icon:'fab fa-instagram', color:'#e1306c', bg:'#fce7f3'}; }
+                          else if (/tiktok\.com/i.test(a.link_publikasi)) { platform = {icon:'fab fa-tiktok',    color:'#0f172a', bg:'#f1f5f9'}; }
+                          else if (/youtube\.com|youtu\.be/i.test(a.link_publikasi)) { platform = {icon:'fab fa-youtube', color:'#ff0000', bg:'#fee2e2'}; }
+                          else if (/facebook\.com/i.test(a.link_publikasi)) { platform = {icon:'fab fa-facebook', color:'#1877f2', bg:'#eff6ff'}; }
+                          else if (/twitter\.com|x\.com/i.test(a.link_publikasi)) { platform = {icon:'fab fa-twitter', color:'#1da1f2', bg:'#e7f3fd'}; }
+                          else if (/threads\.net/i.test(a.link_publikasi)) { platform = {icon:'fas fa-at', color:'#0f172a', bg:'#f1f5f9'}; }
+                          else if (/wa\.me|whatsapp/i.test(a.link_publikasi)) { platform = {icon:'fab fa-whatsapp', color:'#25d366', bg:'#f0fdf4'}; }
+                        }
+                      %>
+                      <% if (a.link_publikasi) { %>
+                        <a href="<%= a.link_publikasi %>" target="_blank" rel="noopener"
+                          style="display:inline-flex;align-items:center;gap:6px;background:<%= platform.bg %>;color:<%= platform.color %>;padding:5px 12px;border-radius:20px;font-size:.75rem;font-weight:600;text-decoration:none">
+                          <i class="<%= platform.icon %>"></i>
+                          <%= a.nama %>
+                        </a>
+                      <% } else { %>
+                        <span style="display:inline-flex;align-items:center;gap:6px;background:#f8fafc;color:#94a3b8;padding:5px 12px;border-radius:20px;font-size:.75rem;font-weight:600">
+                          <i class="fas fa-user"></i>
+                          <%= a.nama %>
+                        </span>
+                      <% } %>
+                    <% }) %>
+                  </div>
+                </div>
+              <% } %>
             </div>
           </div>
         </div>

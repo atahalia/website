@@ -223,6 +223,102 @@
 
             </div>
 
+            <!-- ANGGOTA TIM (bawah kolom kiri, full width) -->
+            <div class="col-lg-8">
+              <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex align-items-center justify-content-between">
+                  <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-users mr-2"></i>Anggota Tim Proyek</h6>
+                  <span class="badge badge-<%= (anggota && anggota.length >= 4) ? 'success' : 'info' %>">
+                    <span id="anggotaCount"><%= anggota ? anggota.length : 0 %></span>/4 siswa
+                  </span>
+                </div>
+                <div class="card-body">
+                  <p class="text-muted mb-3" style="font-size:.85rem">
+                    <i class="fas fa-info-circle mr-1 text-info"></i>
+                    Tambahkan nama siswa dan link publikasi mereka (IG, TikTok, YouTube, dll). Platform terdeteksi otomatis dari URL.
+                  </p>
+
+                  <!-- Daftar anggota yang sudah ada -->
+                  <% if (proyek && anggota && anggota.length > 0) { %>
+                    <div class="mb-3" id="anggotaList">
+                      <% anggota.forEach(function(a){ %>
+                        <div class="d-flex align-items-center mb-2 p-2 border rounded" style="gap:10px;background:#f8f9fc" id="anggota-<%= a.id %>">
+                          <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,<%= program.warna1 %>,<%= program.warna2 || '#f59e0b' %>);display:flex;align-items:center;justify-content:center;color:#fff;font-size:.8rem;font-weight:700;flex-shrink:0">
+                            <%= a.nama.charAt(0).toUpperCase() %>
+                          </div>
+                          <div style="flex:1;min-width:0">
+                            <div style="font-weight:600;font-size:.85rem"><%= a.nama %></div>
+                            <% if (a.link_publikasi) { %>
+                              <a href="<%= a.link_publikasi %>" target="_blank" style="font-size:.75rem;color:#4e73df;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block">
+                                <%= a.link_publikasi.substring(0, 50) %><%= a.link_publikasi.length > 50 ? '...' : '' %>
+                              </a>
+                            <% } else { %>
+                              <span style="font-size:.75rem;color:#adb5bd;font-style:italic">Belum ada link</span>
+                            <% } %>
+                          </div>
+                          <div class="d-flex" style="gap:4px;flex-shrink:0">
+                            <button type="button" class="btn btn-xs btn-outline-primary"
+                              onclick="editAnggota(<%= a.id %>,'<%= a.nama.replace(/'/g, \\'\\') %>','<%= (a.link_publikasi||'').replace(/'/g, \\'\\') %>')"
+                              style="font-size:.72rem;padding:3px 8px"><i class="fas fa-edit"></i></button>
+                            <form action="/admin/move/<%= program.id %>/proyek/<%= proyek.id %>/anggota/<%= a.id %>/delete" method="POST" onsubmit="return confirm('Hapus anggota ini?')" style="margin:0">
+                              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                              <button class="btn btn-xs btn-outline-danger" style="font-size:.72rem;padding:3px 8px"><i class="fas fa-trash"></i></button>
+                            </form>
+                          </div>
+                        </div>
+                      <% }) %>
+                    </div>
+                  <% } %>
+
+                  <!-- Form tambah / edit anggota -->
+                  <% if (proyek) { %>
+                    <% var maxAnggota = 4; var anggotaCount = anggota ? anggota.length : 0; %>
+                    <div id="formAnggotaWrap" style="<%= anggotaCount >= maxAnggota ? 'display:none' : '' %>">
+                      <form id="formAnggota" action="/admin/move/<%= program.id %>/proyek/<%= proyek.id %>/anggota/add" method="POST">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <div class="row">
+                          <div class="col-md-4">
+                            <div class="form-group mb-2">
+                              <label style="font-size:.82rem;font-weight:600">Nama Siswa *</label>
+                              <input type="text" name="nama" id="anggotaNama" class="form-control form-control-sm" required placeholder="cth: Andi Prasetyo">
+                            </div>
+                          </div>
+                          <div class="col-md-7">
+                            <div class="form-group mb-2">
+                              <label style="font-size:.82rem;font-weight:600">
+                                Link Publikasi
+                                <span id="platformDetect" style="font-size:.75rem;color:#4e73df;margin-left:6px"></span>
+                              </label>
+                              <input type="url" name="link_publikasi" id="anggotaLink" class="form-control form-control-sm"
+                                placeholder="Paste link IG / TikTok / YouTube / FB / Twitter / Threads..."
+                                oninput="detectPlatform(this.value)">
+                              <small class="text-muted">Platform terdeteksi otomatis dari URL</small>
+                            </div>
+                          </div>
+                          <div class="col-md-1 d-flex align-items-end">
+                            <div class="form-group mb-2">
+                              <button type="submit" class="btn btn-primary btn-sm" style="padding:6px 10px">
+                                <i class="fas fa-plus"></i>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                    <% if (anggotaCount >= maxAnggota) { %>
+                      <div class="alert alert-success py-2 mb-0" style="font-size:.82rem">
+                        <i class="fas fa-check-circle mr-1"></i>Tim sudah lengkap (4 anggota). Hapus anggota untuk menambah yang baru.
+                      </div>
+                    <% } %>
+                  <% } else { %>
+                    <div class="alert alert-light border" style="font-size:.82rem">
+                      <i class="fas fa-save mr-1 text-muted"></i>Simpan proyek dulu untuk menambah anggota tim.
+                    </div>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+
             <!-- KOLOM KANAN -->
             <div class="col-lg-4">
 
@@ -365,7 +461,60 @@ function updatePreview() {
 });
 updatePreview();
 
-// Hapus foto via fetch
+// Deteksi platform dari URL
+function detectPlatform(url) {
+  var el = document.getElementById('platformDetect');
+  if (!url) { el.textContent = ''; return; }
+  var platforms = [
+    { pattern: /instagram\.com/i,  label: '📸 Instagram',  color: '#e1306c' },
+    { pattern: /tiktok\.com/i,     label: '🎵 TikTok',     color: '#000000' },
+    { pattern: /youtube\.com|youtu\.be/i, label: '📺 YouTube', color: '#ff0000' },
+    { pattern: /facebook\.com/i,   label: '👍 Facebook',   color: '#1877f2' },
+    { pattern: /twitter\.com|x\.com/i, label: '🐦 Twitter/X', color: '#1da1f2' },
+    { pattern: /threads\.net/i,    label: '🔗 Threads',    color: '#000000' },
+    { pattern: /wa\.me|whatsapp/i, label: '💬 WhatsApp',   color: '#25d366' }
+  ];
+  for (var i = 0; i < platforms.length; i++) {
+    if (platforms[i].pattern.test(url)) {
+      el.textContent = '→ ' + platforms[i].label;
+      el.style.color = platforms[i].color;
+      return;
+    }
+  }
+  el.textContent = '🔗 Link Lainnya';
+  el.style.color = '#64748b';
+}
+
+// Edit anggota (isi form tambah dengan data existing, ganti action ke edit)
+function editAnggota(id, nama, link) {
+  var form = document.getElementById('formAnggota');
+  if (!form) return;
+  document.getElementById('anggotaNama').value = nama;
+  document.getElementById('anggotaLink').value = link;
+  detectPlatform(link);
+  form.action = form.action.replace('/anggota/add', '/anggota/' + id + '/edit');
+  document.getElementById('formAnggotaWrap').style.display = '';
+  document.getElementById('formAnggotaWrap').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  // Ganti label tombol
+  form.querySelector('button[type=submit]').innerHTML = '<i class="fas fa-save"></i>';
+  // Tombol batal
+  if (!document.getElementById('btnBatalEdit')) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'btnBatalEdit';
+    btn.className = 'btn btn-outline-secondary btn-sm ml-1';
+    btn.style = 'padding:6px 10px';
+    btn.innerHTML = '<i class="fas fa-times"></i>';
+    btn.onclick = function() {
+      form.reset();
+      form.action = form.action.replace(/\/anggota\/\d+\/edit/, '/anggota/add');
+      form.querySelector('button[type=submit]').innerHTML = '<i class="fas fa-plus"></i>';
+      document.getElementById('platformDetect').textContent = '';
+      this.remove();
+    };
+    form.querySelector('button[type=submit]').parentNode.appendChild(btn);
+  }
+}
 function hapusFoto(id, btn) {
   if (!confirm('Hapus foto ini?')) return;
   var progId = '<%= program.id %>';

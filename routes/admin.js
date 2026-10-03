@@ -478,6 +478,10 @@ router.post('/move/:id/proyek/:pid/delete',   isAuthenticated, csrfProtect, vali
 // Foto proyek (multi-upload)
 router.post('/move/:id/proyek/:pid/foto/upload', isAuthenticated, csrfProtect, uploadLimiter, validateIdParam, moveContentController.proyekFotoUpload);
 router.post('/move/:id/proyek/:pid/foto/:fid/delete', isAuthenticated, csrfProtect, validateIdParam, moveContentController.proyekFotoDelete);
+// Anggota tim proyek
+router.post('/move/:id/proyek/:pid/anggota/add',       isAuthenticated, csrfProtect, validateIdParam, moveContentController.anggotaAdd);
+router.post('/move/:id/proyek/:pid/anggota/:aid/edit',  isAuthenticated, csrfProtect, validateIdParam, moveContentController.anggotaEdit);
+router.post('/move/:id/proyek/:pid/anggota/:aid/delete',isAuthenticated, csrfProtect, validateIdParam, moveContentController.anggotaDelete);
 
 // ── MOVE Content: Berita ─────────────────────────────────────────────────────
 router.get('/move/:id/berita',                isAuthenticated, validateIdParam, moveContentController.beritaPage);

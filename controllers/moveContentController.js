@@ -93,7 +93,7 @@ exports.proyekCreatePage = async (req, res) => {
     res.render('admin/move/proyek-form', {
       title: 'Tambah Proyek – ' + program.nama,
       user: req.session,
-      program, proyek: null, fotos: [],
+      program, proyek: null, fotos: [], anggota: [],
       csrfToken: req.session.csrfToken,
       error: req.query.error
     });
@@ -163,10 +163,17 @@ exports.proyekEditPage = async (req, res) => {
     } catch (e) {
       console.warn('move_proyek_foto belum ada:', e.message);
     }
+    let anggota = [];
+    try {
+      const [anggotaRows] = await db.query('SELECT * FROM move_proyek_anggota WHERE proyek_id=? ORDER BY urutan ASC, id ASC', [req.params.pid]);
+      anggota = anggotaRows;
+    } catch (e) {
+      console.warn('move_proyek_anggota belum ada:', e.message);
+    }
     res.render('admin/move/proyek-form', {
       title: 'Edit Proyek – ' + program.nama,
       user: req.session,
-      program, proyek: rows[0], fotos,
+      program, proyek: rows[0], fotos, anggota,
       csrfToken: req.session.csrfToken,
       error: req.query.error,
       msg: req.query.msg || null,
@@ -511,6 +518,50 @@ exports.proyekFotoDelete = async (req, res) => {
       const [[fotoRow]] = await db.query('SELECT gambar FROM move_proyek_foto WHERE proyek_id=? ORDER BY urutan ASC, id ASC LIMIT 1', [pid]);
       await db.query('UPDATE move_proyek SET gambar=? WHERE id=?', [fotoRow ? fotoRow.gambar : null, pid]);
     }
+    clearMoveCache();
+    res.redirect(`/admin/move/${id}/proyek/${pid}/edit?success=1`);
+  } catch (err) { console.error(err); res.status(500).send('Terjadi kesalahan'); }
+};
+
+// ═══════════════════════════════════════════════════════════════════════
+// ANGGOTA TIM PROYEK (maks 4 siswa, masing-masing punya 1 link publikasi)
+// ═══════════════════════════════════════════════════════════════════════
+
+exports.anggotaAdd = async (req, res) => {
+  const { id, pid } = req.params;
+  try {
+    const { nama, link_publikasi, urutan } = req.body;
+    // Cek apakah sudah 4 anggota
+    const [[countRow]] = await db.query('SELECT COUNT(*) as cnt FROM move_proyek_anggota WHERE proyek_id=?', [pid]);
+    if (countRow.cnt >= 4) {
+      return res.redirect(`/admin/move/${id}/proyek/${pid}/edit?error=${encodeURIComponent('Maksimal 4 anggota per proyek')}`);
+    }
+    await db.query(
+      'INSERT INTO move_proyek_anggota (proyek_id, nama, link_publikasi, urutan) VALUES (?,?,?,?)',
+      [pid, nama, link_publikasi || null, urutan || countRow.cnt]
+    );
+    clearMoveCache();
+    res.redirect(`/admin/move/${id}/proyek/${pid}/edit?success=1`);
+  } catch (err) { console.error(err); res.status(500).send('Terjadi kesalahan'); }
+};
+
+exports.anggotaEdit = async (req, res) => {
+  const { id, pid, aid } = req.params;
+  try {
+    const { nama, link_publikasi } = req.body;
+    await db.query(
+      'UPDATE move_proyek_anggota SET nama=?, link_publikasi=? WHERE id=? AND proyek_id=?',
+      [nama, link_publikasi || null, aid, pid]
+    );
+    clearMoveCache();
+    res.redirect(`/admin/move/${id}/proyek/${pid}/edit?success=1`);
+  } catch (err) { console.error(err); res.status(500).send('Terjadi kesalahan'); }
+};
+
+exports.anggotaDelete = async (req, res) => {
+  const { id, pid, aid } = req.params;
+  try {
+    await db.query('DELETE FROM move_proyek_anggota WHERE id=? AND proyek_id=?', [aid, pid]);
     clearMoveCache();
     res.redirect(`/admin/move/${id}/proyek/${pid}/edit?success=1`);
   } catch (err) { console.error(err); res.status(500).send('Terjadi kesalahan'); }

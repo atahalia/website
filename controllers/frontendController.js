@@ -521,8 +521,24 @@ async function getMovePrograms() {
         console.warn('move_proyek_foto belum ada:', e.message);
         proyek.forEach(pr => { pr.fotos = []; });
       }
+      // Ambil anggota tim per proyek
+      try {
+        const [allAnggota] = await db.query(
+          `SELECT * FROM move_proyek_anggota WHERE proyek_id IN (${proyekIds.map(() => '?').join(',')}) ORDER BY urutan ASC, id ASC`,
+          proyekIds
+        );
+        const anggotaMap = {};
+        allAnggota.forEach(a => {
+          if (!anggotaMap[a.proyek_id]) anggotaMap[a.proyek_id] = [];
+          anggotaMap[a.proyek_id].push(a);
+        });
+        proyek.forEach(pr => { pr.anggota = anggotaMap[pr.id] || []; });
+      } catch (e) {
+        console.warn('move_proyek_anggota belum ada:', e.message);
+        proyek.forEach(pr => { pr.anggota = []; });
+      }
     } else {
-      proyek.forEach(pr => { pr.fotos = []; });
+      proyek.forEach(pr => { pr.fotos = []; pr.anggota = []; });
     }
     p.proyek    = proyek;
     // Alias warna_light → warnaLight agar kompatibel dengan template EJS
@@ -574,6 +590,23 @@ exports.moveIndex = async (req, res) => {
       } catch (e) {
         console.warn('move_proyek_foto belum ada:', e.message);
         allProyek.forEach(p => { p.fotos = []; });
+      }
+      // Ambil anggota per proyek
+      try {
+        const ids = allProyek.map(p => p.id);
+        const [allAnggota] = await db.query(
+          `SELECT * FROM move_proyek_anggota WHERE proyek_id IN (${ids.map(()=>'?').join(',')}) ORDER BY urutan ASC, id ASC`,
+          ids
+        );
+        const anggotaMap = {};
+        allAnggota.forEach(a => {
+          if (!anggotaMap[a.proyek_id]) anggotaMap[a.proyek_id] = [];
+          anggotaMap[a.proyek_id].push(a);
+        });
+        allProyek.forEach(p => { p.anggota = anggotaMap[p.id] || []; });
+      } catch (e) {
+        console.warn('move_proyek_anggota belum ada:', e.message);
+        allProyek.forEach(p => { p.anggota = []; });
       }
     }
 

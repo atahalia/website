@@ -463,9 +463,10 @@ router.post('/move/:id/galeri/upload',    isAuthenticated, csrfProtect, uploadLi
 router.post('/move/galeri/:gid/delete',   isAuthenticated, csrfProtect, validateIdParam, moveAdminController.galeriDelete);
 
 // Tim Pengelola
-router.get('/move/:id/pengelola',           isAuthenticated, validateIdParam, moveAdminController.pengelolaPage);
-router.post('/move/:id/pengelola/add',      isAuthenticated, csrfProtect, uploadLimiter, validateIdParam, moveAdminController.pengelolaAdd);
-router.post('/move/pengelola/:pid/delete',  isAuthenticated, csrfProtect, validateIdParam, moveAdminController.pengelolaDelete);
+router.get('/move/:id/pengelola',              isAuthenticated, validateIdParam, moveAdminController.pengelolaPage);
+router.post('/move/:id/pengelola/add',         isAuthenticated, csrfProtect, uploadLimiter, validateIdParam, moveAdminController.pengelolaAdd);
+router.post('/move/pengelola/:pid/edit',       isAuthenticated, csrfProtect, uploadLimiter, validateIdParam, moveAdminController.pengelolaEdit);
+router.post('/move/pengelola/:pid/delete',     isAuthenticated, csrfProtect, validateIdParam, moveAdminController.pengelolaDelete);
 
 // ── MOVE Content: Proyek ─────────────────────────────────────────────────────
 router.get('/move/:id/proyek',                isAuthenticated, validateIdParam, moveContentController.proyekPage);

@@ -8,9 +8,10 @@
   <link href="/assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
   <link href="/assets/css/sb-admin-2.min.css" rel="stylesheet">
   <style>
-    .pengelola-card { border-radius:12px;border:1px solid #e3e6f0;overflow:hidden;text-align:center;background:#fff;padding:20px 16px;transition:box-shadow .2s }
+    .pengelola-card { border-radius:12px;border:1px solid #e3e6f0;overflow:hidden;text-align:center;background:#fff;padding:20px 16px;transition:box-shadow .2s;position:relative }
     .pengelola-card:hover { box-shadow:0 6px 20px rgba(0,0,0,.1) }
-    .pengelola-avatar { width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid #e3e6f0;margin:0 auto 12px }
+    .pengelola-avatar { width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid #e3e6f0;margin:0 auto 12px;display:block }
+    .card-form-title { font-size:.92rem;font-weight:700;color:#4e73df;display:flex;align-items:center;gap:8px }
   </style>
 </head>
 <body id="page-top">
@@ -35,10 +36,13 @@
         </div>
 
         <div class="d-flex flex-wrap mb-4" style="gap:8px">
-          <a href="/admin/move/<%= program.id %>/edit" class="btn btn-sm btn-outline-primary"><i class="fas fa-info-circle mr-1"></i>Info</a>
-          <a href="/admin/move/<%= program.id %>/layanan" class="btn btn-sm btn-outline-success"><i class="fas fa-list-check mr-1"></i>Layanan</a>
-          <a href="/admin/move/<%= program.id %>/galeri" class="btn btn-sm btn-outline-warning"><i class="fas fa-images mr-1"></i>Galeri</a>
-          <a href="/admin/move/<%= program.id %>/sosmed" class="btn btn-sm btn-outline-danger"><i class="fas fa-share-alt mr-1"></i>Sosmed</a>
+          <a href="/admin/move/<%= program.id %>/edit"      class="btn btn-sm btn-outline-primary"><i class="fas fa-info-circle mr-1"></i>Info</a>
+          <a href="/admin/move/<%= program.id %>/layanan"   class="btn btn-sm btn-outline-success"><i class="fas fa-list-check mr-1"></i>Layanan</a>
+          <a href="/admin/move/<%= program.id %>/proyek"    class="btn btn-sm btn-outline-info"><i class="fas fa-project-diagram mr-1"></i>Proyek</a>
+          <a href="/admin/move/<%= program.id %>/berita"    class="btn btn-sm btn-outline-secondary"><i class="fas fa-newspaper mr-1"></i>Berita</a>
+          <a href="/admin/move/<%= program.id %>/pelanggan" class="btn btn-sm btn-outline-warning"><i class="fas fa-map-marker-alt mr-1"></i>Peta</a>
+          <a href="/admin/move/<%= program.id %>/galeri"    class="btn btn-sm btn-outline-warning"><i class="fas fa-images mr-1"></i>Galeri</a>
+          <a href="/admin/move/<%= program.id %>/sosmed"    class="btn btn-sm btn-outline-danger"><i class="fas fa-share-alt mr-1"></i>Sosmed</a>
           <a href="/admin/move/<%= program.id %>/pengelola" class="btn btn-sm btn-secondary"><i class="fas fa-users mr-1"></i>Tim</a>
         </div>
 
@@ -46,20 +50,23 @@
         <% if (error) { %><div class="alert alert-danger alert-dismissible fade show"><i class="fas fa-exclamation-circle mr-2"></i><%= error %><button type="button" class="close" data-dismiss="alert"><span>&times;</span></button></div><% } %>
 
         <div class="row">
-          <!-- Form tambah -->
+          <!-- Form tambah / edit (kiri) -->
           <div class="col-lg-4 mb-4">
-            <div class="card shadow">
-              <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-user-plus mr-2"></i>Tambah Anggota Tim</h6></div>
+            <!-- Form TAMBAH -->
+            <div class="card shadow" id="formTambahCard">
+              <div class="card-header py-3 d-flex align-items-center justify-content-between">
+                <span class="card-form-title"><i class="fas fa-user-plus"></i>Tambah Anggota Tim</span>
+              </div>
               <div class="card-body">
-                <form action="/admin/move/<%= program.id %>/pengelola/add" method="POST" enctype="multipart/form-data">
+                <form action="/admin/move/<%= program.id %>/pengelola/add" method="POST" enctype="multipart/form-data" id="formTambah">
                   <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-
                   <div class="text-center mb-3">
-                    <img id="fotoPreview" src="/assets/img/undraw_profile.svg" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid #e3e6f0;cursor:pointer" onclick="$('#fotoInput').click()">
+                    <img id="fotoPreviewTambah" src="/assets/img/undraw_profile.svg"
+                      style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid #e3e6f0;cursor:pointer"
+                      onclick="$('#fotoInputTambah').click()">
                     <p class="text-muted mt-2 mb-0" style="font-size:.78rem">Klik foto untuk upload</p>
-                    <input type="file" id="fotoInput" name="foto" accept="image/*" style="display:none">
+                    <input type="file" id="fotoInputTambah" name="foto" accept="image/*" style="display:none">
                   </div>
-
                   <div class="form-group">
                     <label class="font-weight-bold" style="font-size:.85rem">Nama Lengkap *</label>
                     <input type="text" name="nama" class="form-control" placeholder="Nama guru/siswa" required>
@@ -78,9 +85,48 @@
                 </form>
               </div>
             </div>
+
+            <!-- Form EDIT (tersembunyi, muncul saat klik Edit) -->
+            <div class="card shadow border-warning" id="formEditCard" style="display:none">
+              <div class="card-header py-3 d-flex align-items-center justify-content-between" style="background:#fff3cd">
+                <span class="card-form-title" style="color:#856404"><i class="fas fa-edit"></i>Edit Anggota Tim</span>
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="tutupEdit()">
+                  <i class="fas fa-times"></i> Batal
+                </button>
+              </div>
+              <div class="card-body">
+                <form id="formEdit" action="" method="POST" enctype="multipart/form-data">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <div class="text-center mb-3">
+                    <img id="fotoPreviewEdit" src="/assets/img/undraw_profile.svg"
+                      style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid #f6c23e;cursor:pointer"
+                      onclick="$('#fotoInputEdit').click()">
+                    <p class="text-muted mt-1 mb-0" style="font-size:.78rem">Klik untuk ganti foto</p>
+                    <input type="file" id="fotoInputEdit" name="foto" accept="image/*" style="display:none">
+                  </div>
+                  <div class="form-group">
+                    <label class="font-weight-bold" style="font-size:.85rem">Nama Lengkap *</label>
+                    <input type="text" name="nama" id="editNama" class="form-control" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="font-weight-bold" style="font-size:.85rem">Jabatan / Peran</label>
+                    <input type="text" name="jabatan" id="editJabatan" class="form-control">
+                  </div>
+                  <div class="form-group">
+                    <label class="font-weight-bold" style="font-size:.85rem">Urutan</label>
+                    <input type="number" name="urutan" id="editUrutan" class="form-control" min="0">
+                  </div>
+                  <div class="d-flex" style="gap:8px">
+                    <button type="submit" class="btn btn-warning btn-block flex-fill" style="color:#333">
+                      <i class="fas fa-save mr-2"></i>Simpan Perubahan
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
           </div>
 
-          <!-- Daftar pengelola -->
+          <!-- Daftar pengelola (kanan) -->
           <div class="col-lg-8">
             <div class="card shadow">
               <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-users mr-2"></i>Anggota Tim (<%= pengelola.length %>)</h6></div>
@@ -98,13 +144,22 @@
                           <img src="<%= p.foto ? '/uploads/'+p.foto : '/assets/img/undraw_profile.svg' %>"
                                alt="<%= p.nama %>" class="pengelola-avatar">
                           <h6 class="font-weight-bold mb-1" style="font-size:.88rem"><%= p.nama %></h6>
-                          <p class="text-muted mb-2" style="font-size:.78rem"><%= p.jabatan || '-' %></p>
-                          <form action="/admin/move/pengelola/<%= p.id %>/delete" method="POST" onsubmit="return confirm('Hapus anggota ini?')" style="margin:0">
-                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                            <button class="btn btn-sm btn-outline-danger" style="font-size:.75rem;padding:3px 12px">
-                              <i class="fas fa-trash mr-1"></i>Hapus
+                          <p class="text-muted mb-3" style="font-size:.78rem"><%= p.jabatan || '-' %></p>
+                          <!-- Tombol Edit & Hapus -->
+                          <div class="d-flex justify-content-center" style="gap:6px">
+                            <button class="btn btn-sm btn-warning"
+                              style="font-size:.72rem;padding:4px 12px;color:#333"
+                              onclick="bukaEdit(<%= p.id %>, '<%= (p.nama||'').replace(/'/g, '\\\'') %>', '<%= (p.jabatan||'').replace(/'/g, '\\\'') %>', <%= p.urutan||0 %>, '<%= p.foto ? '/uploads/'+p.foto : '/assets/img/undraw_profile.svg' %>')">
+                              <i class="fas fa-edit mr-1"></i>Edit
                             </button>
-                          </form>
+                            <form action="/admin/move/pengelola/<%= p.id %>/delete" method="POST"
+                              onsubmit="return confirm('Hapus anggota ini?')" style="margin:0">
+                              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                              <button class="btn btn-sm btn-outline-danger" style="font-size:.72rem;padding:4px 10px">
+                                <i class="fas fa-trash"></i>
+                              </button>
+                            </form>
+                          </div>
                         </div>
                       </div>
                     <% }) %>
@@ -124,14 +179,46 @@
 <script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="/assets/js/sb-admin-2.min.js"></script>
 <script>
-  $('#fotoInput').on('change', function(){
+  // Preview foto tambah
+  $('#fotoInputTambah').on('change', function(){
     var file = this.files[0];
     if (file) {
-      var reader = new FileReader();
-      reader.onload = function(e){ $('#fotoPreview').attr('src', e.target.result); };
-      reader.readAsDataURL(file);
+      var r = new FileReader();
+      r.onload = function(e){ $('#fotoPreviewTambah').attr('src', e.target.result); };
+      r.readAsDataURL(file);
     }
   });
+
+  // Preview foto edit
+  $('#fotoInputEdit').on('change', function(){
+    var file = this.files[0];
+    if (file) {
+      var r = new FileReader();
+      r.onload = function(e){ $('#fotoPreviewEdit').attr('src', e.target.result); };
+      r.readAsDataURL(file);
+    }
+  });
+
+  // Buka form edit
+  function bukaEdit(id, nama, jabatan, urutan, fotoSrc) {
+    $('#formEditCard').show();
+    $('#formTambahCard').hide();
+    $('#formEdit').attr('action', '/admin/move/pengelola/' + id + '/edit');
+    $('#editNama').val(nama);
+    $('#editJabatan').val(jabatan);
+    $('#editUrutan').val(urutan);
+    $('#fotoPreviewEdit').attr('src', fotoSrc);
+    // Reset file input
+    $('#fotoInputEdit').val('');
+    // Scroll ke form
+    $('html,body').animate({ scrollTop: $('#formEditCard').offset().top - 80 }, 300);
+  }
+
+  // Tutup form edit
+  function tutupEdit() {
+    $('#formEditCard').hide();
+    $('#formTambahCard').show();
+  }
 </script>
 </body>
 </html>

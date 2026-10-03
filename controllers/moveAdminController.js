@@ -342,6 +342,40 @@ exports.pengelolaAdd = (req, res) => {
   });
 };
 
+exports.pengelolaEdit = (req, res) => {
+  const { pid } = req.params;
+  uploadPengelola(req, res, async (err) => {
+    if (err) return res.redirect(`/admin/move/pengelola/${pid}/edit?error=${encodeURIComponent(err.message)}`);
+    await compressImage(req, res, () => {});
+    try {
+      const { nama, jabatan, urutan } = req.body;
+      // Ambil program_id untuk redirect
+      const [rows] = await db.query('SELECT program_id FROM move_pengelola WHERE id=?', [pid]);
+      if (!rows.length) return res.redirect('/admin/move');
+      const programId = rows[0].program_id;
+
+      if (req.file) {
+        // Ada foto baru — update dengan foto baru
+        await db.query(
+          'UPDATE move_pengelola SET nama=?, jabatan=?, urutan=?, foto=? WHERE id=?',
+          [nama, jabatan || '', urutan || 0, req.file.filename, pid]
+        );
+      } else {
+        // Tidak ada foto baru — jaga foto lama
+        await db.query(
+          'UPDATE move_pengelola SET nama=?, jabatan=?, urutan=? WHERE id=?',
+          [nama, jabatan || '', urutan || 0, pid]
+        );
+      }
+      clearMoveCache();
+      res.redirect(`/admin/move/${programId}/pengelola?success=1`);
+    } catch (e) {
+      console.error(e);
+      res.status(500).send('Terjadi kesalahan');
+    }
+  });
+};
+
 exports.pengelolaDelete = async (req, res) => {
   try {
     const pid2 = req.params.pid;

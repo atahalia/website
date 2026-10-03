@@ -341,7 +341,7 @@
                     </div>
                   <% } %>
                 </div>
-                <% if (p.link_maps || p.link_publikasi || p.link_tiktok || p.link_youtube || p.link_facebook) { %>
+                <% if (p.link_maps || p.link_publikasi || p.link_tiktok || p.link_youtube || p.link_facebook || p.link_twitter || p.link_threads) { %>
                   <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;padding-top:10px;border-top:1px solid #f1f5f9">
                     <% if (p.link_maps) { %>
                       <a href="<%= p.link_maps %>" target="_blank" rel="noopener"
@@ -371,6 +371,18 @@
                       <a href="<%= p.link_facebook %>" target="_blank" rel="noopener"
                         style="display:inline-flex;align-items:center;gap:5px;background:#eff6ff;color:#1877f2;padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:600;text-decoration:none">
                         <i class="fab fa-facebook"></i> FB
+                      </a>
+                    <% } %>
+                    <% if (p.link_twitter) { %>
+                      <a href="<%= p.link_twitter %>" target="_blank" rel="noopener"
+                        style="display:inline-flex;align-items:center;gap:5px;background:#e7f3fd;color:#1da1f2;padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:600;text-decoration:none">
+                        <i class="fab fa-twitter"></i> Twitter
+                      </a>
+                    <% } %>
+                    <% if (p.link_threads) { %>
+                      <a href="<%= p.link_threads %>" target="_blank" rel="noopener"
+                        style="display:inline-flex;align-items:center;gap:5px;background:#f1f5f9;color:#0f172a;padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:600;text-decoration:none">
+                        <i class="fas fa-at"></i> Threads
                       </a>
                     <% } %>
                   </div>

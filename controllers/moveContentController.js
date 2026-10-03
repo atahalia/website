@@ -329,8 +329,7 @@ exports.pelangganDelete = async (req, res) => {
 // ── API: semua pelanggan untuk peta publik ────────────────────────────
 exports.apiPelanggan = async (req, res) => {
   try {
-    const cached = cache.get('move_pelanggan_api');
-    if (cached) return res.json(cached);
+    // Tidak pakai cache agar titik baru langsung tampil
     const [rows] = await db.query(`
       SELECT k.id, k.nama, k.alamat, k.layanan, k.tahun,
              k.lat, k.lng, k.keterangan,
@@ -340,10 +339,11 @@ exports.apiPelanggan = async (req, res) => {
       WHERE p.status = 'aktif'
       ORDER BY k.tahun DESC, k.id ASC
     `);
-    cache.set('move_pelanggan_api', rows, 300);
+    // Set header agar tidak di-cache browser
+    res.set('Cache-Control', 'no-store');
     res.json(rows);
   } catch (err) {
-    console.error(err);
+    console.error('API pelanggan error:', err);
     res.status(500).json({ error: 'Gagal memuat data' });
   }
 };

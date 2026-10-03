@@ -700,7 +700,7 @@
         <% if (idx === 0) { %>
           <div class="col-lg-6 mb-4">
             <div style="background:#fff;border-radius:20px;overflow:hidden;border:1px solid #e8edf4;height:100%">
-              <% if (b.gambar) { %><div style="height:260px;overflow:hidden"><img src="/uploads/<%= b.gambar %>" alt="<%= b.judul %>" style="width:100%;height:100%;object-fit:cover" loading="lazy"></div><% } else { %><div style="height:260px;background:var(--move-gradient);display:flex;align-items:center;justify-content:center"><i class="fas fa-newspaper" style="font-size:3rem;color:rgba(255,255,255,.4)"></i></div><% } %>
+              <% if (b.gambar) { %><div style="aspect-ratio:16/9;overflow:hidden"><img src="/uploads/<%= b.gambar %>" alt="<%= b.judul %>" style="width:100%;height:100%;object-fit:cover" loading="lazy"></div><% } else { %><div style="aspect-ratio:16/9;background:var(--move-gradient);display:flex;align-items:center;justify-content:center"><i class="fas fa-newspaper" style="font-size:3rem;color:rgba(255,255,255,.4)"></i></div><% } %>
               <div style="padding:24px">
                 <span style="background:var(--move-light);color:var(--move-primary);font-size:.72rem;font-weight:700;padding:3px 12px;border-radius:20px"><i class="fas fa-star" style="margin-right:4px"></i>Terbaru</span>
                 <h4 style="font-weight:800;margin:12px 0 8px;font-size:1.1rem;color:#0f172a"><%= b.judul %></h4>
@@ -712,7 +712,7 @@
         <% } else if (idx <= 3) { %>
           <div class="col-lg-3 col-md-6 mb-4">
             <div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid #e8edf4;height:100%">
-              <% if (b.gambar) { %><div style="height:140px;overflow:hidden"><img src="/uploads/<%= b.gambar %>" alt="<%= b.judul %>" style="width:100%;height:100%;object-fit:cover" loading="lazy"></div><% } else { %><div style="height:140px;background:var(--move-gradient);display:flex;align-items:center;justify-content:center"><i class="fas fa-newspaper" style="font-size:2rem;color:rgba(255,255,255,.4)"></i></div><% } %>
+              <% if (b.gambar) { %><div style="aspect-ratio:16/9;overflow:hidden"><img src="/uploads/<%= b.gambar %>" alt="<%= b.judul %>" style="width:100%;height:100%;object-fit:cover" loading="lazy"></div><% } else { %><div style="aspect-ratio:16/9;background:var(--move-gradient);display:flex;align-items:center;justify-content:center"><i class="fas fa-newspaper" style="font-size:2rem;color:rgba(255,255,255,.4)"></i></div><% } %>
               <div style="padding:16px">
                 <h6 style="font-weight:700;font-size:.88rem;margin-bottom:6px;color:#0f172a"><%= b.judul %></h6>
                 <% if (b.ringkasan) { %><p style="font-size:.78rem;color:#64748b;line-height:1.5;margin-bottom:8px"><%= b.ringkasan.substring(0,80) %>...</p><% } %>

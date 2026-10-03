@@ -561,6 +561,7 @@ exports.moveIndex = async (req, res) => {
         SELECT mp.id, mp.judul, mp.deskripsi, mp.tahun, mp.tanggal_pelaksanaan,
                mp.lokasi, mp.gambar, mp.jumlah_siswa, mp.jumlah_item, mp.satuan_item,
                mp.nama_pelanggan, mp.kategori_pelanggan, mp.link_maps, mp.link_publikasi,
+               mp.link_tiktok, mp.link_youtube, mp.link_facebook, mp.link_twitter, mp.link_threads,
                pr.nama as program_nama, pr.slug as program_slug,
                pr.warna1 as program_warna1, pr.gradient as program_gradient
         FROM move_proyek mp
@@ -572,6 +573,20 @@ exports.moveIndex = async (req, res) => {
         `SELECT setting_key, setting_value FROM website_settings WHERE setting_key LIKE 'move_%'`
       )
     ]);
+
+    // Ambil berita gabungan semua jurusan
+    let allBerita = [];
+    try {
+      const [beritaRows] = await db.query(`
+        SELECT mb.id, mb.judul, mb.ringkasan, mb.gambar, mb.created_at,
+               mp.nama as program_nama, mp.slug as program_slug, mp.warna1, mp.gradient
+        FROM move_berita mb
+        JOIN move_program mp ON mp.id = mb.program_id
+        WHERE mb.status = 'published' AND mp.status = 'aktif'
+        ORDER BY mb.created_at DESC LIMIT 4
+      `);
+      allBerita = beritaRows;
+    } catch(e) { console.warn('move_berita error:', e.message); }
 
     // Ambil fotos untuk semua proyek gabungan — graceful fallback
     if (allProyek.length > 0) {
@@ -658,6 +673,7 @@ exports.moveIndex = async (req, res) => {
       title: 'MOVE – Melayani Komunitas Via Edukasi',
       allJurusan,
       allProyek,
+      allBerita,
       tentang,
       moveStats
     });

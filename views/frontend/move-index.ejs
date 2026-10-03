@@ -435,6 +435,72 @@
   </div>
 </section>
 
+<!-- BERITA GABUNGAN SEMUA JURUSAN -->
+<% if (allBerita && allBerita.length > 0) { %>
+<section class="section-pad" style="background:#fff" id="berita-index">
+  <div class="container">
+    <div class="row mb-5 align-items-end">
+      <div class="col-lg-8">
+        <div class="section-label justify-content-start"><i class="fas fa-newspaper"></i> Berita Terbaru</div>
+        <h2 class="section-title mb-2">Update dari Semua Program MOVE</h2>
+        <p style="color:#64748b;font-size:.95rem;line-height:1.7">Informasi kegiatan terkini dari seluruh jurusan.</p>
+      </div>
+    </div>
+    <div class="row">
+      <% allBerita.forEach(function(b, idx){ %>
+        <% if (idx === 0) { %>
+          <div class="col-lg-6 mb-4">
+            <div style="background:#fff;border-radius:20px;overflow:hidden;border:1px solid #e8edf4;height:100%">
+              <% if (b.gambar) { %>
+                <div style="aspect-ratio:16/9;overflow:hidden"><img src="/uploads/<%= b.gambar %>" alt="<%= b.judul %>" style="width:100%;height:100%;object-fit:cover" loading="lazy"></div>
+              <% } else { %>
+                <div style="aspect-ratio:16/9;background:<%= b.gradient||'linear-gradient(135deg,#1e3a5f,#1a56db)' %>;display:flex;align-items:center;justify-content:center">
+                  <i class="fas fa-newspaper" style="font-size:3rem;color:rgba(255,255,255,.4)"></i>
+                </div>
+              <% } %>
+              <div style="padding:24px">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+                  <span style="background:<%= b.warna1 %>18;color:<%= b.warna1 %>;font-size:.72rem;font-weight:700;padding:3px 12px;border-radius:20px">
+                    <i class="fas fa-star" style="margin-right:4px"></i>Terbaru
+                  </span>
+                  <span style="background:#f1f5f9;color:#64748b;font-size:.7rem;padding:3px 10px;border-radius:20px">
+                    MOVE <%= b.program_nama.replace('Teknik Komputer Jaringan','TKJ').replace('Teknik Kendaraan Ringan','TKR').replace('Teknik Pemanasan, Tata Udara, dan Pendinginan','TPTUP').replace('Tata Boga','Kuliner') %>
+                  </span>
+                </div>
+                <h4 style="font-weight:800;margin:0 0 8px;font-size:1.1rem;color:#0f172a"><%= b.judul %></h4>
+                <% if (b.ringkasan) { %><p style="font-size:.88rem;color:#64748b;line-height:1.6;margin-bottom:12px"><%= b.ringkasan %></p><% } %>
+                <span style="font-size:.8rem;color:#94a3b8">
+                  <i class="fas fa-calendar" style="margin-right:4px"></i><%= new Date(b.created_at).toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'}) %>
+                </span>
+              </div>
+            </div>
+          </div>
+        <% } else { %>
+          <div class="col-lg-2 col-md-4 mb-4">
+            <div style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid #e8edf4;height:100%">
+              <% if (b.gambar) { %>
+                <div style="aspect-ratio:16/9;overflow:hidden"><img src="/uploads/<%= b.gambar %>" alt="<%= b.judul %>" style="width:100%;height:100%;object-fit:cover" loading="lazy"></div>
+              <% } else { %>
+                <div style="aspect-ratio:16/9;background:<%= b.gradient||'linear-gradient(135deg,#1e3a5f,#1a56db)' %>;display:flex;align-items:center;justify-content:center">
+                  <i class="fas fa-newspaper" style="font-size:1.8rem;color:rgba(255,255,255,.4)"></i>
+                </div>
+              <% } %>
+              <div style="padding:14px">
+                <span style="background:<%= b.warna1 %>18;color:<%= b.warna1 %>;font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:10px;display:inline-block;margin-bottom:6px">
+                  <%= b.program_nama.replace('Teknik Komputer Jaringan','TKJ').replace('Teknik Kendaraan Ringan','TKR').replace('Teknik Pemanasan, Tata Udara, dan Pendinginan','TPTUP').replace('Tata Boga','Kuliner') %>
+                </span>
+                <h6 style="font-weight:700;font-size:.82rem;margin-bottom:6px;color:#0f172a;line-height:1.4"><%= b.judul %></h6>
+                <span style="font-size:.7rem;color:#94a3b8"><%= new Date(b.created_at).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) %></span>
+              </div>
+            </div>
+          </div>
+        <% } %>
+      <% }) %>
+    </div>
+  </div>
+</section>
+<% } %>
+
 <!-- PETA SEMUA PELANGGAN GABUNGAN -->
 <section class="section-pad" id="peta-gabungan">
   <div class="container">

@@ -375,35 +375,6 @@
 <section class="section-pad" id="peta-gabungan">
   <div class="container">
 
-    <!-- Statistik inline di atas peta -->
-    <div style="margin-bottom:28px">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-        <div style="height:2px;width:24px;background:linear-gradient(90deg,#1e3a5f,#1a56db);border-radius:2px"></div>
-        <span style="font-size:.72rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#1e3a5f">DATA MOVE SMKN 1 KRAS SEJAK <%= moveStats.tahun_mulai %></span>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:32px;align-items:center">
-        <% var statsArr = [
-          { icon:'fas fa-project-diagram',    val: moveStats.total_proyek,    lbl:'Proyek',         color:'#1a56db' },
-          { icon:'fas fa-users',              val: moveStats.total_siswa,     lbl:'Siswa Terlibat', color:'#0891b2' },
-          { icon:'fas fa-map-marker-alt',     val: moveStats.total_pelanggan, lbl:'Titik Layanan',  color:'#059669' },
-          { icon:'fas fa-graduation-cap',     val: moveStats.total_jurusan,   lbl:'Jurusan Aktif',  color:'#dc2626' },
-          { icon:'fas fa-calendar-check',     val: (new Date().getFullYear() - moveStats.tahun_mulai + 1), lbl:'Tahun Berjalan', color:'#7c3aed' },
-          { icon:'fas fa-hand-holding-heart', val:'100%',                     lbl:'Gratis',         color:'#d97706' }
-        ]; %>
-        <% statsArr.forEach(function(s){ %>
-          <div style="display:flex;align-items:center;gap:10px">
-            <i class="<%= s.icon %>" style="font-size:1.3rem;color:<%= s.color %>;width:20px;text-align:center"></i>
-            <div>
-              <div style="font-size:1.4rem;font-weight:900;color:<%= s.color %>;line-height:1">
-                <%= typeof s.val === 'number' ? s.val.toLocaleString('id-ID') : s.val %>
-              </div>
-              <div style="font-size:.7rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px"><%= s.lbl %></div>
-            </div>
-          </div>
-        <% }) %>
-      </div>
-    </div>
-
     <div class="row mb-4 align-items-end">
       <div class="col-lg-7">
         <div class="section-label justify-content-start"><i class="fas fa-map-marked-alt"></i> Sebaran Layanan</div>
@@ -419,6 +390,34 @@
             </div>
           <% }) %>
         </div>
+      </div>
+    </div>
+
+    <!-- Statistik tepat di atas peta, rata tengah, lebar sama maps -->
+    <div style="margin-bottom:16px">
+      <p style="font-size:.68rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#94a3b8;text-align:center;margin-bottom:14px">
+        DATA MOVE SMKN 1 KRAS SEJAK <%= moveStats.tahun_mulai %>
+      </p>
+      <div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:0;background:#f8fafc;border-radius:16px;border:1px solid #e2e8f0;padding:18px 24px">
+        <% var statsArr = [
+          { icon:'fas fa-project-diagram',    val: moveStats.total_proyek,    lbl:'Proyek',         color:'#1a56db' },
+          { icon:'fas fa-users',              val: moveStats.total_siswa,     lbl:'Siswa Terlibat', color:'#0891b2' },
+          { icon:'fas fa-map-marker-alt',     val: moveStats.total_pelanggan, lbl:'Titik Layanan',  color:'#059669' },
+          { icon:'fas fa-graduation-cap',     val: moveStats.total_jurusan,   lbl:'Jurusan Aktif',  color:'#dc2626' },
+          { icon:'fas fa-calendar-check',     val: (new Date().getFullYear() - moveStats.tahun_mulai + 1), lbl:'Tahun Berjalan', color:'#7c3aed' },
+          { icon:'fas fa-hand-holding-heart', val:'100%',                     lbl:'Gratis',         color:'#d97706' }
+        ]; %>
+        <% statsArr.forEach(function(s, si){ %>
+          <div style="display:flex;align-items:center;gap:10px;padding:0 28px;<%= si < statsArr.length-1 ? 'border-right:1px solid #e2e8f0;' : '' %>">
+            <i class="<%= s.icon %>" style="font-size:1.3rem;color:<%= s.color %>"></i>
+            <div>
+              <div style="font-size:1.5rem;font-weight:900;color:<%= s.color %>;line-height:1">
+                <%= typeof s.val === 'number' ? s.val.toLocaleString('id-ID') : s.val %>
+              </div>
+              <div style="font-size:.65rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px"><%= s.lbl %></div>
+            </div>
+          </div>
+        <% }) %>
       </div>
     </div>
 

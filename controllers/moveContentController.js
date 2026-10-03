@@ -132,15 +132,27 @@ exports.proyekEditPage = async (req, res) => {
   try {
     const program = await getProgram(req.params.id);
     if (!program) return res.redirect('/admin/move');
-    const [[rows]] = await db.query('SELECT * FROM move_proyek WHERE id=? AND program_id=?', [req.params.pid, program.id]);
+    // Query kolom spesifik agar tidak error jika kolom baru belum ada
+    const [rows] = await db.query(`
+      SELECT id, program_id, judul, deskripsi, tahun, lokasi, gambar, status, featured,
+             IFNULL(tanggal_pelaksanaan, '') as tanggal_pelaksanaan,
+             IFNULL(jumlah_siswa, '') as jumlah_siswa,
+             IFNULL(jumlah_item, '') as jumlah_item,
+             IFNULL(satuan_item, 'Unit') as satuan_item,
+             IFNULL(nama_pelanggan, '') as nama_pelanggan,
+             IFNULL(kategori_pelanggan, 'Lainnya') as kategori_pelanggan,
+             IFNULL(link_maps, '') as link_maps,
+             IFNULL(link_publikasi, '') as link_publikasi
+      FROM move_proyek WHERE id=? AND program_id=?`,
+      [req.params.pid, program.id]
+    );
     if (!rows.length) return res.redirect(`/admin/move/${program.id}/proyek`);
-    // Ambil fotos — graceful fallback jika tabel belum ada
     let fotos = [];
     try {
       const [fotoRows] = await db.query('SELECT * FROM move_proyek_foto WHERE proyek_id=? ORDER BY urutan ASC, id ASC', [req.params.pid]);
       fotos = fotoRows;
     } catch (e) {
-      console.warn('move_proyek_foto belum ada, skip:', e.message);
+      console.warn('move_proyek_foto belum ada:', e.message);
     }
     res.render('admin/move/proyek-form', {
       title: 'Edit Proyek – ' + program.nama,
@@ -151,7 +163,10 @@ exports.proyekEditPage = async (req, res) => {
       msg: req.query.msg || null,
       success: req.query.success
     });
-  } catch (err) { console.error('proyekEditPage error:', err); res.status(500).send('Terjadi kesalahan: ' + err.message); }
+  } catch (err) {
+    console.error('proyekEditPage error:', err);
+    res.status(500).send('Error: ' + err.message);
+  }
 };
 
 exports.proyekUpdate = (req, res) => {

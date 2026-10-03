@@ -550,6 +550,31 @@ async function getMovePrograms() {
   return programs;
 }
 
+/** Helper: singkatan nama jurusan */
+function singkatJurusan(nama) {
+  if (!nama) return '';
+  if (nama.indexOf('Teknik Komputer') >= 0) return 'TKJ';
+  if (nama.indexOf('Teknik Kendaraan') >= 0) return 'TKR';
+  if (nama.indexOf('Teknik Pemanasan') >= 0) return 'TPTUP';
+  if (nama.indexOf('Tata Boga') >= 0 || nama.indexOf('Kuliner') >= 0) return 'Kuliner';
+  if (nama.indexOf('Tata Busana') >= 0) return 'Busana';
+  return nama.substring(0, 10);
+}
+
+/** Helper: deteksi platform dari URL */
+function detectPlatformEjs(url) {
+  if (!url) return { icon: 'fas fa-link', color: '#64748b', bg: '#f1f5f9' };
+  var u = url.toLowerCase();
+  if (u.indexOf('instagram.com') >= 0)  return { icon: 'fab fa-instagram', color: '#e1306c', bg: '#fce7f3' };
+  if (u.indexOf('tiktok.com') >= 0)     return { icon: 'fab fa-tiktok',    color: '#0f172a', bg: '#f1f5f9' };
+  if (u.indexOf('youtube.com') >= 0 || u.indexOf('youtu.be') >= 0) return { icon: 'fab fa-youtube', color: '#ff0000', bg: '#fee2e2' };
+  if (u.indexOf('facebook.com') >= 0)   return { icon: 'fab fa-facebook',  color: '#1877f2', bg: '#eff6ff' };
+  if (u.indexOf('twitter.com') >= 0 || u.indexOf('x.com') >= 0) return { icon: 'fab fa-twitter', color: '#1da1f2', bg: '#e7f3fd' };
+  if (u.indexOf('threads.net') >= 0)    return { icon: 'fas fa-at',        color: '#0f172a', bg: '#f1f5f9' };
+  if (u.indexOf('wa.me') >= 0 || u.indexOf('whatsapp') >= 0) return { icon: 'fab fa-whatsapp', color: '#25d366', bg: '#f0fdf4' };
+  return { icon: 'fas fa-link', color: '#64748b', bg: '#f1f5f9' };
+}
+
 /** GET /move — halaman index semua jurusan */
 exports.moveIndex = async (req, res) => {
   try {
@@ -690,7 +715,9 @@ exports.moveIndex = async (req, res) => {
       allBerita,
       allGaleri,
       tentang,
-      moveStats
+      moveStats,
+      singkatJurusan,
+      detectPlatformEjs
     });
   } catch (err) {
     console.error('MOVE index error:', err);

@@ -371,6 +371,46 @@
   </div>
 </section>
 
+<!-- STATISTIK AGREGAT MOVE -->
+<section style="padding:40px 0 0;background:#fff">
+  <div class="container">
+    <!-- Label -->
+    <div class="d-flex align-items-center mb-4" style="gap:12px">
+      <div style="height:2px;width:32px;background:linear-gradient(90deg,#1e3a5f,#1a56db);border-radius:2px"></div>
+      <span style="font-size:.78rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#1e3a5f">
+        DATA MOVE SMKN 1 KRAS SEJAK <%= moveStats.tahun_mulai %>
+      </span>
+      <div style="height:2px;flex:1;background:linear-gradient(90deg,#e2e8f0,transparent);border-radius:2px"></div>
+    </div>
+
+    <!-- Kartu statistik -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0;background:#f0f7ff;border-radius:20px;overflow:hidden;border:1px solid #dbeafe">
+      <% var stats = [
+        { icon:'fas fa-project-diagram', val: moveStats.total_proyek,    lbl:'Proyek',          color:'#1a56db' },
+        { icon:'fas fa-users',           val: moveStats.total_siswa,     lbl:'Siswa Terlibat',  color:'#0891b2' },
+        { icon:'fas fa-map-marker-alt',  val: moveStats.total_pelanggan, lbl:'Titik Layanan',   color:'#059669' },
+        { icon:'fas fa-graduation-cap',  val: moveStats.total_jurusan,   lbl:'Jurusan Aktif',   color:'#dc2626' },
+        { icon:'fas fa-calendar-check',  val: (new Date().getFullYear() - moveStats.tahun_mulai + 1), lbl:'Tahun Berjalan', color:'#7c3aed' },
+        { icon:'fas fa-hand-holding-heart', val:'100%',                  lbl:'Gratis',          color:'#d97706' }
+      ]; %>
+      <% stats.forEach(function(s, idx){ %>
+        <div style="padding:24px 16px;text-align:center;border-right:<%= idx < stats.length-1 ? '1px solid #dbeafe' : 'none' %>;transition:background .2s"
+          onmouseover="this.style.background='#dbeafe'" onmouseout="this.style.background=''">
+          <div style="width:44px;height:44px;border-radius:12px;background:rgba(30,58,95,.08);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:1.2rem;color:<%= s.color %>">
+            <i class="<%= s.icon %>"></i>
+          </div>
+          <div style="font-size:1.6rem;font-weight:900;color:<%= s.color %>;line-height:1;margin-bottom:4px">
+            <%= typeof s.val === 'number' ? s.val.toLocaleString('id-ID') : s.val %>
+          </div>
+          <div style="font-size:.75rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.5px">
+            <%= s.lbl %>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
 <!-- PETA SEMUA PELANGGAN GABUNGAN -->
 <section class="section-pad" id="peta-gabungan">
   <div class="container">

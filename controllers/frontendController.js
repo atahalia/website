@@ -597,11 +597,36 @@ exports.moveIndex = async (req, res) => {
       desc:  tentang[`move_step${i+1}_desc`]  || d.desc
     }));
 
+    // Statistik agregat untuk banner di atas peta
+    let moveStats = {
+      total_proyek: 0, total_pelanggan: 0, total_siswa: 0,
+      total_jurusan: allJurusan.length, tahun_mulai: new Date().getFullYear(),
+      total_lokasi: 0
+    };
+    try {
+      const [[statsRow]] = await db.query(`
+        SELECT
+          COUNT(DISTINCT mp.id)                          AS total_proyek,
+          COALESCE(SUM(mp.jumlah_siswa), 0)              AS total_siswa,
+          MIN(mp.tahun)                                  AS tahun_mulai
+        FROM move_proyek mp
+        JOIN move_program pr ON pr.id = mp.program_id
+        WHERE mp.status='published' AND pr.status='aktif'
+      `);
+      const [[pelRow]] = await db.query(`SELECT COUNT(*) AS cnt FROM move_pelanggan`);
+      moveStats.total_proyek   = statsRow.total_proyek || 0;
+      moveStats.total_siswa    = statsRow.total_siswa  || 0;
+      moveStats.tahun_mulai    = statsRow.tahun_mulai  || new Date().getFullYear();
+      moveStats.total_pelanggan= pelRow.cnt || 0;
+      moveStats.total_lokasi   = pelRow.cnt || 0;
+    } catch(e) { /* tabel mungkin belum ada kolom baru */ }
+
     res.render('frontend/move-index', {
       title: 'MOVE – Melayani Komunitas Via Edukasi',
       allJurusan,
       allProyek,
-      tentang
+      tentang,
+      moveStats
     });
   } catch (err) {
     console.error('MOVE index error:', err);

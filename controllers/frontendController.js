@@ -588,6 +588,20 @@ exports.moveIndex = async (req, res) => {
       allBerita = beritaRows;
     } catch(e) { console.warn('move_berita error:', e.message); }
 
+    // Ambil galeri gabungan semua jurusan
+    let allGaleri = [];
+    try {
+      const [galeriRows] = await db.query(`
+        SELECT mg.id, mg.gambar, mg.judul,
+               mp.nama as program_nama, mp.slug as program_slug, mp.warna1
+        FROM move_galeri mg
+        JOIN move_program mp ON mp.id = mg.program_id
+        WHERE mp.status = 'aktif'
+        ORDER BY mg.created_at DESC LIMIT 12
+      `);
+      allGaleri = galeriRows;
+    } catch(e) { console.warn('move_galeri error:', e.message); }
+
     // Ambil fotos untuk semua proyek gabungan — graceful fallback
     if (allProyek.length > 0) {
       try {
@@ -674,6 +688,7 @@ exports.moveIndex = async (req, res) => {
       allJurusan,
       allProyek,
       allBerita,
+      allGaleri,
       tentang,
       moveStats
     });

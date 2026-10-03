@@ -501,6 +501,71 @@
 </section>
 <% } %>
 
+<% } %>
+
+<!-- GALERI GABUNGAN SEMUA JURUSAN -->
+<% if (allGaleri && allGaleri.length > 0) { %>
+<section class="section-pad-sm" style="background:#f8fafc" id="galeri-index">
+  <div class="container">
+    <div class="d-flex align-items-end justify-content-between mb-4 flex-wrap" style="gap:12px">
+      <div>
+        <div class="section-label justify-content-start"><i class="fas fa-images"></i> Dokumentasi</div>
+        <h2 class="section-title mb-1">Galeri Kegiatan MOVE</h2>
+        <p style="color:#64748b;font-size:.9rem">Dokumentasi nyata dari semua jurusan di lapangan.</p>
+      </div>
+      <!-- Filter jurusan -->
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <button class="galeri-filter-btn active" data-slug="all"
+          style="padding:5px 16px;border-radius:20px;border:2px solid #1e3a5f;background:#1e3a5f;color:#fff;font-size:.8rem;font-weight:600;cursor:pointer">
+          Semua
+        </button>
+        <% allJurusan.forEach(function(j){ %>
+          <button class="galeri-filter-btn" data-slug="<%= j.slug %>"
+            style="padding:5px 16px;border-radius:20px;border:2px solid #e2e8f0;background:#fff;color:#64748b;font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s"
+            data-color="<%= j.warna1 %>">
+            <span style="width:8px;height:8px;border-radius:50%;background:<%= j.warna1 %>;display:inline-block;margin-right:4px"></span>
+            <%= j.nama.replace('Teknik Komputer Jaringan','TKJ').replace('Teknik Kendaraan Ringan','TKR').replace('Teknik Pemanasan, Tata Udara, dan Pendinginan','TPTUP').replace('Tata Boga','Kuliner') %>
+          </button>
+        <% }) %>
+      </div>
+    </div>
+
+    <!-- Grid masonry-style -->
+    <div id="galeriIndexGrid" style="columns:2;column-gap:12px;-webkit-columns:2"
+      data-cols-sm="2" data-cols-md="3" data-cols-lg="4">
+      <% allGaleri.forEach(function(g){ %>
+        <div class="galeri-idx-item" data-slug="<%= g.program_slug %>"
+          style="break-inside:avoid;margin-bottom:12px;border-radius:12px;overflow:hidden;position:relative;cursor:pointer"
+          onclick="openLightbox('<%= '/uploads/'+g.gambar %>', '<%= (g.judul||'').replace(/'/g,'') %>', '<%= (g.program_nama||'').replace(/'/g,'') %>')">
+          <img src="/uploads/<%= g.gambar %>" alt="<%= g.judul || 'Galeri MOVE' %>"
+            style="width:100%;display:block;transition:transform .3s"
+            loading="lazy"
+            onmouseover="this.style.transform='scale(1.04)'"
+            onmouseout="this.style.transform='scale(1)'">
+          <!-- Badge jurusan -->
+          <div style="position:absolute;bottom:8px;left:8px">
+            <span style="background:<%= g.warna1 %>;color:#fff;font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:10px;backdrop-filter:blur(4px)">
+              <%= g.program_nama.replace('Teknik Komputer Jaringan','TKJ').replace('Teknik Kendaraan Ringan','TKR').replace('Teknik Pemanasan, Tata Udara, dan Pendinginan','TPTUP').replace('Tata Boga','Kuliner') %>
+            </span>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</section>
+<% } %>
+
+<!-- Lightbox sederhana -->
+<div id="lightboxOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:9999;align-items:center;justify-content:center;flex-direction:column"
+  onclick="closeLightbox()">
+  <img id="lightboxImg" src="" style="max-width:90vw;max-height:80vh;border-radius:12px;object-fit:contain">
+  <div style="margin-top:12px;text-align:center">
+    <p id="lightboxCaption" style="color:#fff;font-size:.9rem;margin:0"></p>
+    <p id="lightboxJurusan" style="color:#94a3b8;font-size:.8rem;margin:4px 0 0"></p>
+  </div>
+  <button onclick="closeLightbox()" style="position:absolute;top:20px;right:24px;background:none;border:none;color:#fff;font-size:1.8rem;cursor:pointer">✕</button>
+</div>
+
 <!-- PETA SEMUA PELANGGAN GABUNGAN -->
 <section class="section-pad" id="peta-gabungan">
   <div class="container">
@@ -635,6 +700,37 @@
       applyFilter();
     });
   });
+
+  // ── Filter Galeri ────────────────────────────────────────────────
+  document.querySelectorAll('.galeri-filter-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var slug = this.dataset.slug;
+      document.querySelectorAll('.galeri-filter-btn').forEach(function(b){
+        b.style.background='#fff'; b.style.color='#64748b'; b.style.borderColor='#e2e8f0';
+      });
+      var color = this.dataset.color || '#1e3a5f';
+      if (slug === 'all') color = '#1e3a5f';
+      this.style.background = color; this.style.color='#fff'; this.style.borderColor=color;
+      document.querySelectorAll('.galeri-idx-item').forEach(function(el){
+        el.style.display = (slug === 'all' || el.dataset.slug === slug) ? '' : 'none';
+      });
+    });
+  });
+
+  // Lightbox
+  function openLightbox(src, caption, jurusan) {
+    var ol = document.getElementById('lightboxOverlay');
+    document.getElementById('lightboxImg').src = src;
+    document.getElementById('lightboxCaption').textContent = caption || '';
+    document.getElementById('lightboxJurusan').textContent = jurusan ? 'MOVE ' + jurusan : '';
+    ol.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox() {
+    document.getElementById('lightboxOverlay').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  document.addEventListener('keydown', function(e){ if (e.key==='Escape') closeLightbox(); });
 
   // ── Slider proyek index ────────────────────────────────────────
   (function(){

@@ -8,10 +8,11 @@
   <link href="/assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
   <link href="/assets/css/sb-admin-2.min.css" rel="stylesheet">
   <style>
-    .preview-img{width:100%;max-height:240px;object-fit:cover;border-radius:12px;border:2px solid #e3e6f0}
-    .upload-zone{border:2px dashed #d1d3e2;border-radius:12px;padding:24px;text-align:center;cursor:pointer;transition:all .2s}
-    .upload-zone:hover{border-color:#4e73df;background:#f0f4ff}
-    .section-card-title{font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#858796;margin-bottom:12px}
+    .upload-zone-foto { border:2px dashed #4e73df;border-radius:12px;padding:28px;text-align:center;cursor:pointer;transition:all .2s;background:#f8fbff }
+    .upload-zone-foto:hover { background:#e8f0fe;border-color:#1a56db }
+    .foto-thumb { position:relative;border-radius:8px;overflow:hidden;aspect-ratio:4/5 }
+    .foto-thumb img { width:100%;height:100%;object-fit:cover }
+    .foto-del-btn { position:absolute;top:4px;right:4px;background:rgba(220,38,38,.9);color:#fff;border:none;border-radius:50%;width:24px;height:24px;font-size:.72rem;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0 }
   </style>
 </head>
 <body id="page-top">
@@ -37,24 +38,33 @@
           <h1 class="h3 mb-0 text-gray-800"><%= proyek ? 'Edit' : 'Tambah' %> Proyek — <%= program.nama %></h1>
         </div>
 
-        <% if (error) { %><div class="alert alert-danger"><i class="fas fa-exclamation-circle mr-2"></i><%= error %></div><% } %>
+        <% if (typeof success !== 'undefined' && success) { %>
+          <div class="alert alert-success alert-dismissible fade show">
+            <i class="fas fa-check-circle mr-2"></i>
+            <%= typeof msg !== 'undefined' && msg ? msg : 'Berhasil disimpan!' %>
+            <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+          </div>
+        <% } %>
+        <% if (error) { %>
+          <div class="alert alert-danger"><i class="fas fa-exclamation-circle mr-2"></i><%= error %></div>
+        <% } %>
 
+        <!-- ═══ FORM UTAMA (info + data) ═══ -->
         <form action="/admin/move/<%= program.id %>/proyek/<%= proyek ? proyek.id+'/edit' : 'create' %>" method="POST" enctype="multipart/form-data">
           <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
           <div class="row">
-            <!-- ═══ KOLOM KIRI ═══ -->
+            <!-- KOLOM KIRI -->
             <div class="col-lg-8">
 
-              <!-- Info Dasar -->
+              <!-- Informasi Dasar -->
               <div class="card shadow mb-4">
                 <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-info-circle mr-2"></i>Informasi Dasar</h6></div>
                 <div class="card-body">
                   <div class="form-group">
                     <label class="font-weight-bold" style="font-size:.85rem">Judul Layanan / Proyek *</label>
                     <input type="text" name="judul" class="form-control form-control-lg" required
-                      value="<%= proyek ? proyek.judul : '' %>"
-                      placeholder="cth: Layanan Perawatan Komputer">
+                      value="<%= proyek ? proyek.judul : '' %>" placeholder="cth: Layanan Perawatan Komputer">
                   </div>
                   <div class="row">
                     <div class="col-md-4">
@@ -68,7 +78,7 @@
                       <div class="form-group">
                         <label class="font-weight-bold" style="font-size:.85rem">Tanggal Pelaksanaan</label>
                         <input type="date" name="tanggal_pelaksanaan" class="form-control"
-                          value="<%= proyek && proyek.tanggal_pelaksanaan ? proyek.tanggal_pelaksanaan.substring(0,10) : '' %>">
+                          value="<%= (proyek && proyek.tanggal_pelaksanaan) ? String(proyek.tanggal_pelaksanaan).substring(0,10) : '' %>">
                       </div>
                     </div>
                     <div class="col-md-4">
@@ -84,18 +94,12 @@
                   <div class="form-group">
                     <label class="font-weight-bold" style="font-size:.85rem">Deskripsi Singkat</label>
                     <textarea name="deskripsi" class="form-control" rows="3"
-                      placeholder="Ceritakan kegiatan yang dilakukan dan dampaknya bagi komunitas."><%= proyek ? proyek.deskripsi||'' : '' %></textarea>
+                      placeholder="Ceritakan kegiatan yang dilakukan."><%= proyek ? proyek.deskripsi||'' : '' %></textarea>
                   </div>
-                  <div class="row">
-                    <div class="col-md-12">
-                      <div class="form-group mb-0">
-                        <label class="font-weight-bold d-block" style="font-size:.85rem">Featured</label>
-                        <div class="custom-control custom-switch mt-1">
-                          <input type="hidden" name="featured" value="0">
-                          <input type="checkbox" class="custom-control-input" id="featuredSwitch" name="featured" value="1" <%= (proyek&&proyek.featured)?'checked':'' %>>
-                          <label class="custom-control-label" for="featuredSwitch">Tampilkan di bagian utama halaman landing page</label>
-                        </div>
-                      </div>
+                  <div class="form-group mb-0">
+                    <div class="custom-control custom-switch mt-1">
+                      <input type="checkbox" class="custom-control-input" id="featuredSwitch" name="featured" value="1" <%= (proyek&&proyek.featured)?'checked':'' %>>
+                      <label class="custom-control-label" for="featuredSwitch">Tampilkan di bagian utama halaman landing page</label>
                     </div>
                   </div>
                 </div>
@@ -127,8 +131,7 @@
                       <div class="form-group">
                         <label class="font-weight-bold" style="font-size:.85rem">Satuan Item</label>
                         <input type="text" name="satuan_item" class="form-control"
-                          value="<%= proyek ? proyek.satuan_item||'Unit' : 'Unit' %>"
-                          placeholder="cth: Unit, Mesin, Perangkat">
+                          value="<%= proyek ? proyek.satuan_item||'Unit' : 'Unit' %>" placeholder="Unit">
                       </div>
                     </div>
                   </div>
@@ -144,8 +147,7 @@
                       <div class="form-group">
                         <label class="font-weight-bold" style="font-size:.85rem">Nama Pelanggan</label>
                         <input type="text" name="nama_pelanggan" class="form-control"
-                          value="<%= proyek ? proyek.nama_pelanggan||'' : '' %>"
-                          placeholder="cth: SMPN 1 Kras">
+                          value="<%= proyek ? proyek.nama_pelanggan||'' : '' %>" placeholder="cth: SMPN 1 Kras">
                       </div>
                     </div>
                     <div class="col-md-4">
@@ -162,30 +164,21 @@
                   <div class="form-group">
                     <label class="font-weight-bold" style="font-size:.85rem">Lokasi Lengkap</label>
                     <input type="text" name="lokasi" class="form-control"
-                      value="<%= proyek ? proyek.lokasi||'' : '' %>"
-                      placeholder="cth: Jalan Raya No.4, Dusun Calulan, Purwodadi, Kras, Kediri">
+                      value="<%= proyek ? proyek.lokasi||'' : '' %>" placeholder="Alamat lengkap lokasi kegiatan">
                   </div>
                   <div class="row">
                     <div class="col-md-6">
                       <div class="form-group mb-0">
-                        <label class="font-weight-bold" style="font-size:.85rem">
-                          <i class="fas fa-map-marker-alt text-danger mr-1"></i>Link Google Maps
-                        </label>
+                        <label class="font-weight-bold" style="font-size:.85rem"><i class="fas fa-map-marker-alt text-danger mr-1"></i>Link Google Maps</label>
                         <input type="url" name="link_maps" class="form-control"
-                          value="<%= proyek ? proyek.link_maps||'' : '' %>"
-                          placeholder="https://maps.app.goo.gl/...">
-                        <small class="text-muted">Copy link dari Google Maps → Share</small>
+                          value="<%= proyek ? proyek.link_maps||'' : '' %>" placeholder="https://maps.app.goo.gl/...">
                       </div>
                     </div>
                     <div class="col-md-6">
                       <div class="form-group mb-0">
-                        <label class="font-weight-bold" style="font-size:.85rem">
-                          <i class="fab fa-instagram text-danger mr-1"></i>Link Publikasi
-                        </label>
+                        <label class="font-weight-bold" style="font-size:.85rem"><i class="fab fa-instagram text-danger mr-1"></i>Link Publikasi</label>
                         <input type="url" name="link_publikasi" class="form-control"
-                          value="<%= proyek ? proyek.link_publikasi||'' : '' %>"
-                          placeholder="https://www.instagram.com/p/...">
-                        <small class="text-muted">Link postingan Instagram/media sosial</small>
+                          value="<%= proyek ? proyek.link_publikasi||'' : '' %>" placeholder="https://www.instagram.com/p/...">
                       </div>
                     </div>
                   </div>
@@ -194,79 +187,72 @@
 
             </div>
 
-            <!-- ═══ KOLOM KANAN ═══ -->
+            <!-- KOLOM KANAN -->
             <div class="col-lg-4">
 
-              <!-- ─── FOTO MULTI UPLOAD ─── -->
+              <!-- Foto Proyek -->
               <div class="card shadow mb-4">
                 <div class="card-header py-3 d-flex align-items-center justify-content-between">
                   <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-images mr-2"></i>Foto Proyek</h6>
-                  <span class="badge badge-info" id="fotoBadge">
-                    <span id="fotoCount"><%= fotos ? fotos.length : 0 %></span>/5 foto
-                  </span>
+                  <span class="badge badge-info"><span id="fotoCount"><%= (fotos && fotos.length) ? fotos.length : 0 %></span>/5</span>
                 </div>
                 <div class="card-body">
-
-                  <!-- Foto yang sudah ada (saat edit) -->
+                  <!-- Grid foto yang sudah ada -->
                   <% if (proyek && fotos && fotos.length > 0) { %>
-                    <p class="text-muted mb-2" style="font-size:.78rem"><i class="fas fa-info-circle mr-1"></i>Foto tersimpan (klik × untuk hapus):</p>
-                    <div id="existingFotos" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-bottom:16px">
+                    <p class="text-muted mb-2" style="font-size:.78rem">Klik <i class="fas fa-times text-danger"></i> untuk hapus:</p>
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px">
                       <% fotos.forEach(function(f){ %>
-                        <div class="existing-foto-item" style="position:relative;border-radius:8px;overflow:hidden;aspect-ratio:4/5">
-                          <img src="/uploads/<%= f.gambar %>" style="width:100%;height:100%;object-fit:cover">
-                          <button type="button" onclick="hapusFotoExisting(<%= f.id %>, this)"
-                            style="position:absolute;top:4px;right:4px;background:rgba(220,38,38,.9);color:#fff;border:none;border-radius:50%;width:22px;height:22px;font-size:.7rem;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0">
+                        <div class="foto-thumb">
+                          <img src="/uploads/<%= f.gambar %>" alt="foto">
+                          <button type="button" class="foto-del-btn" onclick="hapusFoto(<%= f.id %>, this)">
                             <i class="fas fa-times"></i>
                           </button>
-                          <input type="hidden" name="hapus_foto_ids" class="hapus-input" value="" disabled>
                         </div>
                       <% }) %>
                     </div>
                   <% } %>
 
-                  <!-- Upload foto baru (auto-submit saat file dipilih) -->
+                  <!-- Area upload (hanya tampil jika proyek sudah ada dan foto < 5) -->
                   <% if (proyek) { %>
-                  <!-- Upload foto (form TERPISAH ada di luar form utama) -->
-                  <% if (proyek) { %>
-                    <label for="fotoMultiInput" id="uploadZoneFoto"
-                      style="display:block;border:2px dashed #d1d3e2;border-radius:12px;padding:28px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:0"
-                      onmouseover="this.style.borderColor='#4e73df';this.style.background='#f0f4ff'"
-                      onmouseout="this.style.borderColor='#d1d3e2';this.style.background=''">
-                      <i class="fas fa-cloud-upload-alt fa-2x mb-2" style="color:#4e73df"></i>
-                      <p class="mb-1" style="font-size:.9rem;font-weight:600;color:#4e73df">Klik di sini untuk pilih foto</p>
-                      <p class="mb-0 text-muted" style="font-size:.75rem">Bisa pilih beberapa sekaligus (maks 5, rasio 4:5)</p>
-                    </label>
-                    <p class="text-muted mt-2 mb-0" style="font-size:.75rem;text-align:center">
-                      <i class="fas fa-magic mr-1 text-success"></i>Foto auto-compress ke WebP 800x1000px
+                    <% var fotoCount = (fotos && fotos.length) ? fotos.length : 0; %>
+                    <% if (fotoCount < 5) { %>
+                      <!-- Tombol upload — diklik via JS, form foto ada di LUAR form ini -->
+                      <div class="upload-zone-foto" onclick="document.getElementById('fotoMultiInput').click()">
+                        <i class="fas fa-cloud-upload-alt fa-2x mb-2" style="color:#4e73df"></i>
+                        <p class="mb-1 font-weight-bold" style="font-size:.9rem;color:#4e73df">Klik untuk pilih foto</p>
+                        <p class="mb-0 text-muted" style="font-size:.75rem">Pilih beberapa sekaligus · Maks <%= 5 - fotoCount %> foto lagi</p>
+                      </div>
+                    <% } else { %>
+                      <div class="alert alert-success py-2 mb-0" style="font-size:.82rem">
+                        <i class="fas fa-check-circle mr-1"></i>Sudah 5 foto (maksimal). Hapus foto untuk upload yang baru.
+                      </div>
+                    <% } %>
+                    <p class="text-muted mt-2 mb-0" style="font-size:.72rem;text-align:center">
+                      <i class="fas fa-compress-arrows-alt mr-1 text-success"></i>Auto-compress ke WebP portrait 800×1000px
                     </p>
                   <% } else { %>
-                    <div style="border:2px dashed #d1d3e2;border-radius:12px;padding:28px;text-align:center;background:#f8f9fc">
+                    <div style="border:2px dashed #d1d3e2;border-radius:12px;padding:24px;text-align:center;background:#f8f9fc">
                       <i class="fas fa-save fa-2x text-muted mb-2 d-block"></i>
                       <p class="text-muted mb-0" style="font-size:.85rem">Simpan proyek dulu, baru bisa upload foto</p>
                     </div>
                   <% } %>
-
-                  <div class="alert alert-light border mt-3 mb-0" style="font-size:.75rem;border-radius:8px;padding:8px 12px">
-                    <i class="fas fa-lightbulb text-warning mr-1"></i>
-                    Gunakan rasio <strong>4:5</strong> (portrait) seperti post Instagram. Foto di-slide otomatis di halaman publik.
-                  </div>
                 </div>
               </div>
 
-              <!-- Preview caption -->
+              <!-- Preview Caption -->
               <div class="card shadow mb-4 border-left-info">
                 <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-info"><i class="fas fa-eye mr-2"></i>Preview Caption</h6></div>
                 <div class="card-body" style="font-size:.82rem;line-height:1.7;color:#5a5c69">
                   <p class="mb-1"><strong id="pv_judul">Judul Proyek</strong></p>
-                  <p class="mb-1" id="pv_tanggal" style="display:none">📅 Pelaksanaan: <span></span></p>
-                  <p class="mb-1" id="pv_siswa"   style="display:none">👨‍🎓 Jumlah Siswa: <span></span></p>
-                  <p class="mb-1" id="pv_item"    style="display:none">🔧 Jumlah Item: <span></span></p>
-                  <p class="mb-1" id="pv_pelanggan" style="display:none">🏢 Pelanggan: <span></span></p>
-                  <p class="mb-1" id="pv_lokasi"  style="display:none">📍 Lokasi: <span></span></p>
+                  <p class="mb-1" id="pv_tanggal" style="display:none">📅 <span></span></p>
+                  <p class="mb-1" id="pv_siswa"   style="display:none">👨‍🎓 <span></span></p>
+                  <p class="mb-1" id="pv_item"    style="display:none">🔧 <span></span></p>
+                  <p class="mb-1" id="pv_pelanggan" style="display:none">🏢 <span></span></p>
+                  <p class="mb-1" id="pv_lokasi"  style="display:none">📍 <span></span></p>
                 </div>
               </div>
 
-              <!-- Tombol simpan -->
+              <!-- Simpan -->
               <div class="card shadow mb-4">
                 <div class="card-body">
                   <button type="submit" class="btn btn-primary btn-block btn-lg">
@@ -282,15 +268,17 @@
           </div>
         </form>
 
-<%# Form upload foto TERPISAH dari form utama � di luar agar tidak nested %>
-<% if (proyek) { %>
-<form action="/admin/move/<%= program.id %>/proyek/<%= proyek.id %>/foto/upload"
-      method="POST" enctype="multipart/form-data" id="formFotoUpload" style="display:none">
-  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-  <input type="file" id="fotoMultiInput" name="foto_baru" accept="image/*" multiple
-    onchange="this.form.submit()">
-</form>
-<% } %>
+        <!-- ═══ FORM UPLOAD FOTO — DI LUAR FORM UTAMA ═══ -->
+        <% if (proyek) { %>
+        <form id="formFotoUpload"
+              action="/admin/move/<%= program.id %>/proyek/<%= proyek.id %>/foto/upload"
+              method="POST" enctype="multipart/form-data" style="display:none">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <input type="file" id="fotoMultiInput" name="foto_baru" accept="image/*" multiple
+            onchange="this.form.submit()">
+        </form>
+        <% } %>
+
       </div>
     </div>
     <%- include('../partials/footer') %>
@@ -300,64 +288,63 @@
 <script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="/assets/js/sb-admin-2.min.js"></script>
 <script>
-  // ── Hapus foto existing via fetch ───────────────────────────────────────
-  function hapusFotoExisting(id, btn) {
-    if (!confirm('Hapus foto ini?')) return;
-    // Submit form hapus via fetch
-    var pid  = '<%= proyek ? proyek.id : "" %>';
-    var progId = '<%= program.id %>';
-    var csrf = '<%= csrfToken %>';
-    fetch('/admin/move/' + progId + '/proyek/' + pid + '/foto/' + id + '/delete', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: '_csrf=' + encodeURIComponent(csrf)
-    }).then(function(r){
-      if (r.ok || r.redirected) {
-        // Hapus elemen dari DOM
-        btn.closest('.existing-foto-item').remove();
-        var cnt = parseInt($('#fotoCount').text()) - 1;
-        $('#fotoCount').text(cnt);
-      } else { alert('Gagal menghapus foto'); }
-    }).catch(function(){ window.location.reload(); });
-  }
+// Live preview caption
+function updatePreview() {
+  var judul    = document.querySelector('[name=judul]').value;
+  var tgl      = document.querySelector('[name=tanggal_pelaksanaan]').value;
+  var siswa    = document.querySelector('[name=jumlah_siswa]').value;
+  var item     = document.querySelector('[name=jumlah_item]').value;
+  var satuan   = document.querySelector('[name=satuan_item]').value || 'Unit';
+  var pelanggan= document.querySelector('[name=nama_pelanggan]').value;
+  var kategori = document.querySelector('[name=kategori_pelanggan]').value;
+  var lokasi   = document.querySelector('[name=lokasi]').value;
 
-  // Live preview caption
-  function updatePreview() {
-    var judul    = $('[name=judul]').val();
-    var tgl      = $('[name=tanggal_pelaksanaan]').val();
-    var siswa    = $('[name=jumlah_siswa]').val();
-    var item     = $('[name=jumlah_item]').val();
-    var satuan   = $('[name=satuan_item]').val() || 'Unit';
-    var pelanggan= $('[name=nama_pelanggan]').val();
-    var kategori = $('[name=kategori_pelanggan]').val();
-    var lokasi   = $('[name=lokasi]').val();
+  document.getElementById('pv_judul').textContent = judul || 'Judul Proyek';
 
-    $('#pv_judul').text(judul || 'Judul Proyek');
+  var elTgl = document.getElementById('pv_tanggal');
+  if (tgl) { var d=new Date(tgl); elTgl.querySelector('span').textContent='Pelaksanaan: '+d.toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}); elTgl.style.display=''; }
+  else { elTgl.style.display='none'; }
 
-    if (tgl) {
-      var d = new Date(tgl);
-      var tglStr = d.toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
-      $('#pv_tanggal span').text(tglStr); $('#pv_tanggal').show();
-    } else { $('#pv_tanggal').hide(); }
+  var elSiswa = document.getElementById('pv_siswa');
+  if (siswa) { elSiswa.querySelector('span').textContent='Jumlah Siswa: '+siswa+' orang'; elSiswa.style.display=''; }
+  else { elSiswa.style.display='none'; }
 
-    if (siswa) { $('#pv_siswa span').text(siswa + ' orang'); $('#pv_siswa').show(); }
-    else { $('#pv_siswa').hide(); }
+  var elItem = document.getElementById('pv_item');
+  if (item) { elItem.querySelector('span').textContent='Jumlah: '+item+' '+satuan; elItem.style.display=''; }
+  else { elItem.style.display='none'; }
 
-    if (item) { $('#pv_item span').text(item + ' ' + satuan); $('#pv_item').show(); }
-    else { $('#pv_item').hide(); }
+  var elPelanggan = document.getElementById('pv_pelanggan');
+  if (pelanggan) { elPelanggan.querySelector('span').textContent='Pelanggan: '+pelanggan+(kategori?' ('+kategori+')':''); elPelanggan.style.display=''; }
+  else { elPelanggan.style.display='none'; }
 
-    if (pelanggan) { $('#pv_pelanggan span').text(pelanggan + (kategori?' ('+kategori+')':'')); $('#pv_pelanggan').show(); }
-    else { $('#pv_pelanggan').hide(); }
+  var elLokasi = document.getElementById('pv_lokasi');
+  if (lokasi) { elLokasi.querySelector('span').textContent=lokasi; elLokasi.style.display=''; }
+  else { elLokasi.style.display='none'; }
+}
 
-    if (lokasi) { $('#pv_lokasi span').text(lokasi); $('#pv_lokasi').show(); }
-    else { $('#pv_lokasi').hide(); }
-  }
+['judul','tanggal_pelaksanaan','jumlah_siswa','jumlah_item','satuan_item','nama_pelanggan','kategori_pelanggan','lokasi'].forEach(function(n){
+  var el = document.querySelector('[name='+n+']');
+  if (el) el.addEventListener('input', updatePreview);
+  if (el && el.tagName === 'SELECT') el.addEventListener('change', updatePreview);
+});
+updatePreview();
 
-  $('[name=judul],[name=tanggal_pelaksanaan],[name=jumlah_siswa],[name=jumlah_item],[name=satuan_item],[name=nama_pelanggan],[name=kategori_pelanggan],[name=lokasi]')
-    .on('input change', updatePreview);
-
-  // Init preview jika edit
-  updatePreview();
+// Hapus foto via fetch
+function hapusFoto(id, btn) {
+  if (!confirm('Hapus foto ini?')) return;
+  var progId = '<%= program.id %>';
+  var pid    = '<%= proyek ? proyek.id : 0 %>';
+  var csrf   = '<%= csrfToken %>';
+  fetch('/admin/move/' + progId + '/proyek/' + pid + '/foto/' + id + '/delete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: '_csrf=' + encodeURIComponent(csrf)
+  }).then(function() {
+    btn.closest('.foto-thumb').remove();
+    var cnt = parseInt(document.getElementById('fotoCount').textContent) - 1;
+    document.getElementById('fotoCount').textContent = cnt;
+  }).catch(function() { location.reload(); });
+}
 </script>
 </body>
 </html>

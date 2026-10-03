@@ -101,12 +101,20 @@
                           <% if (g.judul) { %>
                             <span style="color:#fff;font-size:.75rem;font-weight:600;text-align:center;padding:0 8px"><%= g.judul %></span>
                           <% } %>
-                          <form action="/admin/move/galeri/<%= g.id %>/delete" method="POST" onsubmit="return confirm('Hapus foto ini?')" style="margin:0">
-                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                            <button class="btn btn-sm btn-danger" style="border-radius:8px;padding:4px 12px;font-size:.78rem">
-                              <i class="fas fa-trash mr-1"></i>Hapus
+                          <div style="display:flex;gap:6px">
+                            <button type="button" class="btn btn-sm btn-warning btn-edit-galeri"
+                              data-id="<%= g.id %>"
+                              data-judul="<%= encodeURIComponent(g.judul||'') %>"
+                              style="border-radius:8px;padding:4px 10px;font-size:.78rem;color:#333">
+                              <i class="fas fa-edit"></i>
                             </button>
-                          </form>
+                            <form action="/admin/move/galeri/<%= g.id %>/delete" method="POST" onsubmit="return confirm('Hapus foto ini?')" style="margin:0">
+                              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                              <button class="btn btn-sm btn-danger" style="border-radius:8px;padding:4px 10px;font-size:.78rem">
+                                <i class="fas fa-trash"></i>
+                              </button>
+                            </form>
+                          </div>
                         </div>
                       </div>
                     <% }) %>
@@ -114,6 +122,35 @@
                 <% } %>
               </div>
             </div>
+          </div>
+        </div>
+
+        <!-- Form Edit Keterangan (tersembunyi, muncul saat klik Edit) -->
+        <div class="card shadow mb-4 border-warning" id="formEditGaleriCard" style="display:none">
+          <div class="card-header py-3 d-flex align-items-center justify-content-between" style="background:#fff3cd">
+            <h6 class="m-0 font-weight-bold" style="color:#856404"><i class="fas fa-edit mr-2"></i>Edit Keterangan Foto</h6>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="tutupEditGaleri()">
+              <i class="fas fa-times mr-1"></i>Batal
+            </button>
+          </div>
+          <div class="card-body">
+            <form id="formEditGaleri" action="" method="POST">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <div class="row align-items-end">
+                <div class="col-md-8">
+                  <div class="form-group mb-0">
+                    <label class="font-weight-bold" style="font-size:.85rem">Keterangan Foto</label>
+                    <input type="text" name="judul" id="editGaleriJudul" class="form-control"
+                      placeholder="cth: Workshop Memasak, 15 Agustus 2025">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <button type="submit" class="btn btn-warning btn-block" style="color:#333">
+                    <i class="fas fa-save mr-2"></i>Simpan Keterangan
+                  </button>
+                </div>
+              </div>
+            </form>
           </div>
         </div>
 
@@ -126,6 +163,20 @@
 <script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="/assets/js/sb-admin-2.min.js"></script>
 <script>
+  // Edit keterangan galeri
+  $(document).on('click', '.btn-edit-galeri', function(){
+    var id    = $(this).data('id');
+    var judul = decodeURIComponent($(this).data('judul') || '');
+    $('#editGaleriJudul').val(judul);
+    $('#formEditGaleri').attr('action', '/admin/move/galeri/' + id + '/edit');
+    $('#formEditGaleriCard').slideDown(300);
+    $('html,body').animate({ scrollTop: $('#formEditGaleriCard').offset().top - 80 }, 300);
+  });
+  function tutupEditGaleri() {
+    $('#formEditGaleriCard').slideUp(300);
+    $('#formEditGaleri')[0].reset();
+  }
+
   $('#fileInput').on('change', function(){
     var file = this.files[0];
     if (file) {

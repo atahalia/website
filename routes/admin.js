@@ -460,6 +460,7 @@ router.post('/move/:id/sosmed', isAuthenticated, csrfProtect, validateIdParam, m
 // Galeri
 router.get('/move/:id/galeri',            isAuthenticated, validateIdParam, moveAdminController.galeriPage);
 router.post('/move/:id/galeri/upload',    isAuthenticated, csrfProtect, uploadLimiter, validateIdParam, moveAdminController.galeriUpload);
+router.post('/move/galeri/:gid/edit',     isAuthenticated, csrfProtect, validateIdParam, moveAdminController.galeriEdit);
 router.post('/move/galeri/:gid/delete',   isAuthenticated, csrfProtect, validateIdParam, moveAdminController.galeriDelete);
 
 // Tim Pengelola

@@ -439,3 +439,18 @@ exports.tentangSave = async (req, res) => {
     res.status(500).send('Terjadi kesalahan');
   }
 };
+
+exports.galeriEdit = async (req, res) => {
+  try {
+    const gid = req.params.gid;
+    const { judul } = req.body;
+    const [rows] = await db.query('SELECT program_id FROM move_galeri WHERE id=?', [gid]);
+    if (!rows.length) return res.redirect('/admin/move');
+    await db.query('UPDATE move_galeri SET judul=? WHERE id=?', [judul || '', gid]);
+    clearMoveCache();
+    res.redirect(`/admin/move/${rows[0].program_id}/galeri?success=1`);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Terjadi kesalahan');
+  }
+};

@@ -391,30 +391,6 @@
 <section class="section-pad" id="peta-gabungan">
   <div class="container">
 
-    <!-- Statistik + label tepat di atas peta -->
-    <p style="font-size:.68rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#94a3b8;text-align:center;margin-bottom:12px">
-      DATA MOVE SMKN 1 KRAS SEJAK <%= moveStats.tahun_mulai %>
-    </p>
-    <div style="display:flex;flex-wrap:wrap;justify-content:space-evenly;align-items:center;background:#f8fafc;border-radius:16px;border:1px solid #e2e8f0;padding:20px 0;margin-bottom:12px">
-      <% var statsArr = [
-        { icon:'fas fa-project-diagram',    val: moveStats.total_proyek,    lbl:'Proyek',         color:'#1a56db' },
-        { icon:'fas fa-users',              val: moveStats.total_siswa,     lbl:'Siswa Terlibat', color:'#0891b2' },
-        { icon:'fas fa-map-marker-alt',     val: moveStats.total_pelanggan, lbl:'Titik Layanan',  color:'#059669' },
-        { icon:'fas fa-graduation-cap',     val: moveStats.total_jurusan,   lbl:'Jurusan Aktif',  color:'#dc2626' },
-        { icon:'fas fa-calendar-check',     val: (new Date().getFullYear() - moveStats.tahun_mulai + 1), lbl:'Tahun Berjalan', color:'#7c3aed' },
-        { icon:'fas fa-hand-holding-heart', val:'100%',                     lbl:'Gratis',         color:'#d97706' }
-      ]; %>
-      <% statsArr.forEach(function(s){ %>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px 16px;text-align:center;flex:1">
-          <i class="<%= s.icon %>" style="font-size:1.6rem;color:<%= s.color %>"></i>
-          <div style="font-size:1.5rem;font-weight:900;color:<%= s.color %>;line-height:1">
-            <%= typeof s.val === 'number' ? s.val.toLocaleString('id-ID') : s.val %>
-          </div>
-          <div style="font-size:.65rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px"><%= s.lbl %></div>
-        </div>
-      <% }) %>
-    </div>
-
     <!-- Legend jurusan kanan atas peta -->
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:12px">
       <div>

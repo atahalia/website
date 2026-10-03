@@ -416,13 +416,23 @@
     </div>
 
     <!-- Legend jurusan kanan atas peta -->
-    <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;margin-bottom:8px">
-      <% allJurusan.forEach(function(j){ %>
-        <div style="display:flex;align-items:center;gap:6px;font-size:.8rem;font-weight:600;color:#475569">
-          <span style="width:12px;height:12px;border-radius:50%;background:<%= j.warna1 %>;display:inline-block;flex-shrink:0"></span>
-          <%= singkatJurusan(j.nama) %>
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:12px">
+      <div>
+        <div style="display:inline-flex;align-items:center;gap:8px;margin-bottom:8px">
+          <div style="height:2px;width:28px;background:linear-gradient(90deg,#1e3a5f,#1a56db);border-radius:2px"></div>
+          <span style="font-size:.78rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#1e3a5f"><i class="fas fa-map-marked-alt" style="margin-right:6px"></i>Sebaran Layanan</span>
         </div>
-      <% }) %>
+        <h2 style="font-size:clamp(1.4rem,3vw,2rem);font-weight:800;color:#0f172a;margin:0 0 4px">Peta Semua Lokasi yang Pernah Kami Tangani</h2>
+        <p style="color:#64748b;font-size:.9rem;margin:0">Setiap titik adalah komunitas nyata yang sudah merasakan manfaat program MOVE.</p>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+        <% allJurusan.forEach(function(j){ %>
+          <div style="display:flex;align-items:center;gap:6px;font-size:.8rem;font-weight:600;color:#475569">
+            <span style="width:12px;height:12px;border-radius:50%;background:<%= j.warna1 %>;display:inline-block;flex-shrink:0"></span>
+            <%= singkatJurusan(j.nama) %>
+          </div>
+        <% }) %>
+      </div>
     </div>
     <div style="border-radius:20px;overflow:hidden;border:2px solid #e2e8f0;box-shadow:0 4px 24px rgba(0,0,0,.08)">
       <div id="moveIndexMap" style="height:500px"></div>

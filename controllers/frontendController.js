@@ -503,19 +503,24 @@ async function getMovePrograms() {
     p.pengelola = pengelola;
     p.berita    = berita;
 
-    // Ambil fotos per proyek
+    // Ambil fotos per proyek — graceful fallback jika tabel belum ada
     const proyekIds = proyek.map(pr => pr.id);
     if (proyekIds.length > 0) {
-      const [allFotos] = await db.query(
-        `SELECT * FROM move_proyek_foto WHERE proyek_id IN (${proyekIds.map(() => '?').join(',')}) ORDER BY urutan ASC, id ASC`,
-        proyekIds
-      );
-      const fotosMap = {};
-      allFotos.forEach(f => {
-        if (!fotosMap[f.proyek_id]) fotosMap[f.proyek_id] = [];
-        fotosMap[f.proyek_id].push(f);
-      });
-      proyek.forEach(pr => { pr.fotos = fotosMap[pr.id] || []; });
+      try {
+        const [allFotos] = await db.query(
+          `SELECT * FROM move_proyek_foto WHERE proyek_id IN (${proyekIds.map(() => '?').join(',')}) ORDER BY urutan ASC, id ASC`,
+          proyekIds
+        );
+        const fotosMap = {};
+        allFotos.forEach(f => {
+          if (!fotosMap[f.proyek_id]) fotosMap[f.proyek_id] = [];
+          fotosMap[f.proyek_id].push(f);
+        });
+        proyek.forEach(pr => { pr.fotos = fotosMap[pr.id] || []; });
+      } catch (e) {
+        console.warn('move_proyek_foto belum ada:', e.message);
+        proyek.forEach(pr => { pr.fotos = []; });
+      }
     } else {
       proyek.forEach(pr => { pr.fotos = []; });
     }
@@ -552,19 +557,24 @@ exports.moveIndex = async (req, res) => {
       )
     ]);
 
-    // Ambil fotos untuk semua proyek gabungan
+    // Ambil fotos untuk semua proyek gabungan — graceful fallback
     if (allProyek.length > 0) {
-      const ids = allProyek.map(p => p.id);
-      const [allFotos] = await db.query(
-        `SELECT * FROM move_proyek_foto WHERE proyek_id IN (${ids.map(()=>'?').join(',')}) ORDER BY urutan ASC, id ASC`,
-        ids
-      );
-      const fotosMap = {};
-      allFotos.forEach(f => {
-        if (!fotosMap[f.proyek_id]) fotosMap[f.proyek_id] = [];
-        fotosMap[f.proyek_id].push(f);
-      });
-      allProyek.forEach(p => { p.fotos = fotosMap[p.id] || []; });
+      try {
+        const ids = allProyek.map(p => p.id);
+        const [allFotos] = await db.query(
+          `SELECT * FROM move_proyek_foto WHERE proyek_id IN (${ids.map(()=>'?').join(',')}) ORDER BY urutan ASC, id ASC`,
+          ids
+        );
+        const fotosMap = {};
+        allFotos.forEach(f => {
+          if (!fotosMap[f.proyek_id]) fotosMap[f.proyek_id] = [];
+          fotosMap[f.proyek_id].push(f);
+        });
+        allProyek.forEach(p => { p.fotos = fotosMap[p.id] || []; });
+      } catch (e) {
+        console.warn('move_proyek_foto belum ada:', e.message);
+        allProyek.forEach(p => { p.fotos = []; });
+      }
     }
 
     // Susun settings ke object

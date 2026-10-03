@@ -132,19 +132,26 @@ exports.proyekEditPage = async (req, res) => {
   try {
     const program = await getProgram(req.params.id);
     if (!program) return res.redirect('/admin/move');
-    const [[rows], [fotos]] = await Promise.all([
-      db.query('SELECT * FROM move_proyek WHERE id=? AND program_id=?', [req.params.pid, program.id]),
-      db.query('SELECT * FROM move_proyek_foto WHERE proyek_id=? ORDER BY urutan ASC, id ASC', [req.params.pid])
-    ]);
+    const [[rows]] = await db.query('SELECT * FROM move_proyek WHERE id=? AND program_id=?', [req.params.pid, program.id]);
     if (!rows.length) return res.redirect(`/admin/move/${program.id}/proyek`);
+    // Ambil fotos — graceful fallback jika tabel belum ada
+    let fotos = [];
+    try {
+      const [fotoRows] = await db.query('SELECT * FROM move_proyek_foto WHERE proyek_id=? ORDER BY urutan ASC, id ASC', [req.params.pid]);
+      fotos = fotoRows;
+    } catch (e) {
+      console.warn('move_proyek_foto belum ada, skip:', e.message);
+    }
     res.render('admin/move/proyek-form', {
       title: 'Edit Proyek – ' + program.nama,
       user: req.session,
       program, proyek: rows[0], fotos,
       csrfToken: req.session.csrfToken,
-      error: req.query.error
+      error: req.query.error,
+      msg: req.query.msg || null,
+      success: req.query.success
     });
-  } catch (err) { console.error(err); res.status(500).send('Terjadi kesalahan'); }
+  } catch (err) { console.error('proyekEditPage error:', err); res.status(500).send('Terjadi kesalahan: ' + err.message); }
 };
 
 exports.proyekUpdate = (req, res) => {

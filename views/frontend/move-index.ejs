@@ -462,7 +462,7 @@
       <p style="font-size:.68rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#94a3b8;text-align:center;margin-bottom:14px">
         DATA MOVE SMKN 1 KRAS SEJAK <%= moveStats.tahun_mulai %>
       </p>
-      <div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:0;background:#f8fafc;border-radius:16px;border:1px solid #e2e8f0;padding:18px 24px">
+      <div style="display:flex;flex-wrap:wrap;justify-content:space-evenly;align-items:center;gap:0;background:#f8fafc;border-radius:16px;border:1px solid #e2e8f0;padding:20px 0">
         <% var statsArr = [
           { icon:'fas fa-project-diagram',    val: moveStats.total_proyek,    lbl:'Proyek',         color:'#1a56db' },
           { icon:'fas fa-users',              val: moveStats.total_siswa,     lbl:'Siswa Terlibat', color:'#0891b2' },
@@ -471,9 +471,9 @@
           { icon:'fas fa-calendar-check',     val: (new Date().getFullYear() - moveStats.tahun_mulai + 1), lbl:'Tahun Berjalan', color:'#7c3aed' },
           { icon:'fas fa-hand-holding-heart', val:'100%',                     lbl:'Gratis',         color:'#d97706' }
         ]; %>
-        <% statsArr.forEach(function(s, si){ %>
-          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:12px 28px;text-align:center;<%= si < statsArr.length-1 ? 'border-right:1px solid #e2e8f0;' : '' %>">
-            <i class="<%= s.icon %>" style="font-size:1.5rem;color:<%= s.color %>"></i>
+        <% statsArr.forEach(function(s){ %>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:8px 16px;text-align:center;flex:1">
+            <i class="<%= s.icon %>" style="font-size:1.6rem;color:<%= s.color %>"></i>
             <div style="font-size:1.5rem;font-weight:900;color:<%= s.color %>;line-height:1">
               <%= typeof s.val === 'number' ? s.val.toLocaleString('id-ID') : s.val %>
             </div>

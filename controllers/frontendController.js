@@ -649,7 +649,7 @@ exports.moveIndex = async (req, res) => {
       const [[pelRow]] = await db.query(`SELECT COUNT(*) AS cnt FROM move_pelanggan`);
       moveStats.total_proyek    = statsRow.total_proyek || 0;
       moveStats.total_siswa     = statsRow.total_siswa  || 0;
-      moveStats.tahun_mulai     = statsRow.tahun_mulai  || 2025;
+      moveStats.tahun_mulai     = 2025; // Program MOVE dimulai tahun 2025
       moveStats.total_pelanggan = pelRow.cnt || 0;
       moveStats.total_lokasi    = pelRow.cnt || 0;
     } catch(e) { /* tabel mungkin belum ada kolom baru */ }

@@ -535,8 +535,11 @@
       data-cols-sm="2" data-cols-md="3" data-cols-lg="4">
       <% allGaleri.forEach(function(g){ %>
         <div class="galeri-idx-item" data-slug="<%= g.program_slug %>"
+          data-src="/uploads/<%= g.gambar %>"
+          data-caption="<%= encodeURIComponent(g.judul||'') %>"
+          data-jurusan="<%= encodeURIComponent(g.program_nama||'') %>"
           style="break-inside:avoid;margin-bottom:12px;border-radius:12px;overflow:hidden;position:relative;cursor:pointer"
-          onclick="openLightbox('<%= '/uploads/'+g.gambar %>', '<%= (g.judul||'').replace(/'/g,'') %>', '<%= (g.program_nama||'').replace(/'/g,'') %>')">
+          onclick="openLightboxData(this)">
           <img src="/uploads/<%= g.gambar %>" alt="<%= g.judul || 'Galeri MOVE' %>"
             style="width:100%;display:block;transition:transform .3s"
             loading="lazy"
@@ -717,7 +720,10 @@
     });
   });
 
-  // Lightbox
+  // Lightbox — baca dari data attributes
+  function openLightboxData(el) {
+    openLightbox(el.dataset.src, decodeURIComponent(el.dataset.caption||''), decodeURIComponent(el.dataset.jurusan||''));
+  }
   function openLightbox(src, caption, jurusan) {
     var ol = document.getElementById('lightboxOverlay');
     document.getElementById('lightboxImg').src = src;

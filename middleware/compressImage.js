@@ -17,7 +17,8 @@ function getCompressProfile(req) {
       url.includes('/artikel') || url.includes('/agenda') || url.includes('/prestasi') ||
       url.includes('/bkk') || url.includes('/halaman') || url.includes('/jurusan')) return 'large';
   if (url.includes('/guru') || url.includes('/alumni') || url.includes('/siswa') ||
-      url.includes('/kepsek') || url.includes('/profil')) return 'portrait';
+      url.includes('/kepsek') || url.includes('/profil') || url.includes('/move-proyek') ||
+      url.includes('/move/pengelola')) return 'portrait';
   if (url.includes('/link-terkait') || url.includes('/media-sosial')) return 'thumb';
   return 'default';
 }

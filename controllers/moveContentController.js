@@ -409,7 +409,6 @@ exports.proyekFotoUpload = (req, res) => {
   uploadFotoProyek(req, res, async (err) => {
     if (err) return res.redirect(`/admin/move/${id}/proyek/${pid}/edit?error=${encodeURIComponent(err.message)}`);
     try {
-      // Cek total foto yang sudah ada
       const [[countRow]] = await db.query('SELECT COUNT(*) as cnt FROM move_proyek_foto WHERE proyek_id=?', [pid]);
       const existing = countRow.cnt;
       const files = req.files || [];
@@ -417,19 +416,40 @@ exports.proyekFotoUpload = (req, res) => {
       const toInsert = files.slice(0, sisa);
 
       for (let i = 0; i < toInsert.length; i++) {
-        // Compress setiap file
-        req.file = toInsert[i];
-        await compressImage(req, res, () => {});
-        await db.query(
-          'INSERT INTO move_proyek_foto (proyek_id, gambar, urutan) VALUES (?,?,?)',
-          [pid, toInsert[i].filename, existing + i]
-        );
+        const file = toInsert[i];
+        // Kompresi portrait (800×1000) per file menggunakan sharp langsung
+        const sharp = require('sharp');
+        const inPath  = file.path;
+        const outName = file.filename.replace(/\.[^.]+$/, '') + '.webp';
+        const outPath = require('path').join('uploads', outName);
+        try {
+          await sharp(inPath)
+            .resize(800, 1000, { fit: 'inside', withoutEnlargement: true })
+            .webp({ quality: 80 })
+            .toFile(outPath);
+          // Hapus file original jika berbeda nama
+          if (outPath !== inPath) {
+            require('fs').unlink(inPath, () => {});
+          }
+          await db.query(
+            'INSERT INTO move_proyek_foto (proyek_id, gambar, urutan) VALUES (?,?,?)',
+            [pid, outName, existing + i]
+          );
+        } catch (compressErr) {
+          // Fallback: simpan file original tanpa kompresi
+          console.warn('Kompresi gagal, simpan original:', compressErr.message);
+          await db.query(
+            'INSERT INTO move_proyek_foto (proyek_id, gambar, urutan) VALUES (?,?,?)',
+            [pid, file.filename, existing + i]
+          );
+        }
       }
 
       // Update gambar utama di move_proyek jika belum ada
-      const [proyek] = await db.query('SELECT gambar FROM move_proyek WHERE id=?', [pid]);
-      if (proyek.length && !proyek[0].gambar && toInsert.length > 0) {
-        await db.query('UPDATE move_proyek SET gambar=? WHERE id=?', [toInsert[0].filename, pid]);
+      const [[pRow]] = await db.query('SELECT gambar FROM move_proyek WHERE id=?', [pid]);
+      if (pRow && !pRow.gambar && toInsert.length > 0) {
+        const [firstFoto] = await db.query('SELECT gambar FROM move_proyek_foto WHERE proyek_id=? ORDER BY urutan ASC LIMIT 1', [pid]);
+        if (firstFoto.length) await db.query('UPDATE move_proyek SET gambar=? WHERE id=?', [firstFoto[0].gambar, pid]);
       }
 
       clearMoveCache();
@@ -437,7 +457,7 @@ exports.proyekFotoUpload = (req, res) => {
         ? `${toInsert.length} foto diupload (batas 5 foto per proyek)`
         : `${toInsert.length} foto berhasil diupload`;
       res.redirect(`/admin/move/${id}/proyek/${pid}/edit?success=1&msg=${encodeURIComponent(msg)}`);
-    } catch (e) { console.error(e); res.status(500).send('Terjadi kesalahan'); }
+    } catch (e) { console.error('proyekFotoUpload error:', e); res.status(500).send('Terjadi kesalahan: ' + e.message); }
   });
 };
 

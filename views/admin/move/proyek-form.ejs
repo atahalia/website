@@ -224,32 +224,30 @@
                     </div>
                   <% } %>
 
-                  <!-- Upload foto baru (form terpisah, submit ke route foto) -->
+                  <!-- Upload foto baru (auto-submit saat file dipilih) -->
                   <% if (proyek) { %>
                     <form action="/admin/move/<%= program.id %>/proyek/<%= proyek.id %>/foto/upload"
                           method="POST" enctype="multipart/form-data" id="formFotoUpload">
                       <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                      <div id="uploadZoneFoto" style="border:2px dashed #d1d3e2;border-radius:12px;padding:24px;text-align:center;cursor:pointer;transition:all .2s"
-                        onclick="$('#fotoMultiInput').click()"
+                      <label for="fotoMultiInput" id="uploadZoneFoto"
+                        style="display:block;border:2px dashed #d1d3e2;border-radius:12px;padding:28px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:0"
                         onmouseover="this.style.borderColor='#4e73df';this.style.background='#f0f4ff'"
                         onmouseout="this.style.borderColor='#d1d3e2';this.style.background=''">
-                        <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
-                        <p class="text-muted mb-1" style="font-size:.85rem">Klik untuk pilih foto</p>
-                        <p class="text-muted mb-0" style="font-size:.72rem">Rasio 4:5 · JPG/PNG/WebP · Max 5MB · Maks 5 foto</p>
-                      </div>
-                      <input type="file" id="fotoMultiInput" name="foto_baru" accept="image/*" multiple style="display:none">
-                      <!-- Preview sebelum upload -->
-                      <div id="newFotoPreview" style="display:none;margin-top:10px">
-                        <div id="newFotoGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px"></div>
-                        <button type="submit" class="btn btn-success btn-block btn-sm">
-                          <i class="fas fa-upload mr-1"></i>Upload Foto
-                        </button>
-                      </div>
+                        <i class="fas fa-cloud-upload-alt fa-2x mb-2" style="color:#4e73df"></i>
+                        <p class="mb-1" style="font-size:.9rem;font-weight:600;color:#4e73df">Klik di sini untuk pilih foto</p>
+                        <p class="mb-0 text-muted" style="font-size:.75rem">Bisa pilih beberapa foto sekaligus · Maks 5 · Rasio 4:5</p>
+                      </label>
+                      <input type="file" id="fotoMultiInput" name="foto_baru" accept="image/*" multiple style="display:none"
+                        onchange="document.getElementById('formFotoUpload').submit()">
                     </form>
+                    <p class="text-muted mt-2 mb-0" style="font-size:.75rem;text-align:center">
+                      <i class="fas fa-magic mr-1 text-success"></i>
+                      Foto otomatis di-compress ke WebP portrait 800×1000px
+                    </p>
                   <% } else { %>
-                    <div style="border:2px dashed #d1d3e2;border-radius:12px;padding:24px;text-align:center;background:#f8f9fc">
-                      <i class="fas fa-info-circle text-muted fa-2x mb-2"></i>
-                      <p class="text-muted mb-0" style="font-size:.82rem">Simpan proyek dulu, baru bisa upload foto</p>
+                    <div style="border:2px dashed #d1d3e2;border-radius:12px;padding:28px;text-align:center;background:#f8f9fc">
+                      <i class="fas fa-save fa-2x text-muted mb-2 d-block"></i>
+                      <p class="text-muted mb-0" style="font-size:.85rem">Simpan proyek dulu, baru bisa upload foto</p>
                     </div>
                   <% } %>
 
@@ -297,32 +295,7 @@
 <script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="/assets/js/sb-admin-2.min.js"></script>
 <script>
-  // ── Multi foto preview ───────────────────────────────────────────────
-  $('#fotoMultiInput').on('change', function(){
-    var files = Array.from(this.files);
-    var existingCount = parseInt($('#fotoCount').text()) || 0;
-    var maxNew = 5 - existingCount;
-    if (files.length > maxNew) {
-      alert('Maksimal ' + maxNew + ' foto lagi (sudah ada ' + existingCount + ' foto)');
-      files = files.slice(0, maxNew);
-    }
-    if (files.length === 0) return;
-    $('#newFotoGrid').empty();
-    files.forEach(function(file){
-      var reader = new FileReader();
-      reader.onload = function(e){
-        $('#newFotoGrid').append(
-          '<div style="aspect-ratio:4/5;border-radius:8px;overflow:hidden;border:1px solid #e3e6f0">' +
-          '<img src="' + e.target.result + '" style="width:100%;height:100%;object-fit:cover">' +
-          '</div>'
-        );
-      };
-      reader.readAsDataURL(file);
-    });
-    $('#newFotoPreview').show();
-  });
-
-  // ── Hapus foto existing ───────────────────────────────────────────────
+  // ── Hapus foto existing via fetch ───────────────────────────────────────
   function hapusFotoExisting(id, btn) {
     if (!confirm('Hapus foto ini?')) return;
     // Submit form hapus via fetch

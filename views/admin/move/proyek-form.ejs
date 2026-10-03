@@ -9,8 +9,9 @@
   <link href="/assets/css/sb-admin-2.min.css" rel="stylesheet">
   <style>
     .preview-img{width:100%;max-height:240px;object-fit:cover;border-radius:12px;border:2px solid #e3e6f0}
-    .upload-zone{border:2px dashed #d1d3e2;border-radius:12px;padding:32px;text-align:center;cursor:pointer;transition:all .2s}
+    .upload-zone{border:2px dashed #d1d3e2;border-radius:12px;padding:24px;text-align:center;cursor:pointer;transition:all .2s}
     .upload-zone:hover{border-color:#4e73df;background:#f0f4ff}
+    .section-card-title{font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#858796;margin-bottom:12px}
   </style>
 </head>
 <body id="page-top">
@@ -30,67 +31,173 @@
         </nav>
 
         <div class="d-flex align-items-center mb-4" style="gap:16px">
-          <div style="width:48px;height:48px;border-radius:12px;background:<%= program.warna1 %>;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#fff;flex-shrink:0"><i class="<%= program.icon %>"></i></div>
-          <h1 class="h3 mb-0 text-gray-800"><%= proyek ? 'Edit' : 'Tambah' %> Proyek</h1>
+          <div style="width:48px;height:48px;border-radius:12px;background:<%= program.warna1 %>;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#fff;flex-shrink:0">
+            <i class="<%= program.icon %>"></i>
+          </div>
+          <h1 class="h3 mb-0 text-gray-800"><%= proyek ? 'Edit' : 'Tambah' %> Proyek — <%= program.nama %></h1>
         </div>
 
         <% if (error) { %><div class="alert alert-danger"><i class="fas fa-exclamation-circle mr-2"></i><%= error %></div><% } %>
 
         <form action="/admin/move/<%= program.id %>/proyek/<%= proyek ? proyek.id+'/edit' : 'create' %>" method="POST" enctype="multipart/form-data">
           <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
           <div class="row">
+            <!-- ═══ KOLOM KIRI ═══ -->
             <div class="col-lg-8">
+
+              <!-- Info Dasar -->
               <div class="card shadow mb-4">
-                <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-project-diagram mr-2"></i>Detail Proyek</h6></div>
+                <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-info-circle mr-2"></i>Informasi Dasar</h6></div>
                 <div class="card-body">
                   <div class="form-group">
-                    <label class="font-weight-bold" style="font-size:.85rem">Judul Proyek *</label>
-                    <input type="text" name="judul" class="form-control form-control-lg" value="<%= proyek ? proyek.judul : '' %>" required placeholder="cth: Instalasi WiFi Masjid Al-Hidayah Kras">
+                    <label class="font-weight-bold" style="font-size:.85rem">Judul Layanan / Proyek *</label>
+                    <input type="text" name="judul" class="form-control form-control-lg" required
+                      value="<%= proyek ? proyek.judul : '' %>"
+                      placeholder="cth: Layanan Perawatan Komputer">
                   </div>
                   <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                       <div class="form-group">
-                        <label class="font-weight-bold" style="font-size:.85rem">Tahun Kegiatan *</label>
-                        <input type="number" name="tahun" class="form-control" value="<%= proyek ? proyek.tahun : new Date().getFullYear() %>" min="2020" max="2035" required>
+                        <label class="font-weight-bold" style="font-size:.85rem">Tahun *</label>
+                        <input type="number" name="tahun" class="form-control" required
+                          value="<%= proyek ? proyek.tahun : new Date().getFullYear() %>" min="2020" max="2035">
                       </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                       <div class="form-group">
-                        <label class="font-weight-bold" style="font-size:.85rem">Lokasi</label>
-                        <input type="text" name="lokasi" class="form-control" value="<%= proyek ? proyek.lokasi||'' : '' %>" placeholder="cth: Kras, Kediri">
+                        <label class="font-weight-bold" style="font-size:.85rem">Tanggal Pelaksanaan</label>
+                        <input type="date" name="tanggal_pelaksanaan" class="form-control"
+                          value="<%= proyek && proyek.tanggal_pelaksanaan ? proyek.tanggal_pelaksanaan.substring(0,10) : '' %>">
                       </div>
                     </div>
-                  </div>
-                  <div class="form-group">
-                    <label class="font-weight-bold" style="font-size:.85rem">Deskripsi Kegiatan</label>
-                    <textarea name="deskripsi" class="form-control" rows="5" placeholder="Ceritakan kegiatan proyek ini — apa yang dikerjakan, siapa yang terlibat, dan dampaknya bagi komunitas."><%= proyek ? proyek.deskripsi||'' : '' %></textarea>
-                  </div>
-                  <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                       <div class="form-group">
                         <label class="font-weight-bold" style="font-size:.85rem">Status</label>
                         <select name="status" class="form-control">
-                          <option value="published" <%= (!proyek||proyek.status==='published')?'selected':'' %>>Published (tampil di publik)</option>
-                          <option value="draft" <%= (proyek&&proyek.status==='draft')?'selected':'' %>>Draft (tersembunyi)</option>
+                          <option value="published" <%= (!proyek||proyek.status==='published')?'selected':'' %>>Published</option>
+                          <option value="draft"     <%= (proyek&&proyek.status==='draft')?'selected':'' %>>Draft</option>
                         </select>
                       </div>
                     </div>
-                    <div class="col-md-6">
-                      <div class="form-group">
+                  </div>
+                  <div class="form-group">
+                    <label class="font-weight-bold" style="font-size:.85rem">Deskripsi Singkat</label>
+                    <textarea name="deskripsi" class="form-control" rows="3"
+                      placeholder="Ceritakan kegiatan yang dilakukan dan dampaknya bagi komunitas."><%= proyek ? proyek.deskripsi||'' : '' %></textarea>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12">
+                      <div class="form-group mb-0">
                         <label class="font-weight-bold d-block" style="font-size:.85rem">Featured</label>
-                        <div class="custom-control custom-switch mt-2">
+                        <div class="custom-control custom-switch mt-1">
                           <input type="hidden" name="featured" value="0">
                           <input type="checkbox" class="custom-control-input" id="featuredSwitch" name="featured" value="1" <%= (proyek&&proyek.featured)?'checked':'' %>>
-                          <label class="custom-control-label" for="featuredSwitch">Tampilkan di bagian utama halaman</label>
+                          <label class="custom-control-label" for="featuredSwitch">Tampilkan di bagian utama halaman landing page</label>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
+
+              <!-- Data Kuantitatif -->
+              <div class="card shadow mb-4">
+                <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-chart-bar mr-2"></i>Data Kuantitatif</h6></div>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label class="font-weight-bold" style="font-size:.85rem">Jumlah Siswa</label>
+                        <div class="input-group">
+                          <input type="number" name="jumlah_siswa" class="form-control" min="0"
+                            value="<%= proyek ? proyek.jumlah_siswa||'' : '' %>" placeholder="cth: 12">
+                          <div class="input-group-append"><span class="input-group-text">orang</span></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label class="font-weight-bold" style="font-size:.85rem">Jumlah Item</label>
+                        <input type="number" name="jumlah_item" class="form-control" min="0"
+                          value="<%= proyek ? proyek.jumlah_item||'' : '' %>" placeholder="cth: 20">
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label class="font-weight-bold" style="font-size:.85rem">Satuan Item</label>
+                        <input type="text" name="satuan_item" class="form-control"
+                          value="<%= proyek ? proyek.satuan_item||'Unit' : 'Unit' %>"
+                          placeholder="cth: Unit, Mesin, Perangkat">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Data Pelanggan -->
+              <div class="card shadow mb-4">
+                <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-building mr-2"></i>Data Pelanggan / Lokasi</h6></div>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-8">
+                      <div class="form-group">
+                        <label class="font-weight-bold" style="font-size:.85rem">Nama Pelanggan</label>
+                        <input type="text" name="nama_pelanggan" class="form-control"
+                          value="<%= proyek ? proyek.nama_pelanggan||'' : '' %>"
+                          placeholder="cth: SMPN 1 Kras">
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label class="font-weight-bold" style="font-size:.85rem">Kategori</label>
+                        <select name="kategori_pelanggan" class="form-control">
+                          <% ['Sekolah','Masjid/Mushola','Kantor/Instansi','UMKM','Rumah Tangga','Organisasi','Lainnya'].forEach(function(k){ %>
+                            <option value="<%= k %>" <%= (proyek && proyek.kategori_pelanggan===k)?'selected':'' %>><%= k %></option>
+                          <% }) %>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="font-weight-bold" style="font-size:.85rem">Lokasi Lengkap</label>
+                    <input type="text" name="lokasi" class="form-control"
+                      value="<%= proyek ? proyek.lokasi||'' : '' %>"
+                      placeholder="cth: Jalan Raya No.4, Dusun Calulan, Purwodadi, Kras, Kediri">
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group mb-0">
+                        <label class="font-weight-bold" style="font-size:.85rem">
+                          <i class="fas fa-map-marker-alt text-danger mr-1"></i>Link Google Maps
+                        </label>
+                        <input type="url" name="link_maps" class="form-control"
+                          value="<%= proyek ? proyek.link_maps||'' : '' %>"
+                          placeholder="https://maps.app.goo.gl/...">
+                        <small class="text-muted">Copy link dari Google Maps → Share</small>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group mb-0">
+                        <label class="font-weight-bold" style="font-size:.85rem">
+                          <i class="fab fa-instagram text-danger mr-1"></i>Link Publikasi
+                        </label>
+                        <input type="url" name="link_publikasi" class="form-control"
+                          value="<%= proyek ? proyek.link_publikasi||'' : '' %>"
+                          placeholder="https://www.instagram.com/p/...">
+                        <small class="text-muted">Link postingan Instagram/media sosial</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
             </div>
 
+            <!-- ═══ KOLOM KANAN ═══ -->
             <div class="col-lg-4">
+
+              <!-- Foto -->
               <div class="card shadow mb-4">
                 <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-image mr-2"></i>Foto Proyek</h6></div>
                 <div class="card-body">
@@ -99,7 +206,7 @@
                   <% } else { %>
                     <img src="" class="preview-img mb-3" id="previewImg" style="display:none">
                   <% } %>
-                  <div class="upload-zone" id="uploadZone" onclick="$('#fileInput').click()">
+                  <div class="upload-zone" onclick="$('#fileInput').click()">
                     <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
                     <p class="text-muted mb-0" style="font-size:.85rem">Klik untuk upload foto</p>
                     <p class="text-muted mb-0" style="font-size:.75rem">JPG, PNG, WebP · Max 5MB</p>
@@ -111,12 +218,31 @@
                 </div>
               </div>
 
-              <div class="card shadow mb-4">
-                <div class="card-body">
-                  <button type="submit" class="btn btn-primary btn-block btn-lg"><i class="fas fa-save mr-2"></i>Simpan Proyek</button>
-                  <a href="/admin/move/<%= program.id %>/proyek" class="btn btn-outline-secondary btn-block mt-2"><i class="fas fa-arrow-left mr-2"></i>Kembali</a>
+              <!-- Preview caption -->
+              <div class="card shadow mb-4 border-left-info">
+                <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-info"><i class="fas fa-eye mr-2"></i>Preview Caption Publik</h6></div>
+                <div class="card-body" style="font-size:.82rem;line-height:1.7;color:#5a5c69">
+                  <p class="mb-1"><strong id="pv_judul">Judul Proyek</strong></p>
+                  <p class="mb-1" id="pv_tanggal" style="display:none">📅 Pelaksanaan: <span></span></p>
+                  <p class="mb-1" id="pv_siswa"   style="display:none">👨‍🎓 Jumlah Siswa: <span></span></p>
+                  <p class="mb-1" id="pv_item"    style="display:none">🔧 Jumlah Item: <span></span></p>
+                  <p class="mb-1" id="pv_pelanggan" style="display:none">🏢 Pelanggan: <span></span></p>
+                  <p class="mb-1" id="pv_lokasi"  style="display:none">📍 Lokasi: <span></span></p>
                 </div>
               </div>
+
+              <!-- Tombol simpan -->
+              <div class="card shadow mb-4">
+                <div class="card-body">
+                  <button type="submit" class="btn btn-primary btn-block btn-lg">
+                    <i class="fas fa-save mr-2"></i>Simpan Proyek
+                  </button>
+                  <a href="/admin/move/<%= program.id %>/proyek" class="btn btn-outline-secondary btn-block mt-2">
+                    <i class="fas fa-arrow-left mr-2"></i>Kembali
+                  </a>
+                </div>
+              </div>
+
             </div>
           </div>
         </form>
@@ -129,14 +255,53 @@
 <script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="/assets/js/sb-admin-2.min.js"></script>
 <script>
+  // Preview foto
   $('#fileInput').on('change', function(){
     var file = this.files[0];
     if (file) {
-      var reader = new FileReader();
-      reader.onload = function(e){ $('#previewImg').attr('src',e.target.result).show(); };
-      reader.readAsDataURL(file);
+      var r = new FileReader();
+      r.onload = function(e){ $('#previewImg').attr('src',e.target.result).show(); };
+      r.readAsDataURL(file);
     }
   });
+
+  // Live preview caption
+  function updatePreview() {
+    var judul    = $('[name=judul]').val();
+    var tgl      = $('[name=tanggal_pelaksanaan]').val();
+    var siswa    = $('[name=jumlah_siswa]').val();
+    var item     = $('[name=jumlah_item]').val();
+    var satuan   = $('[name=satuan_item]').val() || 'Unit';
+    var pelanggan= $('[name=nama_pelanggan]').val();
+    var kategori = $('[name=kategori_pelanggan]').val();
+    var lokasi   = $('[name=lokasi]').val();
+
+    $('#pv_judul').text(judul || 'Judul Proyek');
+
+    if (tgl) {
+      var d = new Date(tgl);
+      var tglStr = d.toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
+      $('#pv_tanggal span').text(tglStr); $('#pv_tanggal').show();
+    } else { $('#pv_tanggal').hide(); }
+
+    if (siswa) { $('#pv_siswa span').text(siswa + ' orang'); $('#pv_siswa').show(); }
+    else { $('#pv_siswa').hide(); }
+
+    if (item) { $('#pv_item span').text(item + ' ' + satuan); $('#pv_item').show(); }
+    else { $('#pv_item').hide(); }
+
+    if (pelanggan) { $('#pv_pelanggan span').text(pelanggan + (kategori?' ('+kategori+')':'')); $('#pv_pelanggan').show(); }
+    else { $('#pv_pelanggan').hide(); }
+
+    if (lokasi) { $('#pv_lokasi span').text(lokasi); $('#pv_lokasi').show(); }
+    else { $('#pv_lokasi').hide(); }
+  }
+
+  $('[name=judul],[name=tanggal_pelaksanaan],[name=jumlah_siswa],[name=jumlah_item],[name=satuan_item],[name=nama_pelanggan],[name=kategori_pelanggan],[name=lokasi]')
+    .on('input change', updatePreview);
+
+  // Init preview jika edit
+  updatePreview();
 </script>
 </body>
 </html>

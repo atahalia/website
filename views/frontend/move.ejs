@@ -509,19 +509,90 @@
     <div class="row" id="proyekGrid">
       <% jurusan.proyek.forEach(function(p){ %>
         <div class="col-md-6 col-lg-4 mb-4 proyek-item" data-tahun="<%= p.tahun %>">
-          <div style="background:#fff;border-radius:20px;overflow:hidden;border:1px solid #e8edf4;height:100%;transition:transform .25s,box-shadow .25s">
+          <div style="background:#fff;border-radius:20px;overflow:hidden;border:1px solid #e8edf4;height:100%;transition:transform .25s,box-shadow .25s"
+            onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 32px rgba(0,0,0,.1)'"
+            onmouseout="this.style.transform='none';this.style.boxShadow='none'">
+            <!-- Foto lebih besar -->
             <% if (p.gambar) { %>
-              <div style="height:200px;overflow:hidden"><img src="/uploads/<%= p.gambar %>" alt="<%= p.judul %>" style="width:100%;height:100%;object-fit:cover;transition:transform .4s" loading="lazy"></div>
-            <% } else { %>
-              <div style="height:200px;background:var(--move-gradient);display:flex;align-items:center;justify-content:center;font-size:3rem;color:rgba(255,255,255,.4)"><i class="fas fa-project-diagram"></i></div>
-            <% } %>
-            <div style="padding:20px">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-                <span style="background:var(--move-gradient);color:#fff;padding:3px 12px;border-radius:20px;font-size:.72rem;font-weight:700"><%= p.tahun %></span>
-                <% if (p.lokasi) { %><span style="font-size:.75rem;color:#94a3b8"><i class="fas fa-map-marker-alt" style="margin-right:4px"></i><%= p.lokasi %></span><% } %>
+              <div style="height:220px;overflow:hidden;position:relative">
+                <img src="/uploads/<%= p.gambar %>" alt="<%= p.judul %>"
+                  style="width:100%;height:100%;object-fit:cover;transition:transform .4s"
+                  loading="lazy"
+                  onmouseover="this.style.transform='scale(1.05)'"
+                  onmouseout="this.style.transform='scale(1)'">
+                <!-- Badge tahun overlay -->
+                <span style="position:absolute;top:12px;left:12px;background:var(--move-gradient);color:#fff;padding:4px 12px;border-radius:20px;font-size:.72rem;font-weight:700;backdrop-filter:blur(4px)">
+                  <%= p.tahun %>
+                </span>
               </div>
-              <h5 style="font-weight:700;font-size:.95rem;margin-bottom:8px;color:#0f172a"><%= p.judul %></h5>
-              <% if (p.deskripsi) { %><p style="font-size:.85rem;color:#64748b;line-height:1.6;margin:0"><%= p.deskripsi.substring(0,120) %><%= p.deskripsi.length>120?'...':'' %></p><% } %>
+            <% } else { %>
+              <div style="height:220px;background:var(--move-gradient);display:flex;align-items:center;justify-content:center;position:relative">
+                <i class="fas fa-project-diagram" style="font-size:3rem;color:rgba(255,255,255,.4)"></i>
+                <span style="position:absolute;top:12px;left:12px;background:rgba(255,255,255,.2);color:#fff;padding:4px 12px;border-radius:20px;font-size:.72rem;font-weight:700">
+                  <%= p.tahun %>
+                </span>
+              </div>
+            <% } %>
+
+            <!-- Caption detail -->
+            <div style="padding:18px 20px">
+              <h5 style="font-weight:700;font-size:.95rem;margin-bottom:12px;color:#0f172a;line-height:1.4">
+                <%= p.judul %>
+              </h5>
+
+              <!-- Detail list -->
+              <div style="font-size:.78rem;color:#64748b;line-height:1.8">
+                <% if (p.tanggal_pelaksanaan) { %>
+                  <div style="display:flex;gap:8px;margin-bottom:3px">
+                    <span style="color:#94a3b8;flex-shrink:0">📅</span>
+                    <span>Pelaksanaan: <strong style="color:#475569"><%= new Date(p.tanggal_pelaksanaan).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}) %></strong></span>
+                  </div>
+                <% } %>
+                <% if (p.jumlah_siswa) { %>
+                  <div style="display:flex;gap:8px;margin-bottom:3px">
+                    <span style="color:#94a3b8;flex-shrink:0">👨‍🎓</span>
+                    <span>Jumlah Siswa: <strong style="color:#475569"><%= p.jumlah_siswa %> orang</strong></span>
+                  </div>
+                <% } %>
+                <% if (p.jumlah_item) { %>
+                  <div style="display:flex;gap:8px;margin-bottom:3px">
+                    <span style="color:#94a3b8;flex-shrink:0">🔧</span>
+                    <span>Jumlah: <strong style="color:#475569"><%= p.jumlah_item %> <%= p.satuan_item || 'Unit' %></strong></span>
+                  </div>
+                <% } %>
+                <% if (p.nama_pelanggan) { %>
+                  <div style="display:flex;gap:8px;margin-bottom:3px">
+                    <span style="color:#94a3b8;flex-shrink:0">🏢</span>
+                    <span>Pelanggan: <strong style="color:#475569"><%= p.nama_pelanggan %><% if(p.kategori_pelanggan){ %> <span style="font-weight:400;color:#94a3b8">(<%= p.kategori_pelanggan %>)</span><% } %></strong></span>
+                  </div>
+                <% } %>
+                <% if (p.lokasi) { %>
+                  <div style="display:flex;gap:8px;margin-bottom:3px">
+                    <span style="color:#94a3b8;flex-shrink:0">📍</span>
+                    <span style="color:#475569"><%= p.lokasi %></span>
+                  </div>
+                <% } %>
+              </div>
+
+              <!-- Tombol link -->
+              <% if (p.link_maps || p.link_publikasi) { %>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid #f1f5f9">
+                  <% if (p.link_maps) { %>
+                    <a href="<%= p.link_maps %>" target="_blank" rel="noopener"
+                      style="display:inline-flex;align-items:center;gap:6px;background:#fee2e2;color:#dc2626;padding:5px 12px;border-radius:20px;font-size:.75rem;font-weight:600;text-decoration:none;transition:background .2s"
+                      onmouseover="this.style.background='#fecaca'" onmouseout="this.style.background='#fee2e2'">
+                      <i class="fas fa-map-marker-alt"></i> Lokasi
+                    </a>
+                  <% } %>
+                  <% if (p.link_publikasi) { %>
+                    <a href="<%= p.link_publikasi %>" target="_blank" rel="noopener"
+                      style="display:inline-flex;align-items:center;gap:6px;background:#fce7f3;color:#db2777;padding:5px 12px;border-radius:20px;font-size:.75rem;font-weight:600;text-decoration:none;transition:background .2s"
+                      onmouseover="this.style.background='#fbcfe8'" onmouseout="this.style.background='#fce7f3'">
+                      <i class="fab fa-instagram"></i> Publikasi
+                    </a>
+                  <% } %>
+                </div>
+              <% } %>
             </div>
           </div>
         </div>

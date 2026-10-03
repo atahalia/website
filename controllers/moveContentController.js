@@ -106,11 +106,21 @@ exports.proyekCreate = (req, res) => {
     if (err) return res.redirect(`/admin/move/${pid}/proyek/create?error=${encodeURIComponent(err.message)}`);
     await compressImage(req, res, () => {});
     try {
-      const { judul, deskripsi, tahun, lokasi, status, featured } = req.body;
+      const { judul, deskripsi, tahun, tanggal_pelaksanaan, lokasi, status, featured,
+              jumlah_siswa, jumlah_item, satuan_item, nama_pelanggan, kategori_pelanggan,
+              link_maps, link_publikasi } = req.body;
       const gambar = req.file ? req.file.filename : null;
       await db.query(
-        'INSERT INTO move_proyek (program_id,judul,deskripsi,tahun,lokasi,gambar,status,featured) VALUES (?,?,?,?,?,?,?,?)',
-        [pid, judul, deskripsi||'', tahun||new Date().getFullYear(), lokasi||'', gambar, status||'published', featured==='1'?1:0]
+        `INSERT INTO move_proyek
+          (program_id,judul,deskripsi,tahun,tanggal_pelaksanaan,lokasi,gambar,status,featured,
+           jumlah_siswa,jumlah_item,satuan_item,nama_pelanggan,kategori_pelanggan,link_maps,link_publikasi)
+         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+        [pid, judul, deskripsi||'', tahun||new Date().getFullYear(),
+         tanggal_pelaksanaan||null, lokasi||'', gambar,
+         status||'published', featured==='1'?1:0,
+         jumlah_siswa||null, jumlah_item||null, satuan_item||'Unit',
+         nama_pelanggan||null, kategori_pelanggan||'Lainnya',
+         link_maps||null, link_publikasi||null]
       );
       clearMoveCache();
       res.redirect(`/admin/move/${pid}/proyek?success=1`);
@@ -140,17 +150,30 @@ exports.proyekUpdate = (req, res) => {
     if (err) return res.redirect(`/admin/move/${id}/proyek/${pid}/edit?error=${encodeURIComponent(err.message)}`);
     await compressImage(req, res, () => {});
     try {
-      const { judul, deskripsi, tahun, lokasi, status, featured } = req.body;
+      const { judul, deskripsi, tahun, tanggal_pelaksanaan, lokasi, status, featured,
+              jumlah_siswa, jumlah_item, satuan_item, nama_pelanggan, kategori_pelanggan,
+              link_maps, link_publikasi } = req.body;
       const gambar = req.file ? req.file.filename : null;
+      const baseFields = [judul, deskripsi||'', tahun, tanggal_pelaksanaan||null, lokasi||'',
+                          status||'published', featured==='1'?1:0,
+                          jumlah_siswa||null, jumlah_item||null, satuan_item||'Unit',
+                          nama_pelanggan||null, kategori_pelanggan||'Lainnya',
+                          link_maps||null, link_publikasi||null];
       if (gambar) {
         await db.query(
-          'UPDATE move_proyek SET judul=?,deskripsi=?,tahun=?,lokasi=?,gambar=?,status=?,featured=? WHERE id=? AND program_id=?',
-          [judul, deskripsi||'', tahun, lokasi||'', gambar, status||'published', featured==='1'?1:0, pid, id]
+          `UPDATE move_proyek SET judul=?,deskripsi=?,tahun=?,tanggal_pelaksanaan=?,lokasi=?,
+           status=?,featured=?,jumlah_siswa=?,jumlah_item=?,satuan_item=?,
+           nama_pelanggan=?,kategori_pelanggan=?,link_maps=?,link_publikasi=?,gambar=?
+           WHERE id=? AND program_id=?`,
+          [...baseFields, gambar, pid, id]
         );
       } else {
         await db.query(
-          'UPDATE move_proyek SET judul=?,deskripsi=?,tahun=?,lokasi=?,status=?,featured=? WHERE id=? AND program_id=?',
-          [judul, deskripsi||'', tahun, lokasi||'', status||'published', featured==='1'?1:0, pid, id]
+          `UPDATE move_proyek SET judul=?,deskripsi=?,tahun=?,tanggal_pelaksanaan=?,lokasi=?,
+           status=?,featured=?,jumlah_siswa=?,jumlah_item=?,satuan_item=?,
+           nama_pelanggan=?,kategori_pelanggan=?,link_maps=?,link_publikasi=?
+           WHERE id=? AND program_id=?`,
+          [...baseFields, pid, id]
         );
       }
       clearMoveCache();

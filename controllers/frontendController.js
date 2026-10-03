@@ -508,7 +508,7 @@ async function getMovePrograms() {
     p.deskripsi_singkat = p.deskripsi_singkat || '';
   }));
 
-  cache.set('move_all_programs', programs, 120);
+  cache.set('move_all_programs', programs, 30); // cache 30 detik
   return programs;
 }
 
@@ -520,7 +520,10 @@ exports.moveIndex = async (req, res) => {
     // Ambil semua proyek gabungan semua jurusan
     const [[allProyek], [rows]] = await Promise.all([
       db.query(`
-        SELECT mp.*, pr.nama as program_nama, pr.slug as program_slug,
+        SELECT mp.id, mp.judul, mp.deskripsi, mp.tahun, mp.tanggal_pelaksanaan,
+               mp.lokasi, mp.gambar, mp.jumlah_siswa, mp.jumlah_item, mp.satuan_item,
+               mp.nama_pelanggan, mp.kategori_pelanggan, mp.link_maps, mp.link_publikasi,
+               pr.nama as program_nama, pr.slug as program_slug,
                pr.warna1 as program_warna1, pr.gradient as program_gradient
         FROM move_proyek mp
         JOIN move_program pr ON pr.id = mp.program_id

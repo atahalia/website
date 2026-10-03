@@ -157,7 +157,19 @@
                         </div>
                         <form action="/admin/move/pelanggan/<%= k.id %>/delete" method="POST" onsubmit="return confirm('Hapus titik ini?')" style="margin:0;flex-shrink:0">
                           <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                          <button class="btn btn-xs btn-outline-danger ml-2" style="font-size:.72rem;padding:3px 8px"><i class="fas fa-trash"></i></button>
+                          <div style="display:flex;flex-direction:column;gap:4px">
+                            <button type="button" class="btn btn-xs btn-warning"
+                              style="font-size:.7rem;padding:3px 8px;color:#333"
+                              onclick="bukaEditPelanggan(<%= k.id %>,
+                                '<%- (k.nama||'').replace(/'/g,"\\'").replace(/"/g,'&quot;') %>',
+                                '<%- (k.alamat||'').replace(/'/g,"\\'").replace(/"/g,'&quot;') %>',
+                                '<%- (k.layanan||'').replace(/'/g,"\\'").replace(/"/g,'&quot;') %>',
+                                <%= k.tahun %>, <%= k.lat %>, <%= k.lng %>,
+                                '<%- (k.keterangan||'').replace(/'/g,"\\'").replace(/"/g,'&quot;') %>')">
+                              <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-xs btn-outline-danger" style="font-size:.7rem;padding:3px 8px"><i class="fas fa-trash"></i></button>
+                          </div>
                         </form>
                       </div>
                     </div>
@@ -165,6 +177,71 @@
                 <% }) %>
               </div>
             <% } %>
+          </div>
+        </div>
+
+        <!-- Form Edit Pelanggan (modal-style, tersembunyi) -->
+        <div class="card shadow mb-4 border-warning" id="formEditPelangganCard" style="display:none">
+          <div class="card-header py-3 d-flex align-items-center justify-content-between" style="background:#fff3cd">
+            <h6 class="m-0 font-weight-bold" style="color:#856404"><i class="fas fa-edit mr-2"></i>Edit Titik Lokasi</h6>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="tutupEditPelanggan()">
+              <i class="fas fa-times mr-1"></i>Batal
+            </button>
+          </div>
+          <div class="card-body">
+            <form id="formEditPelanggan" action="" method="POST">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="font-weight-bold" style="font-size:.85rem">Nama Pelanggan / Lokasi *</label>
+                    <input type="text" name="nama" id="ep_nama" class="form-control" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="font-weight-bold" style="font-size:.85rem">Alamat</label>
+                    <input type="text" name="alamat" id="ep_alamat" class="form-control">
+                  </div>
+                  <div class="form-group">
+                    <label class="font-weight-bold" style="font-size:.85rem">Layanan yang Diberikan</label>
+                    <input type="text" name="layanan" id="ep_layanan" class="form-control">
+                  </div>
+                  <div class="form-group">
+                    <label class="font-weight-bold" style="font-size:.85rem">Tahun</label>
+                    <input type="number" name="tahun" id="ep_tahun" class="form-control" min="2020" max="2035">
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-2">
+                    <label class="font-weight-bold" style="font-size:.85rem">Koordinat <span class="text-danger">*</span></label>
+                    <div class="alert alert-info py-2" style="font-size:.78rem;border-radius:8px">
+                      <i class="fas fa-hand-pointer mr-1"></i>Klik peta di atas untuk update koordinat, atau edit manual di bawah.
+                    </div>
+                    <div id="ep_koordinatDisplay" class="koordinat-display mb-2" style="font-size:.82rem">-</div>
+                  </div>
+                  <div class="row">
+                    <div class="col-6">
+                      <div class="form-group">
+                        <label style="font-size:.78rem;color:#858796">Latitude</label>
+                        <input type="text" name="lat" id="ep_lat" class="form-control form-control-sm" required style="font-family:monospace">
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <div class="form-group">
+                        <label style="font-size:.78rem;color:#858796">Longitude</label>
+                        <input type="text" name="lng" id="ep_lng" class="form-control form-control-sm" required style="font-family:monospace">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="font-weight-bold" style="font-size:.85rem">Keterangan</label>
+                    <textarea name="keterangan" id="ep_keterangan" class="form-control" rows="2"></textarea>
+                  </div>
+                  <button type="submit" class="btn btn-warning btn-block" style="color:#333">
+                    <i class="fas fa-save mr-2"></i>Simpan Perubahan
+                  </button>
+                </div>
+              </div>
+            </form>
           </div>
         </div>
 
@@ -219,20 +296,61 @@ fetch('/api/move/pelanggan')
     });
   });
 
-// Klik peta untuk pilih koordinat
+// Klik peta untuk pilih koordinat (untuk form tambah dan edit)
 var tempMarker = null;
+var editMode = false;
 adminMap.on('click', function(e){
   var lat = e.latlng.lat.toFixed(7);
   var lng = e.latlng.lng.toFixed(7);
-  $('#latInput').val(lat);
-  $('#lngInput').val(lng);
-  $('#koordinatDisplay').text(lat + ', ' + lng);
+
+  if (editMode) {
+    // Update field edit
+    $('#ep_lat').val(lat);
+    $('#ep_lng').val(lng);
+    $('#ep_koordinatDisplay').text(lat + ', ' + lng);
+  } else {
+    // Update field tambah
+    $('#latInput').val(lat);
+    $('#lngInput').val(lng);
+    $('#koordinatDisplay').text(lat + ', ' + lng);
+  }
+
   if (tempMarker) adminMap.removeLayer(tempMarker);
   var sv = '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="38" viewBox="0 0 28 38">'
     + '<path d="M14 0C8.477 0 4 4.477 4 10c0 7.5 10 24 10 24S24 17.5 24 10C24 4.477 19.523 0 14 0z" fill="#22c55e"/>'
     + '<circle cx="14" cy="10" r="5" fill="white"/></svg>';
   var ic = L.divIcon({ html: sv, iconSize:[28,38], iconAnchor:[14,38], className:'' });
-  tempMarker = L.marker([lat, lng], { icon: ic }).addTo(adminMap).bindPopup('Lokasi baru dipilih').openPopup();
+  tempMarker = L.marker([lat, lng], { icon: ic }).addTo(adminMap).bindPopup('Lokasi dipilih').openPopup();
+});
+
+// Buka form edit pelanggan
+function bukaEditPelanggan(id, nama, alamat, layanan, tahun, lat, lng, keterangan) {
+  editMode = true;
+  $('#formEditPelangganCard').slideDown(300);
+  $('#formEditPelanggan').attr('action', '/admin/move/pelanggan/' + id + '/edit');
+  $('#ep_nama').val(nama);
+  $('#ep_alamat').val(alamat);
+  $('#ep_layanan').val(layanan);
+  $('#ep_tahun').val(tahun);
+  $('#ep_lat').val(lat);
+  $('#ep_lng').val(lng);
+  $('#ep_keterangan').val(keterangan);
+  $('#ep_koordinatDisplay').text(parseFloat(lat).toFixed(6) + ', ' + parseFloat(lng).toFixed(6));
+  // Scroll ke form edit
+  $('html,body').animate({ scrollTop: $('#formEditPelangganCard').offset().top - 80 }, 400);
+}
+
+// Tutup form edit
+function tutupEditPelanggan() {
+  editMode = false;
+  $('#formEditPelangganCard').slideUp(300);
+}
+
+// Sync lat/lng manual ke display
+$('#ep_lat, #ep_lng').on('input', function(){
+  var lat = $('#ep_lat').val();
+  var lng = $('#ep_lng').val();
+  if (lat && lng) $('#ep_koordinatDisplay').text(parseFloat(lat).toFixed(6) + ', ' + parseFloat(lng).toFixed(6));
 });
 </script>
 </body>

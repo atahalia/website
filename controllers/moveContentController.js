@@ -326,6 +326,26 @@ exports.pelangganDelete = async (req, res) => {
   } catch (err) { console.error(err); res.status(500).send('Terjadi kesalahan'); }
 };
 
+exports.pelangganEdit = async (req, res) => {
+  try {
+    const klid = req.params.klid;
+    const { nama, alamat, layanan, tahun, lat, lng, keterangan } = req.body;
+    if (!lat || !lng || isNaN(parseFloat(lat)) || isNaN(parseFloat(lng))) {
+      const [rows] = await db.query('SELECT program_id FROM move_pelanggan WHERE id=?', [klid]);
+      const pid = rows.length ? rows[0].program_id : '';
+      return res.redirect(`/admin/move/${pid}/pelanggan?error=Koordinat+tidak+valid`);
+    }
+    const [rows] = await db.query('SELECT program_id FROM move_pelanggan WHERE id=?', [klid]);
+    if (!rows.length) return res.redirect('/admin/move');
+    await db.query(
+      'UPDATE move_pelanggan SET nama=?, alamat=?, layanan=?, tahun=?, lat=?, lng=?, keterangan=? WHERE id=?',
+      [nama, alamat||'', layanan||'', tahun||new Date().getFullYear(), parseFloat(lat), parseFloat(lng), keterangan||'', klid]
+    );
+    clearMoveCache();
+    res.redirect(`/admin/move/${rows[0].program_id}/pelanggan?success=1`);
+  } catch (err) { console.error(err); res.status(500).send('Terjadi kesalahan'); }
+};
+
 // ── API: semua pelanggan untuk peta publik ────────────────────────────
 exports.apiPelanggan = async (req, res) => {
   try {

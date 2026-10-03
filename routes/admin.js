@@ -487,6 +487,7 @@ router.post('/move/:id/berita/:bid/delete',   isAuthenticated, csrfProtect, vali
 // ── MOVE Content: Pelanggan/Peta ─────────────────────────────────────────────
 router.get('/move/:id/pelanggan',             isAuthenticated, validateIdParam, moveContentController.pelangganPage);
 router.post('/move/:id/pelanggan/add',        isAuthenticated, csrfProtect, validateIdParam, moveContentController.pelangganAdd);
+router.post('/move/pelanggan/:klid/edit',     isAuthenticated, csrfProtect, validateIdParam, moveContentController.pelangganEdit);
 router.post('/move/pelanggan/:klid/delete',   isAuthenticated, csrfProtect, validateIdParam, moveContentController.pelangganDelete);
 
 module.exports = router;

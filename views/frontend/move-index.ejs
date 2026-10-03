@@ -341,7 +341,7 @@
                     </div>
                   <% } %>
                 </div>
-                <% if (p.link_maps || p.link_publikasi) { %>
+                <% if (p.link_maps || p.link_publikasi || p.link_tiktok || p.link_youtube || p.link_facebook) { %>
                   <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;padding-top:10px;border-top:1px solid #f1f5f9">
                     <% if (p.link_maps) { %>
                       <a href="<%= p.link_maps %>" target="_blank" rel="noopener"
@@ -352,7 +352,25 @@
                     <% if (p.link_publikasi) { %>
                       <a href="<%= p.link_publikasi %>" target="_blank" rel="noopener"
                         style="display:inline-flex;align-items:center;gap:5px;background:#fce7f3;color:#db2777;padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:600;text-decoration:none">
-                        <i class="fab fa-instagram"></i> Publikasi
+                        <i class="fab fa-instagram"></i> IG
+                      </a>
+                    <% } %>
+                    <% if (p.link_tiktok) { %>
+                      <a href="<%= p.link_tiktok %>" target="_blank" rel="noopener"
+                        style="display:inline-flex;align-items:center;gap:5px;background:#f1f5f9;color:#0f172a;padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:600;text-decoration:none">
+                        <i class="fab fa-tiktok"></i> TikTok
+                      </a>
+                    <% } %>
+                    <% if (p.link_youtube) { %>
+                      <a href="<%= p.link_youtube %>" target="_blank" rel="noopener"
+                        style="display:inline-flex;align-items:center;gap:5px;background:#fee2e2;color:#ff0000;padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:600;text-decoration:none">
+                        <i class="fab fa-youtube"></i> YT
+                      </a>
+                    <% } %>
+                    <% if (p.link_facebook) { %>
+                      <a href="<%= p.link_facebook %>" target="_blank" rel="noopener"
+                        style="display:inline-flex;align-items:center;gap:5px;background:#eff6ff;color:#1877f2;padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:600;text-decoration:none">
+                        <i class="fab fa-facebook"></i> FB
                       </a>
                     <% } %>
                   </div>

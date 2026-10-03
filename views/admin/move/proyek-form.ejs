@@ -168,19 +168,41 @@
                   </div>
                   <div class="row">
                     <div class="col-md-6">
-                      <div class="form-group mb-0">
+                      <div class="form-group">
                         <label class="font-weight-bold" style="font-size:.85rem"><i class="fas fa-map-marker-alt text-danger mr-1"></i>Link Google Maps</label>
                         <input type="url" name="link_maps" class="form-control"
                           value="<%= proyek ? proyek.link_maps||'' : '' %>" placeholder="https://maps.app.goo.gl/...">
                       </div>
                     </div>
                     <div class="col-md-6">
-                      <div class="form-group mb-0">
-                        <label class="font-weight-bold" style="font-size:.85rem"><i class="fab fa-instagram text-danger mr-1"></i>Link Publikasi</label>
+                      <div class="form-group">
+                        <label class="font-weight-bold" style="font-size:.85rem"><i class="fab fa-instagram" style="color:#e1306c;margin-right:4px"></i>Instagram</label>
                         <input type="url" name="link_publikasi" class="form-control"
                           value="<%= proyek ? proyek.link_publikasi||'' : '' %>" placeholder="https://www.instagram.com/p/...">
                       </div>
                     </div>
+                    <div class="col-md-4">
+                      <div class="form-group mb-0">
+                        <label class="font-weight-bold" style="font-size:.85rem"><i class="fab fa-tiktok" style="color:#000;margin-right:4px"></i>TikTok</label>
+                        <input type="url" name="link_tiktok" class="form-control"
+                          value="<%= proyek ? proyek.link_tiktok||'' : '' %>" placeholder="https://www.tiktok.com/@.../video/...">
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group mb-0">
+                        <label class="font-weight-bold" style="font-size:.85rem"><i class="fab fa-youtube" style="color:#ff0000;margin-right:4px"></i>YouTube</label>
+                        <input type="url" name="link_youtube" class="form-control"
+                          value="<%= proyek ? proyek.link_youtube||'' : '' %>" placeholder="https://www.youtube.com/watch?v=...">
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group mb-0">
+                        <label class="font-weight-bold" style="font-size:.85rem"><i class="fab fa-facebook" style="color:#1877f2;margin-right:4px"></i>Facebook</label>
+                        <input type="url" name="link_facebook" class="form-control"
+                          value="<%= proyek ? proyek.link_facebook||'' : '' %>" placeholder="https://www.facebook.com/...">
+                      </div>
+                    </div>
+                  </div>
                   </div>
                 </div>
               </div>

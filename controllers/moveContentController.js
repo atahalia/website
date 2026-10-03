@@ -108,19 +108,21 @@ exports.proyekCreate = (req, res) => {
     try {
       const { judul, deskripsi, tahun, tanggal_pelaksanaan, lokasi, status, featured,
               jumlah_siswa, jumlah_item, satuan_item, nama_pelanggan, kategori_pelanggan,
-              link_maps, link_publikasi } = req.body;
+              link_maps, link_publikasi, link_tiktok, link_youtube, link_facebook } = req.body;
       const gambar = req.file ? req.file.filename : null;
       await db.query(
         `INSERT INTO move_proyek
           (program_id,judul,deskripsi,tahun,tanggal_pelaksanaan,lokasi,gambar,status,featured,
-           jumlah_siswa,jumlah_item,satuan_item,nama_pelanggan,kategori_pelanggan,link_maps,link_publikasi)
-         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+           jumlah_siswa,jumlah_item,satuan_item,nama_pelanggan,kategori_pelanggan,
+           link_maps,link_publikasi,link_tiktok,link_youtube,link_facebook)
+         VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
         [pid, judul, deskripsi||'', tahun||new Date().getFullYear(),
          tanggal_pelaksanaan||null, lokasi||'', gambar,
          status||'published', featured==='1'?1:0,
          jumlah_siswa||null, jumlah_item||null, satuan_item||'Unit',
          nama_pelanggan||null, kategori_pelanggan||'Lainnya',
-         link_maps||null, link_publikasi||null]
+         link_maps||null, link_publikasi||null,
+         link_tiktok||null, link_youtube||null, link_facebook||null]
       );
       clearMoveCache();
       res.redirect(`/admin/move/${pid}/proyek?success=1`);
@@ -142,7 +144,10 @@ exports.proyekEditPage = async (req, res) => {
              IFNULL(nama_pelanggan, '') as nama_pelanggan,
              IFNULL(kategori_pelanggan, 'Lainnya') as kategori_pelanggan,
              IFNULL(link_maps, '') as link_maps,
-             IFNULL(link_publikasi, '') as link_publikasi
+             IFNULL(link_publikasi, '') as link_publikasi,
+             IFNULL(link_tiktok, '') as link_tiktok,
+             IFNULL(link_youtube, '') as link_youtube,
+             IFNULL(link_facebook, '') as link_facebook
       FROM move_proyek WHERE id=? AND program_id=?`,
       [req.params.pid, program.id]
     );
@@ -177,18 +182,20 @@ exports.proyekUpdate = (req, res) => {
     try {
       const { judul, deskripsi, tahun, tanggal_pelaksanaan, lokasi, status, featured,
               jumlah_siswa, jumlah_item, satuan_item, nama_pelanggan, kategori_pelanggan,
-              link_maps, link_publikasi } = req.body;
+              link_maps, link_publikasi, link_tiktok, link_youtube, link_facebook } = req.body;
       const gambar = req.file ? req.file.filename : null;
       const baseFields = [judul, deskripsi||'', tahun, tanggal_pelaksanaan||null, lokasi||'',
                           status||'published', featured==='1'?1:0,
                           jumlah_siswa||null, jumlah_item||null, satuan_item||'Unit',
                           nama_pelanggan||null, kategori_pelanggan||'Lainnya',
-                          link_maps||null, link_publikasi||null];
+                          link_maps||null, link_publikasi||null,
+                          link_tiktok||null, link_youtube||null, link_facebook||null];
       if (gambar) {
         await db.query(
           `UPDATE move_proyek SET judul=?,deskripsi=?,tahun=?,tanggal_pelaksanaan=?,lokasi=?,
            status=?,featured=?,jumlah_siswa=?,jumlah_item=?,satuan_item=?,
-           nama_pelanggan=?,kategori_pelanggan=?,link_maps=?,link_publikasi=?,gambar=?
+           nama_pelanggan=?,kategori_pelanggan=?,link_maps=?,link_publikasi=?,
+           link_tiktok=?,link_youtube=?,link_facebook=?,gambar=?
            WHERE id=? AND program_id=?`,
           [...baseFields, gambar, pid, id]
         );
@@ -196,7 +203,8 @@ exports.proyekUpdate = (req, res) => {
         await db.query(
           `UPDATE move_proyek SET judul=?,deskripsi=?,tahun=?,tanggal_pelaksanaan=?,lokasi=?,
            status=?,featured=?,jumlah_siswa=?,jumlah_item=?,satuan_item=?,
-           nama_pelanggan=?,kategori_pelanggan=?,link_maps=?,link_publikasi=?
+           nama_pelanggan=?,kategori_pelanggan=?,link_maps=?,link_publikasi=?,
+           link_tiktok=?,link_youtube=?,link_facebook=?
            WHERE id=? AND program_id=?`,
           [...baseFields, pid, id]
         );

@@ -262,27 +262,43 @@
             <div style="background:#fff;border-radius:18px;overflow:hidden;border:1px solid #e8edf4;height:100%;transition:transform .25s,box-shadow .25s"
               onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 32px rgba(0,0,0,.1)'"
               onmouseout="this.style.transform='none';this.style.boxShadow='none'">
-              <!-- Foto rasio 4:5 portrait dengan badge overlay -->
-              <% if (p.gambar) { %>
-                <div style="aspect-ratio:4/5;overflow:hidden;position:relative">
-                  <img src="/uploads/<%= p.gambar %>" alt="<%= p.judul %>"
-                    style="width:100%;height:100%;object-fit:cover;transition:transform .4s" loading="lazy"
-                    onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                  <div style="position:absolute;top:10px;left:10px;display:flex;gap:6px;flex-wrap:wrap">
+              <!-- Foto slider 4:5 portrait dengan badge overlay -->
+              <%
+                var sliderFotosIdx = (p.fotos && p.fotos.length > 0)
+                  ? p.fotos
+                  : (p.gambar ? [{gambar: p.gambar}] : []);
+                var sliderIdIdx = 'sidx_' + p.id;
+              %>
+              <% if (sliderFotosIdx.length > 0) { %>
+                <div class="proyek-slider-idx" id="<%= sliderIdIdx %>" style="aspect-ratio:4/5;position:relative;overflow:hidden;background:#f8fafc">
+                  <% sliderFotosIdx.forEach(function(f, fi){ %>
+                    <div class="slide-item-idx" style="position:absolute;inset:0;transition:opacity .6s;opacity:<%= fi===0?1:0 %>;z-index:<%= fi===0?1:0 %>">
+                      <img src="/uploads/<%= f.gambar %>" alt="<%= p.judul %>"
+                        style="width:100%;height:100%;object-fit:cover" loading="lazy">
+                    </div>
+                  <% }) %>
+                  <!-- Badge overlay -->
+                  <div style="position:absolute;top:10px;left:10px;display:flex;gap:6px;flex-wrap:wrap;z-index:10">
                     <span style="background:<%= p.program_warna1 %>;color:#fff;padding:3px 10px;border-radius:20px;font-size:.68rem;font-weight:700"><%= p.tahun %></span>
                     <span style="background:rgba(255,255,255,.9);color:<%= p.program_warna1 %>;padding:3px 10px;border-radius:20px;font-size:.68rem;font-weight:700">
                       <%= p.program_nama.replace('Teknik Komputer Jaringan','TKJ').replace('Teknik Kendaraan Ringan','TKR').replace('Teknik Pemanasan, Tata Udara, dan Pendinginan','TPTUP').replace('Tata Boga','Kuliner') %>
                     </span>
                   </div>
+                  <!-- Dots -->
+                  <% if (sliderFotosIdx.length > 1) { %>
+                    <div style="position:absolute;bottom:8px;left:0;right:0;display:flex;justify-content:center;gap:5px;z-index:10">
+                      <% sliderFotosIdx.forEach(function(f, fi){ %>
+                        <span class="dot-idx" data-idx="<%= fi %>"
+                          style="width:<%= fi===0?'18px':'7px' %>;height:7px;border-radius:4px;background:rgba(255,255,255,<%= fi===0?.95:.5 %>);transition:all .3s;cursor:pointer"></span>
+                      <% }) %>
+                    </div>
+                  <% } %>
                 </div>
               <% } else { %>
                 <div style="aspect-ratio:4/5;background:<%= p.program_gradient||'linear-gradient(135deg,#1e3a5f,#1a56db)' %>;display:flex;align-items:center;justify-content:center;position:relative">
                   <i class="fas fa-project-diagram" style="font-size:2.5rem;color:rgba(255,255,255,.35)"></i>
-                  <div style="position:absolute;top:10px;left:10px;display:flex;gap:6px">
+                  <div style="position:absolute;top:10px;left:10px;display:flex;gap:6px;z-index:10">
                     <span style="background:rgba(255,255,255,.2);color:#fff;padding:3px 10px;border-radius:20px;font-size:.68rem;font-weight:700"><%= p.tahun %></span>
-                    <span style="background:rgba(255,255,255,.2);color:#fff;padding:3px 10px;border-radius:20px;font-size:.68rem;font-weight:700">
-                      <%= p.program_nama.replace('Teknik Komputer Jaringan','TKJ').replace('Teknik Kendaraan Ringan','TKR').replace('Teknik Pemanasan, Tata Udara, dan Pendinginan','TPTUP').replace('Tata Boga','Kuliner') %>
-                    </span>
                   </div>
                 </div>
               <% } %>
@@ -462,6 +478,27 @@
       applyFilter();
     });
   });
+
+  // ── Slider proyek index ────────────────────────────────────────
+  (function(){
+    document.querySelectorAll('.proyek-slider-idx').forEach(function(slider){
+      var slides = slider.querySelectorAll('.slide-item-idx');
+      var dots   = slider.querySelectorAll('.dot-idx');
+      if (slides.length <= 1) return;
+      var cur = 0;
+      function goTo(n) {
+        slides[cur].style.opacity='0'; slides[cur].style.zIndex='0';
+        dots[cur] && (dots[cur].style.width='7px', dots[cur].style.background='rgba(255,255,255,.5)');
+        cur = (n + slides.length) % slides.length;
+        slides[cur].style.opacity='1'; slides[cur].style.zIndex='1';
+        dots[cur] && (dots[cur].style.width='18px', dots[cur].style.background='rgba(255,255,255,.95)');
+      }
+      var t = setInterval(function(){ goTo(cur+1); }, 3000);
+      dots.forEach(function(d,i){ d.addEventListener('click',function(e){ e.stopPropagation(); clearInterval(t); goTo(i); t=setInterval(function(){goTo(cur+1);},3000); }); });
+      slider.addEventListener('mouseenter',function(){ clearInterval(t); });
+      slider.addEventListener('mouseleave',function(){ t=setInterval(function(){goTo(cur+1);},3000); });
+    });
+  })();
 
   // ── Peta Gabungan Leaflet ────────────────────────────
   if (document.getElementById('moveIndexMap')) {

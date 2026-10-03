@@ -501,8 +501,25 @@ async function getMovePrograms() {
     p.sosmed    = sosmedRows[0] || { instagram:'', tiktok:'', youtube:'', facebook:'', whatsapp:'', embed:'' };
     p.galeri    = galeri;
     p.pengelola = pengelola;
-    p.proyek    = proyek;
     p.berita    = berita;
+
+    // Ambil fotos per proyek
+    const proyekIds = proyek.map(pr => pr.id);
+    if (proyekIds.length > 0) {
+      const [allFotos] = await db.query(
+        `SELECT * FROM move_proyek_foto WHERE proyek_id IN (${proyekIds.map(() => '?').join(',')}) ORDER BY urutan ASC, id ASC`,
+        proyekIds
+      );
+      const fotosMap = {};
+      allFotos.forEach(f => {
+        if (!fotosMap[f.proyek_id]) fotosMap[f.proyek_id] = [];
+        fotosMap[f.proyek_id].push(f);
+      });
+      proyek.forEach(pr => { pr.fotos = fotosMap[pr.id] || []; });
+    } else {
+      proyek.forEach(pr => { pr.fotos = []; });
+    }
+    p.proyek    = proyek;
     // Alias warna_light → warnaLight agar kompatibel dengan template EJS
     p.warnaLight = p.warna_light || '#eff6ff';
     p.deskripsi_singkat = p.deskripsi_singkat || '';
@@ -534,6 +551,21 @@ exports.moveIndex = async (req, res) => {
         `SELECT setting_key, setting_value FROM website_settings WHERE setting_key LIKE 'move_%'`
       )
     ]);
+
+    // Ambil fotos untuk semua proyek gabungan
+    if (allProyek.length > 0) {
+      const ids = allProyek.map(p => p.id);
+      const [allFotos] = await db.query(
+        `SELECT * FROM move_proyek_foto WHERE proyek_id IN (${ids.map(()=>'?').join(',')}) ORDER BY urutan ASC, id ASC`,
+        ids
+      );
+      const fotosMap = {};
+      allFotos.forEach(f => {
+        if (!fotosMap[f.proyek_id]) fotosMap[f.proyek_id] = [];
+        fotosMap[f.proyek_id].push(f);
+      });
+      allProyek.forEach(p => { p.fotos = fotosMap[p.id] || []; });
+    }
 
     // Susun settings ke object
     const tentang = {};

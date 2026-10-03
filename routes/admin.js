@@ -475,6 +475,9 @@ router.post('/move/:id/proyek/create',        isAuthenticated, csrfProtect, uplo
 router.get('/move/:id/proyek/:pid/edit',      isAuthenticated, validateIdParam, moveContentController.proyekEditPage);
 router.post('/move/:id/proyek/:pid/edit',     isAuthenticated, csrfProtect, uploadLimiter, validateIdParam, moveContentController.proyekUpdate);
 router.post('/move/:id/proyek/:pid/delete',   isAuthenticated, csrfProtect, validateIdParam, moveContentController.proyekDelete);
+// Foto proyek (multi-upload)
+router.post('/move/:id/proyek/:pid/foto/upload', isAuthenticated, csrfProtect, uploadLimiter, validateIdParam, moveContentController.proyekFotoUpload);
+router.post('/move/:id/proyek/:pid/foto/:fid/delete', isAuthenticated, csrfProtect, validateIdParam, moveContentController.proyekFotoDelete);
 
 // ── MOVE Content: Berita ─────────────────────────────────────────────────────
 router.get('/move/:id/berita',                isAuthenticated, validateIdParam, moveContentController.beritaPage);

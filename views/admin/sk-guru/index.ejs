@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title><%= title %> - Admin Panel</title>
+    <link rel="icon" type="image/png" href="/assets/img/favicon.png?v=4">
+    <link href="/assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link href="/assets/css/sb-admin-2.min.css" rel="stylesheet">
+    <link href="/assets/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+</head>
+<body id="page-top">
+<div id="wrapper">
+    <%- include('../partials/sidebar') %>
+    <div id="content-wrapper" class="d-flex flex-column">
+        <div id="content">
+            <%- include('../partials/topbar', { user }) %>
+            <div class="container-fluid">
+
+                <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                    <h1 class="h3 mb-0 text-gray-800">
+                        <i class="fas fa-file-contract mr-2 text-primary"></i>Kelola SK Guru
+                    </h1>
+                    <a href="/admin/sk-guru/create" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                        <i class="fas fa-plus fa-sm text-white-50 mr-1"></i>Upload SK Baru
+                    </a>
+                </div>
+
+                <% if (success) { %>
+                <div class="alert alert-success alert-dismissible fade show">
+                    <i class="fas fa-check-circle mr-1"></i>
+                    <%= success === '1' ? 'SK berhasil disimpan.' : success === 'deleted' ? 'SK berhasil dihapus.' : 'Berhasil.' %>
+                    <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+                </div>
+                <% } %>
+
+                <!-- Statistik ringkas -->
+                <div class="row mb-4">
+                    <div class="col-xl-3 col-md-6 mb-3">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total SK</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800"><%= skList.length %></div>
+                                    </div>
+                                    <div class="col-auto"><i class="fas fa-file-contract fa-2x text-gray-300"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6 mb-3">
+                        <div class="card border-left-success shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">SK Mengajar</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800"><%= skList.filter(s => s.jenis === 'sk_mengajar').length %></div>
+                                    </div>
+                                    <div class="col-auto"><i class="fas fa-chalkboard-teacher fa-2x text-gray-300"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6 mb-3">
+                        <div class="card border-left-info shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">SK Tugas Tambahan</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800"><%= skList.filter(s => s.jenis === 'sk_tugas_tambahan').length %></div>
+                                    </div>
+                                    <div class="col-auto"><i class="fas fa-briefcase fa-2x text-gray-300"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6 mb-3">
+                        <div class="card border-left-warning shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Total Penerima</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800"><%= skList.reduce((a,s) => a + (s.jumlah_penerima||0), 0) %></div>
+                                    </div>
+                                    <div class="col-auto"><i class="fas fa-users fa-2x text-gray-300"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabel SK -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-list mr-2"></i>Daftar SK Guru</h6>
+                        <a href="/admin/sk-guru/create" class="btn btn-sm btn-primary">
+                            <i class="fas fa-plus mr-1"></i>Upload SK
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <% if (!skList || skList.length === 0) { %>
+                            <div class="text-center py-5 text-muted">
+                                <i class="fas fa-file-contract fa-3x mb-3 d-block" style="opacity:.3"></i>
+                                <p>Belum ada SK. <a href="/admin/sk-guru/create">Upload SK pertama</a>.</p>
+                            </div>
+                        <% } else { %>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover" id="skTable" width="100%" cellspacing="0">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th style="width:40px">#</th>
+                                        <th>Judul SK</th>
+                                        <th style="width:140px">Jenis</th>
+                                        <th style="width:120px">Tahun Ajaran</th>
+                                        <th style="width:80px">Penerima</th>
+                                        <th style="width:120px">Dibuat</th>
+                                        <th style="width:130px">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% skList.forEach(function(sk, idx) { %>
+                                    <tr>
+                                        <td class="text-center"><%= idx + 1 %></td>
+                                        <td>
+                                            <div class="font-weight-bold"><%= sk.judul %></div>
+                                            <% if (sk.nomor_sk) { %>
+                                                <small class="text-muted">No: <%= sk.nomor_sk %></small>
+                                            <% } %>
+                                            <% if (sk.nama_pembuat) { %>
+                                                <small class="text-muted d-block">Oleh: <%= sk.nama_pembuat %></small>
+                                            <% } %>
+                                        </td>
+                                        <td>
+                                            <% if (sk.jenis === 'sk_mengajar') { %>
+                                                <span class="badge badge-primary"><i class="fas fa-chalkboard-teacher mr-1"></i>SK Mengajar</span>
+                                            <% } else if (sk.jenis === 'sk_tugas_tambahan') { %>
+                                                <span class="badge badge-success"><i class="fas fa-briefcase mr-1"></i>Tugas Tambahan</span>
+                                            <% } else { %>
+                                                <span class="badge badge-secondary"><i class="fas fa-file mr-1"></i>Lainnya</span>
+                                            <% } %>
+                                        </td>
+                                        <td class="text-center"><%= sk.tahun_ajaran || '-' %></td>
+                                        <td class="text-center">
+                                            <span class="badge badge-info"><%= sk.jumlah_penerima || 0 %> guru</span>
+                                        </td>
+                                        <td style="font-size:.82rem">
+                                            <%= sk.created_at ? new Date(sk.created_at).toLocaleDateString('id-ID', {day:'2-digit',month:'short',year:'numeric'}) : '-' %>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex" style="gap:4px">
+                                                <a href="/admin/sk-guru/detail/<%= sk.id %>" class="btn btn-xs btn-info" title="Detail" style="padding:3px 8px">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="/admin/sk-guru/edit/<%= sk.id %>" class="btn btn-xs btn-warning" title="Edit" style="padding:3px 8px">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <form action="/admin/sk-guru/delete/<%= sk.id %>" method="POST"
+                                                      onsubmit="return confirm('Hapus SK ini beserta semua data penerimanya?')" style="margin:0">
+                                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                                    <button class="btn btn-xs btn-danger" title="Hapus" style="padding:3px 8px">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+                        <% } %>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <%- include('../partials/footer') %>
+    </div>
+</div>
+
+<script src="/assets/vendor/jquery/jquery.min.js"></script>
+<script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/vendor/datatables/jquery.dataTables.min.js"></script>
+<script src="/assets/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+<script src="/assets/js/sb-admin-2.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#skTable').DataTable({
+            language: { url: '/assets/vendor/datatables/i18n/id.json' },
+            order: [[5, 'desc']],
+            pageLength: 25,
+            columnDefs: [{ orderable: false, targets: [6] }]
+        });
+    });
+</script>
+</body>
+</html>

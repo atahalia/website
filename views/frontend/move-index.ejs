@@ -415,46 +415,54 @@
       <style>
         .stats-overlay {
           position:absolute; top:0; left:0; right:0; z-index:500;
-          background:rgba(255,255,255,.94); backdrop-filter:blur(8px);
+          background:rgba(255,255,255,.95); backdrop-filter:blur(8px);
           border-bottom:1px solid rgba(0,0,0,.08);
         }
+        /* Di mobile: pindah ke bawah peta, bukan overlay */
+        @media (max-width:639px) {
+          .stats-overlay { position:relative; top:auto; border-bottom:none; border-top:1px solid #e2e8f0; order:2; }
+          .map-peta-wrap { display:flex; flex-direction:column; }
+          #moveIndexMap { order:1; }
+        }
         .stats-row { display:flex; flex-wrap:nowrap; justify-content:space-evenly; align-items:center; padding:8px 0; }
-        .stat-item { display:flex; flex-direction:column; align-items:center; gap:2px; padding:3px 8px; text-align:center; flex:1; min-width:0; }
-        .stat-item i { font-size:.9rem; }
+        .stat-item { display:flex; flex-direction:column; align-items:center; gap:2px; padding:3px 6px; text-align:center; flex:1; min-width:0; }
+        .stat-item i { font-size:.85rem; }
         .stat-item .sv { font-size:.9rem; font-weight:900; line-height:1; }
-        .stat-item .sl { font-size:.5rem; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:.3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+        .stat-item .sl { font-size:.48rem; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:.3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:56px; }
         @media (min-width:640px) {
           .stat-item i { font-size:1.1rem; }
           .stat-item .sv { font-size:1.1rem; }
-          .stat-item .sl { font-size:.58rem; }
+          .stat-item .sl { font-size:.58rem; max-width:none; }
           .stats-row { padding:10px 0; }
         }
-        #moveIndexMap { height:400px; }
+        #moveIndexMap { height:380px; }
         @media (min-width:640px) { #moveIndexMap { height:520px; } }
       </style>
-      <div class="stats-overlay">
-        <div class="stats-row">
-          <% var statsArr = [
-            { icon:'fas fa-project-diagram',    val: moveStats.total_proyek,    lbl:'Proyek',      color:'#1a56db' },
-            { icon:'fas fa-users',              val: moveStats.total_siswa,     lbl:'Siswa',       color:'#0891b2' },
-            { icon:'fas fa-map-marker-alt',     val: moveStats.total_pelanggan, lbl:'Titik',       color:'#059669' },
-            { icon:'fas fa-graduation-cap',     val: moveStats.total_jurusan,   lbl:'Jurusan',     color:'#dc2626' },
-            { icon:'fas fa-calendar-check',     val: (new Date().getFullYear() - moveStats.tahun_mulai + 1), lbl:'Tahun', color:'#7c3aed' },
-            { icon:'fas fa-hand-holding-heart', val:'100%',                     lbl:'Gratis',      color:'#d97706' }
-          ]; %>
-          <% statsArr.forEach(function(s){ %>
-            <div class="stat-item">
-              <i class="<%= s.icon %>" style="color:<%= s.color %>"></i>
-              <div class="sv" style="color:<%= s.color %>"><%= typeof s.val === 'number' ? s.val.toLocaleString('id-ID') : s.val %></div>
-              <div class="sl"><%= s.lbl %></div>
-            </div>
-          <% }) %>
+      <div class="map-peta-wrap" style="position:relative">
+        <div class="stats-overlay">
+          <div class="stats-row">
+            <% var statsArr = [
+              { icon:'fas fa-project-diagram',    val: moveStats.total_proyek,    lbl:'Proyek',      color:'#1a56db' },
+              { icon:'fas fa-users',              val: moveStats.total_siswa,     lbl:'Siswa',       color:'#0891b2' },
+              { icon:'fas fa-map-marker-alt',     val: moveStats.total_pelanggan, lbl:'Titik',       color:'#059669' },
+              { icon:'fas fa-graduation-cap',     val: moveStats.total_jurusan,   lbl:'Jurusan',     color:'#dc2626' },
+              { icon:'fas fa-calendar-check',     val: (new Date().getFullYear() - moveStats.tahun_mulai + 1), lbl:'Tahun', color:'#7c3aed' },
+              { icon:'fas fa-hand-holding-heart', val:'100%',                     lbl:'Gratis',      color:'#d97706' }
+            ]; %>
+            <% statsArr.forEach(function(s){ %>
+              <div class="stat-item">
+                <i class="<%= s.icon %>" style="color:<%= s.color %>"></i>
+                <div class="sv" style="color:<%= s.color %>"><%= typeof s.val === 'number' ? s.val.toLocaleString('id-ID') : s.val %></div>
+                <div class="sl"><%= s.lbl %></div>
+              </div>
+            <% }) %>
+          </div>
+          <div style="text-align:center;font-size:.5rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#cbd5e1;padding:3px 0 5px">
+            DATA MOVE SMKN 1 KRAS SEJAK <%= moveStats.tahun_mulai %>
+          </div>
         </div>
-        <div style="text-align:center;font-size:.5rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#cbd5e1;padding:3px 0 5px">
-          DATA MOVE SMKN 1 KRAS SEJAK <%= moveStats.tahun_mulai %>
-        </div>
+        <div id="moveIndexMap"></div>
       </div>
-      <div id="moveIndexMap"></div>
     </div>
     <p style="font-size:.8rem;color:#94a3b8;margin-top:12px;text-align:center">
       <i class="fas fa-info-circle" style="margin-right:4px"></i>Klik titik untuk detail lokasi. Peta menggunakan <a href="https://openstreetmap.org" target="_blank" style="color:#94a3b8">OpenStreetMap</a>.
